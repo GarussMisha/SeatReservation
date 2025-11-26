@@ -1,0 +1,147 @@
+<script setup>
+import { RouterView, useRoute } from 'vue-router'
+import NotificationToast from './components/NotificationToast.vue'
+import Header from './components/Header.vue'
+import { useAuthStore } from './stores/auth'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
+
+// Показываем Header только для авторизованных пользователей
+const showHeader = computed(() => {
+  return authStore.isAuthenticated && route.name !== 'Login'
+})
+
+// Настройки заголовка в зависимости от маршрута
+const headerConfig = computed(() => {
+  switch (route.name) {
+    case 'Dashboard':
+      return {
+        title: 'Панель управления',
+        showLogout: true,
+        actions: [] // Убираем кнопки на дашборде - мы уже на дашборде
+      }
+    case 'Booking':
+      return {
+        title: 'Бронирование рабочего места',
+        showLogout: true,
+        actions: [
+          {
+            key: 'back',
+            text: '← Назад к дашборду',
+            className: 'back-btn',
+            onClick: () => router.push('/dashboard')
+          },
+          {
+            key: 'toggle',
+            text: 'Мои бронирования',
+            className: 'toggle-btn',
+            onClick: () => {
+              // Это действие должно обрабатываться на странице Booking
+              window.dispatchEvent(new CustomEvent('toggle-booking-mode'))
+            }
+          }
+        ]
+      }
+    case 'Profile':
+      return {
+        title: 'Профиль пользователя',
+        showLogout: true,
+        actions: [
+          {
+            key: 'back',
+            text: '← Назад к дашборду',
+            className: 'back-btn',
+            onClick: () => router.push('/dashboard')
+          }
+        ]
+      }
+    case 'AdminPanel':
+      return {
+        title: 'Административная панель',
+        showLogout: true,
+        actions: [
+          {
+            key: 'back',
+            text: '← Назад к дашборду',
+            className: 'back-btn',
+            onClick: () => router.push('/dashboard')
+          }
+        ]
+      }
+    default:
+      return {
+        title: 'Система бронирования',
+        showLogout: true
+      }
+  }
+})
+
+// Обработчик выхода
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
+}
+</script>
+
+<template>
+  <div id="app">
+    <Header
+      v-if="showHeader"
+      :title="headerConfig.title"
+      :actions="headerConfig.actions"
+      :show-logout="headerConfig.showLogout"
+      @logout="handleLogout"
+    />
+    <RouterView />
+    <NotificationToast />
+  </div>
+</template>
+
+<style>
+#app {
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -khtml-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+button,
+.header-action-btn,
+.nav-btn,
+.filter-btn,
+.today-btn,
+.logout-btn,
+.back-btn,
+.toggle-btn,
+.feature-action,
+.cancel-btn,
+.book-workspace-btn {
+  -webkit-appearance: button;
+  appearance: button;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: inherit;
+  line-height: 1.6;
+}
+</style>

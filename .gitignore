@@ -1,0 +1,5 @@
+*__pycache__*
+/SeatReservetion_back/venv/
+*.db
+*.vscode*
+/SeatReservetion_front/node_modules/
