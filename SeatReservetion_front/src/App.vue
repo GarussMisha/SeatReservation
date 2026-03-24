@@ -72,6 +72,19 @@ const headerConfig = computed(() => {
           }
         ]
       }
+    case 'Notifications':
+      return {
+        title: 'Мои уведомления',
+        showLogout: true,
+        actions: [
+          {
+            key: 'back',
+            text: '← Назад к дашборду',
+            className: 'back-btn',
+            onClick: () => router.push('/dashboard')
+          }
+        ]
+      }
     default:
       return {
         title: 'Система бронирования',
