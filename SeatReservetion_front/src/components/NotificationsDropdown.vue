@@ -174,22 +174,26 @@ onMounted(() => {
 
 .notification-bell-btn {
   position: relative;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
   transition: all 0.2s;
-  color: #6b7280;
+  color: #ffffff;
+  backdrop-filter: blur(10px);
 }
 
 .notification-bell-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
+  transform: scale(1.05);
 }
 
 .notification-bell-btn.has-unread {
-  color: #3b82f6;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.25);
   animation: bell-shake 0.5s ease-in-out;
 }
 
