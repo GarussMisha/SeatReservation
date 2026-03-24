@@ -18,14 +18,16 @@ export const useServerNotificationStore = defineStore('serverNotifications', () 
   const unreadCount = ref(0)
   
   // Загружаем прочитанные уведомления из localStorage
-  const readNotificationsIds = ref(() => {
-    try {
-      const stored = localStorage.getItem(READ_NOTIFICATIONS_KEY)
-      return stored ? JSON.parse(stored) : []
-    } catch {
-      return []
+  let storedReadIds = []
+  try {
+    const stored = localStorage.getItem(READ_NOTIFICATIONS_KEY)
+    if (stored) {
+      storedReadIds = JSON.parse(stored)
     }
-  })()
+  } catch (e) {
+    console.error('Ошибка загрузки прочитанных уведомлений:', e)
+  }
+  const readNotificationsIds = ref(storedReadIds)
 
   // Computed - вычисляемые свойства
   const hasUnreadNotifications = computed(() => unreadCount.value > 0)
