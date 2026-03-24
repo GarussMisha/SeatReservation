@@ -43,10 +43,11 @@ api.interceptors.request.use(
   }
 )
 
-// Добавляем перехватчик для обработки ошибок авторизации
+// Добавляем перехватчик для обработки ошибок авторизации и сети
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Обработка 401 Unauthorized
     if (error.response?.status === 401) {
       // Не редиректим на /login при ошибке самого логина
       if (!error.config.url.includes('/login')) {
@@ -55,6 +56,27 @@ api.interceptors.response.use(
         window.location.href = '/login'
       }
     }
+    // Обработка 403 Forbidden
+    else if (error.response?.status === 403) {
+      console.error('Доступ запрещен:', error.config.url)
+    }
+    // Обработка ошибок сервера (5xx)
+    else if (error.response?.status >= 500) {
+      console.error('Ошибка сервера:', error.response.status, error.response.data?.detail || error.message)
+    }
+    // Обработка таймаута
+    else if (error.code === 'ECONNABORTED') {
+      console.error('Превышено время ожидания ответа сервера')
+    }
+    // Обработка отсутствия подключения к интернету
+    else if (!navigator.onLine) {
+      console.error('Нет подключения к интернету')
+    }
+    // Обработка CORS ошибок
+    else if (error.response?.status === 0) {
+      console.error('Ошибка CORS или сеть недоступна')
+    }
+    
     return Promise.reject(error)
   }
 )
@@ -123,17 +145,6 @@ export const authAPI = {
       return response.data
     } catch (error) {
       console.error('Ошибка получения статистики аккаунтов:', error)
-      throw error
-    }
-  },
-
-  // Обновление аккаунта
-  async updateAccount(accountId, accountData) {
-    try {
-      const response = await api.put(`/api/v1/accounts/${accountId}`, accountData)
-      return response.data
-    } catch (error) {
-      console.error('Ошибка обновления аккаунта:', error)
       throw error
     }
   }
@@ -697,5 +708,8 @@ export const utilsAPI = {
     }
   }
 }
+
+// Notifications API (экспорт для удобства)
+export { notificationsAPI } from './notifications'
 
 export default api
