@@ -26,12 +26,12 @@ from app.schemas.room_object import (
     RoomPlanResponse,
 )
 
-router = APIRouter(prefix="/api/v1/rooms", tags=["Room Objects"])
+router = APIRouter(prefix="/api/v1", tags=["Room Objects"])
 
 
 # === CRUD для RoomObject ===
 
-@router.get("/{room_id}/objects", response_model=List[RoomObjectResponse])
+@router.get("/rooms/{room_id}/objects", response_model=List[RoomObjectResponse])
 def get_room_objects(room_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
     Получить все объекты помещения
@@ -44,7 +44,7 @@ def get_room_objects(room_id: int, skip: int = 0, limit: int = 100, db: Session 
     return objects
 
 
-@router.get("/objects/{object_id}", response_model=RoomObjectResponse)
+@router.get("/rooms/objects/{object_id}", response_model=RoomObjectResponse)
 def get_room_object(object_id: int, db: Session = Depends(get_db)):
     """
     Получить объект помещения по ID
@@ -55,7 +55,7 @@ def get_room_object(object_id: int, db: Session = Depends(get_db)):
     return obj
 
 
-@router.post("/{room_id}/objects", response_model=RoomObjectResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/rooms/{room_id}/objects", response_model=RoomObjectResponse, status_code=status.HTTP_201_CREATED)
 def create_room_object(room_id: int, object_data: RoomObjectCreate, db: Session = Depends(get_db)):
     """
     Создать объект помещения
@@ -105,7 +105,7 @@ def create_room_object(room_id: int, object_data: RoomObjectCreate, db: Session 
     return db_object
 
 
-@router.put("/objects/{object_id}", response_model=RoomObjectResponse)
+@router.put("/rooms/objects/{object_id}", response_model=RoomObjectResponse)
 def update_room_object(object_id: int, update_data: RoomObjectUpdate, db: Session = Depends(get_db)):
     """
     Обновить объект помещения
@@ -126,7 +126,7 @@ def update_room_object(object_id: int, update_data: RoomObjectUpdate, db: Sessio
     return obj
 
 
-@router.delete("/objects/{object_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/rooms/objects/{object_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_room_object(object_id: int, db: Session = Depends(get_db)):
     """
     Удалить объект помещения
@@ -288,7 +288,7 @@ def update_workspace_on_plan(wp_id: int, update_data: WorkspaceOnPlanUpdate, db:
 
 # === Endpoints для управления планом помещения ===
 
-@router.post("/{room_id}/plan", response_model=RoomPlanResponse)
+@router.post("/rooms/{room_id}/plan", response_model=RoomPlanResponse)
 def save_room_plan(room_id: int, plan_data: RoomPlanCreate, db: Session = Depends(get_db)):
     """
     Сохранить весь план помещения
@@ -339,7 +339,7 @@ def save_room_plan(room_id: int, plan_data: RoomPlanCreate, db: Session = Depend
     )
 
 
-@router.get("/{room_id}/plan", response_model=RoomPlanResponse)
+@router.get("/rooms/{room_id}/plan", response_model=RoomPlanResponse)
 def get_room_plan(room_id: int, db: Session = Depends(get_db)):
     """
     Получить весь план помещения

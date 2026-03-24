@@ -101,7 +101,7 @@
       </v-layer>
 
       <!-- Слой 3: Объекты (самый верхний) -->
-      <v-layer ref="objectsLayer" name="objectsLayer">
+      <v-layer ref="objectsLayer">
         <!-- Стены -->
         <v-rect
           v-for="wall in walls"
@@ -378,22 +378,33 @@ const handleContentMouseDown = (e) => {
 }
 
 const handleStageMouseDown = (e) => {
+  console.log('handleStageMouseDown:', {
+    button: e.evt.button,
+    target: e.target,
+    currentTool: props.currentTool,
+    isSelect: props.currentTool === 'select'
+  })
+
   // Левая кнопка мыши
   if (e.evt.button === 0) {
     // Клик на пустом месте - снимаем выделение
     if (e.target === e.target.getStage()) {
       emit('select-object', null)
 
-      // Если активен инструмент добавления
+      // Если активен инструмент добавления (не select)
       if (props.currentTool !== 'select') {
         // Получаем координаты с учетом масштаба и смещения
         const pos = e.target.getStage().getPointerPosition()
+        console.log('Pointer position:', pos)
+        
         const x = (pos.x - props.offset.x) / props.zoom
         const y = (pos.y - props.offset.y) / props.zoom
+        console.log('Calculated position:', { x, y })
 
         // Скругляем до сетки
         const snappedX = snapToGrid(x)
         const snappedY = snapToGrid(y)
+        console.log('Snapped position:', { snappedX, snappedY })
 
         // Проверяем, что координаты в пределах поля
         if (snappedX < 0 || snappedX > fieldWidthPx.value || snappedY < 0 || snappedY > fieldHeightPx.value) {
@@ -424,7 +435,11 @@ const handleStageMouseDown = (e) => {
             stageInstance.batchDraw()
           }
         }, 10)
+      } else {
+        console.log('Инструмент select, объект не создаем')
       }
+    } else {
+      console.log('Клик не по stage, а по:', e.target)
     }
   }
 }
