@@ -87,7 +87,8 @@
             <div
               v-for="notification in filteredNotifications"
               :key="notification.id"
-              :class="['notification-card', notification.status_name === 'pending' ? 'unread' : 'read']"
+              :class="['notification-card', isNotificationUnread(notification) ? 'unread' : 'read']"
+              @click="markAsRead(notification.id)"
             >
               <div class="notification-header">
                 <div class="notification-icon" :class="getIconClass(notification.notification_type)">
@@ -104,7 +105,7 @@
 
               <div class="notification-body">
                 <h3 class="notification-title">{{ notification.subject }}</h3>
-                <div v-if="notification.message" class="notification-message" v-html="truncateMessage(notification.message)"></div>
+                <div v-if="notification.message" class="notification-message">{{ truncateMessage(notification.message) }}</div>
               </div>
 
               <div class="notification-footer">
@@ -201,8 +202,19 @@ const refreshNotifications = async () => {
   }
 }
 
+const markAsRead = (notificationId) => {
+  notificationStore.markAsRead(notificationId)
+}
+
+const isNotificationUnread = (notification) => {
+  // Уведомление считается непрочитанным если:
+  // 1. Оно в статусе pending
+  // 2. Его ID нет в списке прочитанных
+  return notification.status_name === 'pending' && !notificationStore.isRead(notification.id)
+}
+
 const markAllAsRead = () => {
-  notificationStore.unreadCount = 0
+  notificationStore.markAllAsRead()
   toastStore.success('Все уведомления отмечены как прочитанные')
 }
 
@@ -339,7 +351,7 @@ onMounted(async () => {
 
 .notifications-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 2rem auto;
   position: relative;
   z-index: 1;
 }

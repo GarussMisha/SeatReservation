@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { notificationsAPI } from '../services/api'
 
+const READ_NOTIFICATIONS_KEY = 'seatreservation_read_notifications'
+
 /**
  * Store для работы с серверными уведомлениями
  * Отличается от notificationStore тем, что работает с уведомлениями из БД
@@ -14,6 +16,16 @@ export const useServerNotificationStore = defineStore('serverNotifications', () 
   const isLoading = ref(false)
   const error = ref(null)
   const unreadCount = ref(0)
+  
+  // Загружаем прочитанные уведомления из localStorage
+  const readNotificationsIds = ref(() => {
+    try {
+      const stored = localStorage.getItem(READ_NOTIFICATIONS_KEY)
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
+  })()
 
   // Computed - вычисляемые свойства
   const hasUnreadNotifications = computed(() => unreadCount.value > 0)
@@ -204,6 +216,48 @@ export const useServerNotificationStore = defineStore('serverNotifications', () 
     ).length
   }
 
+  /**
+   * Сохранить прочитанные уведомления в localStorage
+   */
+  const saveReadNotifications = () => {
+    try {
+      localStorage.setItem(READ_NOTIFICATIONS_KEY, JSON.stringify(readNotificationsIds.value))
+    } catch (error) {
+      console.error('Ошибка сохранения прочитанных уведомлений:', error)
+    }
+  }
+
+  /**
+   * Отметить уведомление как прочитанное
+   */
+  const markAsRead = (notificationId) => {
+    if (!readNotificationsIds.value.includes(notificationId)) {
+      readNotificationsIds.value.push(notificationId)
+      saveReadNotifications()
+      updateUnreadCount()
+    }
+  }
+
+  /**
+   * Отметить все уведомления как прочитанные
+   */
+  const markAllAsRead = () => {
+    notifications.value.forEach(n => {
+      if (!readNotificationsIds.value.includes(n.id)) {
+        readNotificationsIds.value.push(n.id)
+      }
+    })
+    saveReadNotifications()
+    unreadCount.value = 0
+  }
+
+  /**
+   * Проверить, прочитано ли уведомление
+   */
+  const isRead = (notificationId) => {
+    return readNotificationsIds.value.includes(notificationId)
+  }
+
   return {
     // Состояние
     notifications,
@@ -211,6 +265,7 @@ export const useServerNotificationStore = defineStore('serverNotifications', () 
     isLoading,
     error,
     unreadCount,
+    readNotificationsIds,
 
     // Computed
     hasUnreadNotifications,
@@ -226,6 +281,10 @@ export const useServerNotificationStore = defineStore('serverNotifications', () 
     sendPendingNotifications,
     clearError,
     clearNotifications,
-    updateUnreadCount
+    updateUnreadCount,
+    saveReadNotifications,
+    markAsRead,
+    markAllAsRead,
+    isRead
   }
 })
