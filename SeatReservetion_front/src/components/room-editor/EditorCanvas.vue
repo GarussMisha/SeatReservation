@@ -444,6 +444,12 @@ watch(() => props.currentTool, (newTool) => {
 
 // === Глобальные обработчики для перемещения на средней кнопке ===
 
+// Переменные для отслеживания перемещения
+let panStartX = 0
+let panStartY = 0
+let panOffsetStartX = 0
+let panOffsetStartY = 0
+
 // Добавляем глобальные обработчики при монтировании
 const addGlobalListeners = () => {
   const container = canvasContainer.value
@@ -453,42 +459,62 @@ const addGlobalListeners = () => {
     // Средняя кнопка мыши (button === 1)
     if (evt.button === 1) {
       evt.preventDefault()
+      evt.stopPropagation()
+      
       isPanning.value = true
       canvasCursor.value = 'grabbing'
       
+      // Сохраняем начальную позицию мыши
+      panStartX = evt.clientX
+      panStartY = evt.clientY
+      
+      // Сохраняем текущее смещение холста
       const stageInstance = stage.value?.getNode()
       if (stageInstance) {
-        stageInstance.draggable(true)
+        panOffsetStartX = stageInstance.x()
+        panOffsetStartY = stageInstance.y()
       }
     }
   })
   
   container.addEventListener('mouseup', (evt) => {
     if (evt.button === 1) {
+      evt.preventDefault()
       isPanning.value = false
       canvasCursor.value = 'default'
-      
-      const stageInstance = stage.value?.getNode()
-      if (stageInstance) {
-        stageInstance.draggable(false)
-      }
     }
   })
   
   container.addEventListener('mousemove', (evt) => {
     if (isPanning.value) {
       evt.preventDefault()
+      evt.stopPropagation()
+      
+      // Вычисляем смещение мыши
+      const deltaX = evt.clientX - panStartX
+      const deltaY = evt.clientY - panStartY
+      
+      // Обновляем позицию холста
+      const newOffsetX = panOffsetStartX + deltaX
+      const newOffsetY = panOffsetStartY + deltaY
+      
+      // Применяем смещение напрямую к stage
       const stageInstance = stage.value?.getNode()
       if (stageInstance) {
-        const pos = stageInstance.position()
-        emit('set-offset', pos)
+        stageInstance.x(newOffsetX)
+        stageInstance.y(newOffsetY)
+        stageInstance.batchDraw()
       }
+      
+      // Отправляем новое смещение в store
+      emit('set-offset', { x: newOffsetX, y: newOffsetY })
     }
   })
   
   // Блокируем контекстное меню при нажатии колесика
   container.addEventListener('contextmenu', (evt) => {
     evt.preventDefault()
+    evt.stopPropagation()
   })
 }
 
