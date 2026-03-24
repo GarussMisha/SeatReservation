@@ -416,20 +416,22 @@ const handleDragEnd = (object, evt) => {
 
 const handleWheel = (e) => {
   e.evt.preventDefault()
-  
+
   const scaleBy = 1.1
   const stageInstance = stage.value.getNode()
   const oldScale = props.zoom
   const pointer = stageInstance.getPointerPosition()
-  
+
   const mousePointTo = {
     x: (pointer.x - props.offset.x) / oldScale,
     y: (pointer.y - props.offset.y) / oldScale
   }
-  
+
   const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy
-  const clampedScale = Math.max(0.1, Math.min(5, newScale))
   
+  // Ограничиваем масштаб: от 0.2 до 3 (было 0.1 до 5)
+  const clampedScale = Math.max(0.2, Math.min(3, newScale))
+
   emit('set-zoom', clampedScale)
   emit('set-offset', {
     x: pointer.x - mousePointTo.x * clampedScale,
@@ -466,18 +468,30 @@ const updatePosition = (newOffsetX, newOffsetY) => {
     if (animationFrameId !== null) {
       cancelAnimationFrame(animationFrameId)
     }
-    
+
     // Используем requestAnimationFrame для плавности
     animationFrameId = requestAnimationFrame(() => {
-      stageInstance.x(newOffsetX)
-      stageInstance.y(newOffsetY)
+      // Ограничиваем перемещение (не даем уйти слишком далеко)
+      const limitX = stageWidth.value * 0.8
+      const limitY = stageHeight.value * 0.8
+      
+      const clampedX = Math.max(-limitX, Math.min(limitX, newOffsetX))
+      const clampedY = Math.max(-limitY, Math.min(limitY, newOffsetY))
+      
+      stageInstance.x(clampedX)
+      stageInstance.y(clampedY)
       stageInstance.batchDraw()
       animationFrameId = null
     })
   }
-  
-  // Отправляем новое смещение в store (без throttle)
-  emit('set-offset', { x: newOffsetX, y: newOffsetY })
+
+  // Отправляем новое смещение в store (с ограничениями)
+  const limitX = stageWidth.value * 0.8
+  const limitY = stageHeight.value * 0.8
+  emit('set-offset', { 
+    x: Math.max(-limitX, Math.min(limitX, newOffsetX)), 
+    y: Math.max(-limitY, Math.min(limitY, newOffsetY)) 
+  })
 }
 
 // Добавляем глобальные обработчики при монтировании

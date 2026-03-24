@@ -177,7 +177,8 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
    * Установить масштаб
    */
   const setZoom = (newZoom) => {
-    zoom.value = Math.max(0.1, Math.min(5, newZoom))
+    // Ограничиваем масштаб от 0.2 до 3
+    zoom.value = Math.max(0.2, Math.min(3, newZoom))
   }
   
   /**
