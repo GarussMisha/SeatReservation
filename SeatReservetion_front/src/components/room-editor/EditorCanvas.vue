@@ -381,14 +381,17 @@ const handleStageMouseDown = (e) => {
   console.log('handleStageMouseDown:', {
     button: e.evt.button,
     target: e.target,
+    targetType: e.target.getClassName(),
     currentTool: props.currentTool,
     isSelect: props.currentTool === 'select'
   })
 
   // Левая кнопка мыши
   if (e.evt.button === 0) {
-    // Клик на пустом месте - снимаем выделение
-    if (e.target === e.target.getStage()) {
+    // Проверяем, что клик был по фону (Rect) или по stage
+    const isBackground = e.target.getClassName() === 'Rect' || e.target === e.target.getStage()
+    
+    if (isBackground) {
       emit('select-object', null)
 
       // Если активен инструмент добавления (не select)
@@ -439,7 +442,7 @@ const handleStageMouseDown = (e) => {
         console.log('Инструмент select, объект не создаем')
       }
     } else {
-      console.log('Клик не по stage, а по:', e.target)
+      console.log('Клик по объекту:', e.target.getClassName())
     }
   }
 }
