@@ -66,6 +66,42 @@ class Settings(BaseSettings):
         default="UTC",
         description="Часовой пояс приложения"
     )
+
+    # === НАСТРОЙКИ EMAIL / SMTP ===
+    smtp_host: str = Field(
+        default="smtp.gmail.com",
+        description="SMTP сервер для отправки email"
+    )
+
+    smtp_port: int = Field(
+        default=587,
+        description="SMTP порт (587 для TLS, 465 для SSL)"
+    )
+
+    smtp_user: str = Field(
+        default="",
+        description="SMTP пользователь (email)"
+    )
+
+    smtp_password: str = Field(
+        default="",
+        description="SMTP пароль (app password)"
+    )
+
+    smtp_from_email: str = Field(
+        default="noreply@seatreservation.com",
+        description="Email отправителя"
+    )
+
+    smtp_from_name: str = Field(
+        default="Seat Reservation System",
+        description="Имя отправителя"
+    )
+
+    smtp_use_tls: bool = Field(
+        default=True,
+        description="Использовать TLS для SMTP"
+    )
     
     class Config:
         """Конфигурация Pydantic Settings"""
@@ -114,16 +150,36 @@ except ValueError as e:
 # === КОНСТАНТЫ ПРИЛОЖЕНИЯ ===
 class AppConstants:
     """Константы приложения"""
-    
+
     # Названия статусов по умолчанию
     DEFAULT_STATUSES = {
+        # === Для аккаунтов (пользователей) ===
         "active": "Активный",
-        "inactive": "Неактивный", 
+        "inactive": "Неактивный",
         "blocked": "Заблокированный",
+        "on_leave": "В отпуске",
+        "sick": "На больничном",
+        "terminated": "Уволенный",
+        
+        # === Для помещений ===
+        "available": "Доступно",
+        "maintenance": "На обслуживании",
+        "unavailable": "Недоступно",
+        
+        # === Для рабочих мест ===
+        "free": "Свободно",
+        "occupied": "Занято",
+        "inactive": "Не активно",
+        
+        # === Для бронирований ===
         "pending": "Ожидает подтверждения",
         "confirmed": "Подтверждено",
         "cancelled": "Отменено",
         "completed": "Завершено",
+        
+        # === Для уведомлений ===
+        "sent": "Отправлено",
+        "failed": "Ошибка отправки",
     }
     
     # Максимальные длины полей

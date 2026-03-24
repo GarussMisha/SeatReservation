@@ -49,7 +49,7 @@ def create_tables():
     """Создание всех таблиц в базе данных"""
     try:
         # Импортируем модели здесь, чтобы избежать циклических импортов
-        from app.models import Account, Status, Room, Workspace, Booking
+        from app.models import Account, Status, Room, Workspace, Booking, Notification
         Base.metadata.create_all(bind=engine)
     except Exception as e:
         print(f"Ошибка при создании таблиц: {e}")
@@ -63,7 +63,7 @@ def create_tables():
 def drop_tables():
     """Удаление всех таблиц из базы данных"""
     # Импортируем модели здесь, чтобы избежать циклических импортов
-    from app.models import Account, Status, Room, Workspace, Booking
+    from app.models import Account, Status, Room, Workspace, Booking, Notification
     Base.metadata.drop_all(bind=engine)
 
 # Функция для заполнения стандартных данных

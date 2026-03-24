@@ -22,11 +22,27 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠️  Ошибка при инициализации базы данных: {e}")
         print("🔄 Продолжаем запуск...")
-    
+
+    # Запускаем планировщик уведомлений
+    try:
+        from app.services.scheduler_service import start_notification_scheduler
+        start_notification_scheduler(check_interval_minutes=5)
+        print("✅ Планировщик уведомлений запущен (проверка каждые 5 мин)")
+    except Exception as e:
+        print(f"⚠️  Ошибка при запуске планировщика уведомлений: {e}")
+
     yield
-    
+
     # Очистка при завершении работы
     print("👋 Завершение работы приложения")
+    
+    # Останавливаем планировщик
+    try:
+        from app.services.scheduler_service import stop_notification_scheduler
+        stop_notification_scheduler()
+        print("✅ Планировщик уведомлений остановлен")
+    except Exception as e:
+        print(f"⚠️  Ошибка при остановке планировщика: {e}")
 
 
 # Создаем FastAPI приложение

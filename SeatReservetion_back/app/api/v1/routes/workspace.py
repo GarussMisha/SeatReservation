@@ -12,14 +12,16 @@ from app.core.database import get_db
 from app.models.workspace import Workspace
 from app.models.room import Room
 from app.models.status import Status
+from app.models.booking import Booking
 from app.schemas.workspace import (
-    WorkspaceCreate, 
-    WorkspaceUpdate, 
+    WorkspaceCreate,
+    WorkspaceUpdate,
     WorkspaceResponse,
     WorkspaceSearchParams,
     WorkspaceStats,
     WorkspaceBulkUpdate
 )
+from app.services.notification_service import get_notification_service
 
 router = APIRouter(tags=["workspaces"])
 
@@ -27,32 +29,36 @@ router = APIRouter(tags=["workspaces"])
 def format_workspace_response(workspace: Workspace, db: Session) -> Dict[str, Any]:
     """
     Форматирование ответа с данными рабочего места
-    
+
     Args:
         workspace: Объект рабочего места из БД
         db: Сессия базы данных
-    
+
     Returns:
         Словарь с отформатированными данными
     """
     # Получаем связанные данные
     room = db.query(Room).filter(Room.id == workspace.room_id).first()
-    status_obj = db.query(Status).filter(Status.id == room.status_id).first() if room else None
-    
+    room_status_obj = db.query(Status).filter(Status.id == room.status_id).first() if room else None
+    workspace_status_obj = db.query(Status).filter(Status.id == workspace.status_id).first() if workspace.status_id else None
+
     # Подсчитываем бронирования
     booking_count = len(workspace.bookings) if workspace.bookings else 0
-    
+
     return {
         "id": getattr(workspace, 'id', None),
         "name": getattr(workspace, 'name', None),
         "is_active": getattr(workspace, 'is_active', False),
         "room_id": getattr(workspace, 'room_id', None),
+        "status_id": getattr(workspace, 'status_id', None),
         "created_at": getattr(workspace, 'created_at', None).isoformat() if getattr(workspace, 'created_at', None) is not None else None,
         # Данные помещения
         "room_name": getattr(room, 'name', None) if room else None,
         "room_address": getattr(room, 'address', None) if room and getattr(room, 'address', None) else None,
         "room_description": getattr(room, 'description', None) if room and getattr(room, 'description', None) else None,
-        "room_status_name": getattr(status_obj, 'name', None) if status_obj else None,
+        "room_status_name": getattr(room_status_obj, 'name', None) if room_status_obj else None,
+        # Данные статуса рабочего места
+        "status_name": getattr(workspace_status_obj, 'name', None) if workspace_status_obj else None,
         # Статистика
         "total_bookings": booking_count,
         "active_bookings": booking_count  # Упрощенно - все бронирования считаются активными
@@ -254,16 +260,33 @@ async def update_workspace(
         
         # Обновляем поля
         update_data = workspace_data.dict(exclude_unset=True)
+        
+        # Проверяем, меняется ли is_active с True на False
+        send_notification = False
+        if 'is_active' in update_data:
+            if workspace.is_active == True and update_data['is_active'] == False:
+                send_notification = True
+        
         for field, value in update_data.items():
             setattr(workspace, field, value)
-        
+
         db.commit()
-        db.refresh(workspace)
         
+        # Если рабочее место отключено, отправляем уведомления
+        if send_notification:
+            try:
+                notification_service = get_notification_service(db)
+                notification_service.send_workspace_disabled_notification(workspace_id=workspace.id)
+            except Exception as notif_error:
+                # Логгируем ошибку уведомления, но не прерываем основной запрос
+                print(f"Предупреждение: не удалось отправить уведомления: {notif_error}")
+
+        db.refresh(workspace)
+
         # Форматируем ответ
         result = format_workspace_response(workspace, db)
         result["message"] = "Рабочее место успешно обновлено"
-        
+
         return result
         
     except HTTPException:

@@ -36,9 +36,11 @@
   - `services/` - API клиенты и бизнес-логика
 - **Алиасы путей**: `@/` указывает на `src/`
 
-### Скрипты запуска
+### Скрипты запуска front
 
 ```bash
+cd SeatReservetion_front
+npm install
 npm run dev      # Запуск dev-сервера (обычно http://localhost:5173)
 npm run build    # Сборка для продакшена
 npm run preview  # Предпросмотр production-сборки
@@ -137,9 +139,15 @@ FastAPI автоматически генерирует документацию
 - **ReDoc**: http://localhost:8000/redoc
 - **OpenAPI Schema**: http://localhost:8000/openapi.json
 
-### Скрипты запуска
+### Скрипты запуска back:
 
 ```bash
+cd SeatReservetion_back
+python -m venv venv 
+venv\Scripts\activate
+
+pip install -r requeriments
+
 # Обычный запуск
 python start.py
 
@@ -172,7 +180,14 @@ FastAPI Backend (port 8000)
 
 Backend настроен на прием запросов от фронтенда:
 ```python
-ALLOWED_ORIGINS=["http://localhost:5173"]
+ALLOWED_ORIGINS=[
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174"
+]
 ```
 
 ### Аутентификация
@@ -183,42 +198,6 @@ ALLOWED_ORIGINS=["http://localhost:5173"]
 4. Все последующие запросы содержат `Authorization: Bearer {token}`
 
 ---
-
-## 📦 Установка и запуск проекта
-
-### Backend
-
-```bash
-cd SeatReservetion_back
-
-# Создать виртуальное окружение
-python -m venv venv
-
-# Активировать (Windows)
-venv\Scripts\activate
-
-# Установить зависимости
-pip install -r requirements.txt
-
-# Создать .env файл
-# DATABASE_URL=sqlite:///./seat_reservation.db
-# SECRET_KEY=your-secret-key
-
-# Запустить
-python start.py
-```
-
-### Frontend
-
-```bash
-cd SeatReservetion_front
-
-# Установить зависимости
-npm install
-
-# Запустить dev-сервер
-npm run dev
-```
 
 ### Тестовые данные
 
@@ -292,5 +271,5 @@ npm run dev
 
 ---
 
-**Документация актуальна на**: 2025
+**Документация актуальна на**: 2026
 **Версия проекта**: 1.0.0

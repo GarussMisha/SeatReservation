@@ -28,7 +28,7 @@ class AccountBase(BaseModel):
     middle_name: Optional[str] = Field(default=None, description="Отчество")
     birth_date: Optional[date] = Field(default=None, description="Дата рождения")
     phone: Optional[str] = Field(default=None, description="Телефон")
-    email: str = Field(description="Бизнес-почта")
+    email: Optional[str] = Field(default=None, description="Бизнес-почта")
 
 
 class AccountCreate(AccountBase):

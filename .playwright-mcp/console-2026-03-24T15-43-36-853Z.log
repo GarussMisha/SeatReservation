@@ -1,0 +1,2 @@
+[   42280ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ https://fastapi.tiangolo.com/img/favicon.png:0
+[   80816ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ https://fastapi.tiangolo.com/img/favicon.png:0

@@ -13,12 +13,13 @@ from app.models.account import Account
 from app.models.workspace import Workspace
 from app.models.status import Status
 from app.schemas.booking import (
-    BookingCreate, 
-    BookingUpdate, 
+    BookingCreate,
+    BookingUpdate,
     BookingResponse,
     BookingSearchParams,
     BookingStats
 )
+from app.services.notification_service import get_notification_service
 
 router = APIRouter(tags=["bookings"])
 
@@ -657,12 +658,21 @@ async def cancel_booking(booking_id: int, db: Session = Depends(get_db)):
         # Изменяем статус бронирования на "отменено"
         booking.status_id = cancelled_status.id
         db.commit()
-        db.refresh(booking)
         
+        # Отправляем уведомление пользователю
+        try:
+            notification_service = get_notification_service(db)
+            notification_service.send_booking_cancelled_notification(booking_id=booking.id)
+        except Exception as notif_error:
+            # Логгируем ошибку уведомления, но не прерываем основной запрос
+            print(f"Предупреждение: не удалось отправить уведомление об отмене: {notif_error}")
+        
+        db.refresh(booking)
+
         # Форматируем ответ
         result = format_booking_response(booking, db)
         result["message"] = "Бронирование успешно отменено"
-        
+
         return result
         
     except HTTPException:

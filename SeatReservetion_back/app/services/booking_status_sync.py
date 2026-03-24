@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models import Booking, Status
-from app.repositories.booking_repository import BookingRepository
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,10 +17,9 @@ logger = logging.getLogger(__name__)
 
 class BookingStatusSyncService:
     """Сервис для синхронизации статусов бронирований"""
-    
+
     def __init__(self, db: Optional[Session] = None):
         self.db = db or SessionLocal()
-        self.booking_repo = BookingRepository(self.db)
         
     def close(self):
         """Закрытие сессии базы данных"""

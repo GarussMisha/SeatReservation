@@ -15,10 +15,14 @@ class WorkspaceBase(BaseModel):
     )
     is_active: bool = Field(
         default=True,
-        description="Активно ли рабочее место"
+        description="Активно ли рабочее место (устаревшее поле)"
     )
     room_id: int = Field(
         description="ID помещения, в котором находится рабочее место"
+    )
+    status_id: Optional[int] = Field(
+        default=None,
+        description="ID статуса рабочего места (free, occupied, inactive)"
     )
 
 
@@ -36,11 +40,15 @@ class WorkspaceUpdate(BaseModel):
     )
     is_active: Optional[bool] = Field(
         default=None,
-        description="Активно ли рабочее место"
+        description="Активно ли рабочее место (устаревшее поле)"
     )
     room_id: Optional[int] = Field(
         default=None,
         description="ID помещения"
+    )
+    status_id: Optional[int] = Field(
+        default=None,
+        description="ID статуса рабочего места"
     )
 
 
@@ -48,15 +56,18 @@ class WorkspaceResponse(WorkspaceBase):
     """Схема ответа с данными рабочего места"""
     id: int
     created_at: str
-    
+
     # Данные связанного помещения
     room_name: Optional[str] = None
     room_address: Optional[str] = None
     room_description: Optional[str] = None
-    
+
     # Данные статуса помещения
     room_status_name: Optional[str] = None
     
+    # Данные статуса рабочего места
+    status_name: Optional[str] = None
+
     # Статистика
     total_bookings: int = Field(
         default=0,
@@ -66,7 +77,7 @@ class WorkspaceResponse(WorkspaceBase):
         default=0,
         description="Количество активных бронирований"
     )
-    
+
     class Config:
         """Конфигурация для сериализации"""
         from_attributes = True
@@ -169,9 +180,13 @@ class WorkspaceBulkUpdate(BaseModel):
     )
     is_active: Optional[bool] = Field(
         default=None,
-        description="Новый статус активности"
+        description="Новый статус активности (устаревшее поле)"
     )
     room_id: Optional[int] = Field(
         default=None,
         description="Новое помещение"
+    )
+    status_id: Optional[int] = Field(
+        default=None,
+        description="Новый статус рабочего места"
     )

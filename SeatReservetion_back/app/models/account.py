@@ -32,10 +32,16 @@ class Account(BaseModel):
     
     # Отношения
     status = relationship("Status", back_populates="accounts")
-    
+
     # Отношение к бронированиям
     bookings = relationship("Booking", back_populates="account", cascade="all, delete-orphan")
-    
+
+    # Отношения к уведомлениям (как получатель)
+    notifications = relationship("Notification", back_populates="user", foreign_keys="Notification.user_id")
+
+    # Отношения к уведомлениям (как создатель/админ)
+    created_notifications = relationship("Notification", back_populates="creator", foreign_keys="Notification.created_by_id")
+
     # Ограничения
     __table_args__ = (
         UniqueConstraint('login', name='uq_accounts_login'),

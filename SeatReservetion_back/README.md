@@ -100,6 +100,7 @@ python start.py --new
 **Тестовый вход**:
 - Login: `admin`
 - Password: `admin123`
+- Email: `admin@example.com`
 - Роль: Admin
 
 ## 🔧 Конфигурация (.env)
@@ -107,7 +108,7 @@ python start.py --new
 ```env
 DATABASE_URL=sqlite:///./seat_reservation.db
 SECRET_KEY=your-secret-key-here  # Изменить!
-ALLOWED_ORIGINS=["http://localhost:5173"]
+ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"]
 DEBUG=True
 ```
 

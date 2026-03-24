@@ -12,14 +12,16 @@ from app.core.database import get_db
 from app.models.room import Room
 from app.models.status import Status
 from app.models.workspace import Workspace
+from app.models.booking import Booking
 from app.schemas.room import (
-    RoomCreate, 
-    RoomUpdate, 
+    RoomCreate,
+    RoomUpdate,
     RoomResponse,
     RoomSearchParams,
     RoomStats,
     RoomBulkUpdate
 )
+from app.services.notification_service import get_notification_service
 
 router = APIRouter(tags=["rooms"])
 
@@ -57,7 +59,6 @@ def format_room_response(room: Room, db: Session) -> Dict[str, Any]:
         "created_at": created_at_str,
         # Данные статуса
         "status_name": getattr(status_obj, 'name', None) if status_obj else None,
-        "status_color": getattr(status_obj, 'color', None) if status_obj else None,
         # Статистика
         "total_workspaces": total_workspaces,
         "active_workspaces": active_workspaces,
@@ -241,25 +242,48 @@ async def update_room(
                     Room.id != room_id  # Исключаем текущее помещение
                 )
             ).first()
-            
+
             if existing_room:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Помещение с названием '{room_data.name}' уже существует"
                 )
+
+        # Проверяем, меняется ли статус помещения (для уведомления)
+        send_notification = False
+        old_status_id = room.status_id
+        new_status_id = room_data.status_id if room_data.status_id is not None else old_status_id
         
+        # Получаем статус "available" для сравнения
+        available_status = db.query(Status).filter(Status.name == "available").first()
+        available_status_id = available_status.id if available_status else None
+        
+        # Если статус меняется с "available" на другой - отправляем уведомления
+        if old_status_id == available_status_id and new_status_id != available_status_id:
+            send_notification = True
+
         # Обновляем поля
         update_data = room_data.dict(exclude_unset=True)
         for field, value in update_data.items():
             setattr(room, field, value)
-        
+
         db.commit()
-        db.refresh(room)
         
+        # Если помещение отключено, отправляем уведомления
+        if send_notification:
+            try:
+                notification_service = get_notification_service(db)
+                notification_service.send_room_disabled_notification(room_id=room.id)
+            except Exception as notif_error:
+                # Логгируем ошибку уведомления, но не прерываем основной запрос
+                print(f"Предупреждение: не удалось отправить уведомления: {notif_error}")
+
+        db.refresh(room)
+
         # Форматируем ответ
         result = format_room_response(room, db)
         result["message"] = "Помещение успешно обновлено"
-        
+
         return result
         
     except HTTPException:
