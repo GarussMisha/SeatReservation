@@ -8,14 +8,14 @@
         <h2>{{ isEdit ? 'Редактировать рабочее место' : 'Добавить рабочее место' }}</h2>
         <button @click="close" class="close-btn">×</button>
       </div>
-      
+
       <form @submit.prevent="handleSubmit" class="modal-body">
         <div class="form-group">
           <label for="name">Название *</label>
-          <input 
+          <input
             id="name"
-            v-model="formData.name" 
-            type="text" 
+            v-model="formData.name"
+            type="text"
             required
             placeholder="Введите название рабочего места"
           >
@@ -23,14 +23,14 @@
 
         <div class="form-group">
           <label for="room_id">Помещение *</label>
-          <select 
+          <select
             id="room_id"
             v-model="formData.room_id"
             required
           >
-            <option 
-              v-for="room in rooms" 
-              :key="room.id" 
+            <option
+              v-for="room in rooms"
+              :key="room.id"
               :value="room.id"
             >
               {{ room.name }} ({{ room.address }})
@@ -39,6 +39,23 @@
         </div>
 
         <div class="form-group">
+          <label for="status_id">Статус *</label>
+          <select
+            id="status_id"
+            v-model="formData.status_id"
+            required
+          >
+            <option value="1">Свободно</option>
+            <option value="2">Занято</option>
+            <option value="3">Не активно</option>
+          </select>
+          <p class="form-hint">
+            {{ getStatusHint(formData.status_id) }}
+          </p>
+        </div>
+
+        <!-- Оставляем is_active для обратной совместимости, но скрываем -->
+        <div class="form-group" style="display: none;">
           <label class="checkbox-label">
             <input
               id="is_active"
@@ -46,7 +63,7 @@
               type="checkbox"
             >
             <span class="checkmark"></span>
-            Активное рабочее место
+            Активное рабочее место (устаревшее)
           </label>
         </div>
 
@@ -77,15 +94,33 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'save'])
 
+// Статусы по умолчанию (должны совпадать с бэкендом)
+const defaultStatuses = {
+  FREE: 1,
+  OCCUPIED: 2,
+  INACTIVE: 3
+}
+
 // Локальные данные
 const formData = ref({
   name: '',
   room_id: null,
-  is_active: true
+  status_id: defaultStatuses.FREE,
+  is_active: true // Для обратной совместимости
 })
 
 // Вычисляемые свойства
 const isEdit = computed(() => !!props.workspace)
+
+// Подсказка для статуса
+const getStatusHint = (statusId) => {
+  const hints = {
+    [defaultStatuses.FREE]: 'Рабочее место доступно для бронирования',
+    [defaultStatuses.OCCUPIED]: 'Рабочее место занято (есть активное бронирование)',
+    [defaultStatuses.INACTIVE]: 'Рабочее место отключено и недоступно для бронирования'
+  }
+  return hints[statusId] || ''
+}
 
 // Инициализация формы
 watch(() => props.workspace, (newWorkspace) => {
@@ -93,12 +128,14 @@ watch(() => props.workspace, (newWorkspace) => {
     formData.value = {
       name: newWorkspace.name || '',
       room_id: newWorkspace.room_id || null,
+      status_id: newWorkspace.status_id || defaultStatuses.FREE,
       is_active: newWorkspace.is_active !== undefined ? newWorkspace.is_active : true
     }
   } else {
     formData.value = {
       name: '',
       room_id: props.rooms.length > 0 ? props.rooms[0].id : null,
+      status_id: defaultStatuses.FREE,
       is_active: true
     }
   }
@@ -110,6 +147,8 @@ const close = () => {
 }
 
 const handleSubmit = () => {
+  // Синхронизируем is_active со status_id для обратной совместимости
+  formData.value.is_active = formData.value.status_id !== defaultStatuses.INACTIVE
   emit('save', { ...formData.value })
 }
 </script>

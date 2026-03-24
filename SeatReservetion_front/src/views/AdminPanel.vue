@@ -74,7 +74,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="user in users" :key="user.id">
+                <tr v-for="user in paginatedUsers" :key="user.id">
                   <td>{{ user.id }}</td>
                   <td>{{ user.login }}</td>
                   <td>{{ getUserName(user) }}</td>
@@ -96,6 +96,27 @@
                 </tr>
               </tbody>
             </table>
+            
+            <!-- Пагинация -->
+            <div v-if="users.length > pageSize" class="pagination">
+              <button 
+                @click="currentPageUsers--" 
+                :disabled="currentPageUsers === 1"
+                class="pagination-btn"
+              >
+                ← Назад
+              </button>
+              <span class="pagination-info">
+                Страница {{ currentPageUsers }} из {{ Math.ceil(users.length / pageSize) }}
+              </span>
+              <button 
+                @click="currentPageUsers++" 
+                :disabled="currentPageUsers === Math.ceil(users.length / pageSize)"
+                class="pagination-btn"
+              >
+                Вперед →
+              </button>
+            </div>
           </div>
         </div>
 
@@ -194,8 +215,8 @@
                   <td>{{ getRoomName(workspace.room_id) }}</td>
                   <td>{{ getRoomAddress(workspace.room_id) }}</td>
                   <td>
-                    <span class="badge" :class="workspace.is_active ? 'success' : 'danger'">
-                      {{ workspace.is_active ? 'Активно' : 'Неактивно' }}
+                    <span class="badge" :class="getWorkspaceStatusClass(workspace)">
+                      {{ getWorkspaceStatusName(workspace) }}
                     </span>
                   </td>
                   <td>
@@ -261,6 +282,7 @@ import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { accountsAPI, roomsAPI, workspacesAPI, statusesAPI } from '../services/api'
 import { useNotificationStore } from '../stores/notifications'
+import { getStatusConfig } from '../utils/statusHelpers'
 
 import Header from '../components/Header.vue'
 import RoomModal from '../components/admin/RoomModal.vue'
@@ -289,6 +311,12 @@ const selectedUser = ref(null)
 const selectedWorkspace = ref(null)
 const roomFilter = ref('all')
 
+// Переменные для пагинации
+const currentPageUsers = ref(1)
+const currentPageRooms = ref(1)
+const currentPageWorkspaces = ref(1)
+const pageSize = ref(20)
+
 const showConfirmModal = ref(false)
 const confirmModalData = ref({
   title: 'Подтверждение действия',
@@ -307,6 +335,27 @@ const filteredWorkspaces = computed(() => {
     return workspaces.value
   }
   return workspaces.value.filter(workspace => workspace.room_id === parseInt(roomFilter.value))
+})
+
+// Пагинация для пользователей
+const paginatedUsers = computed(() => {
+  const start = (currentPageUsers.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return users.value.slice(start, end)
+})
+
+// Пагинация для помещений
+const paginatedRooms = computed(() => {
+  const start = (currentPageRooms.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return rooms.value.slice(start, end)
+})
+
+// Пагинация для рабочих мест
+const paginatedWorkspaces = computed(() => {
+  const start = (currentPageWorkspaces.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredWorkspaces.value.slice(start, end)
 })
 
 // Действия для header
@@ -355,11 +404,28 @@ const getWorkspaceCount = (roomId) => {
 
 const getStatusBadgeClass = (statusName) => {
   if (!statusName) return 'secondary'
-  const name = statusName.toLowerCase()
-  if (name.includes('актив')) return 'success'
-  if (name.includes('неактив')) return 'warning'
-  if (name.includes('заблок')) return 'danger'
-  return 'secondary'
+  const config = getStatusConfig(statusName)
+  return `badge-${config.class}`
+}
+
+// Новые функции для рабочих мест с поддержкой status_id
+const getWorkspaceStatusClass = (workspace) => {
+  // Если есть status_id, используем его
+  if (workspace.status_id) {
+    const config = getStatusConfig(workspace.status_name, 'workspace')
+    return `badge-${config.class}`
+  }
+  // Fallback на старый is_active
+  return workspace.is_active ? 'badge-success' : 'badge-warning'
+}
+
+const getWorkspaceStatusName = (workspace) => {
+  // Если есть status_id, используем его
+  if (workspace.status_id && workspace.status_name) {
+    return getStatusConfig(workspace.status_name, 'workspace').label
+  }
+  // Fallback на старый is_active
+  return workspace.is_active ? 'Активно' : 'Неактивно'
 }
 
 const handleLogout = () => {
@@ -373,6 +439,7 @@ const goToDashboard = () => {
 
 const refreshUsers = async () => {
   try {
+    currentPageUsers.value = 1 // Сброс на первую страницу
     users.value = await accountsApi.getAccounts()
   } catch (error) {
     console.error('Ошибка загрузки пользователей:', error)
@@ -382,6 +449,7 @@ const refreshUsers = async () => {
 
 const refreshRooms = async () => {
   try {
+    currentPageRooms.value = 1 // Сброс на первую страницу
     rooms.value = await roomsApi.getRooms()
   } catch (error) {
     console.error('Ошибка загрузки помещений:', error)
@@ -391,6 +459,7 @@ const refreshRooms = async () => {
 
 const refreshWorkspaces = async () => {
   try {
+    currentPageWorkspaces.value = 1 // Сброс на первую страницу
     workspaces.value = await workspacesApi.getWorkspaces()
   } catch (error) {
     console.error('Ошибка загрузки рабочих мест:', error)
@@ -1065,5 +1134,42 @@ onMounted(async () => {
     font-size: 0.875rem;
     padding: 0.75rem 1.5rem;
   }
+}
+
+/* Пагинация */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #e8e8e8;
+  border-color: #d0d0d0;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
 }
 </style>
