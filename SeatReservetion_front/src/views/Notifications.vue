@@ -302,7 +302,7 @@ onMounted(async () => {
 .notifications-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
+  padding: 8rem 20px 20px 20px;
   position: relative;
   overflow: hidden;
 }
@@ -351,7 +351,7 @@ onMounted(async () => {
 
 .notifications-container {
   max-width: 1200px;
-  margin: 2rem auto;
+  margin: 0 auto;
   position: relative;
   z-index: 1;
 }
