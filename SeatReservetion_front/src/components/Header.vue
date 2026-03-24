@@ -7,7 +7,7 @@
       <div class="header-left">
         <h1 class="header-title">{{ title }}</h1>
       </div>
-      
+
       <div class="header-right">
         <div v-if="hasActions" class="header-actions">
           <button
@@ -19,14 +19,17 @@
             {{ action.text }}
           </button>
         </div>
-        
+
+        <!-- Уведомления (колокольчик) -->
+        <NotificationsDropdown />
+
         <div class="user-section">
           <div v-if="authStore.user" class="user-avatar"
                :title="`${authStore.user.first_name || ''} ${authStore.user.last_name || ''}`.trim()"
                @click="goToProfile">
             {{ getInitials() }}
           </div>
-          
+
           <button v-if="showLogout" @click="handleLogout" class="logout-btn">
             Выйти
           </button>
@@ -40,6 +43,7 @@
 import { computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
+import NotificationsDropdown from './NotificationsDropdown.vue'
 
 const props = defineProps({
   title: {
@@ -136,6 +140,12 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+/* Уведомления */
+.notifications-dropdown-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .user-section {
