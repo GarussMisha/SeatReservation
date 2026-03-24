@@ -16,38 +16,23 @@
   - Специализированные endpoints для стен, дверей, окон
   - Endpoints для сохранения/загрузки плана помещения
 
-#### API Endpoints
-
-**Получение объектов:**
-```
-GET /api/v1/rooms/{room_id}/objects - получить все объекты помещения
-GET /api/v1/rooms/objects/{object_id} - получить объект по ID
-GET /api/v1/rooms/{room_id}/plan - получить весь план помещения
-```
-
-**Создание объектов:**
-```
-POST /api/v1/rooms/{room_id}/objects - создать объект
-POST /api/v1/rooms/walls - создать стену
-POST /api/v1/rooms/doors - создать дверь
-POST /api/v1/rooms/windows - создать окно
-POST /api/v1/rooms/workspaces-on-plan - создать рабочее место на плане
-POST /api/v1/rooms/{room_id}/plan - сохранить весь план
-```
-
-**Обновление/Удаление:**
-```
-PUT /api/v1/rooms/objects/{object_id} - обновить объект
-PUT /api/v1/rooms/workspaces-on-plan/{wp_id} - обновить рабочее место
-DELETE /api/v1/rooms/objects/{object_id} - удалить объект
-```
+#### Frontend (ШАГИ 3-12)
+- ✅ Установлены зависимости (vue-konva, konva)
+- ✅ Store для редактора помещений
+- ✅ Компоненты редактора:
+  - RoomEditor.vue - главный компонент
+  - EditorToolbar.vue - панель инструментов
+  - ObjectPalette.vue - палитра объектов
+  - EditorCanvas.vue - холст с сеткой
+  - PropertiesPanel.vue - панель свойств
+- ✅ Интеграция с AdminPanel (кнопка "Редактировать план")
 
 ### 🚧 В процессе
 
-#### Frontend (ШАГИ 3-13)
-- ⏳ Установка зависимостей (vue-konva, konva)
-- ⏳ Store для редактора помещений
-- ⏳ Компоненты редактора
+#### Дальнейшая разработка (ШАГ 13)
+- ⏳ Тестирование функционала
+- ⏳ Документирование API
+- ⏳ Улучшение UX
 
 ---
 

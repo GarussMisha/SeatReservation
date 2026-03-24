@@ -1,35 +1,46 @@
 /**
  * EditorCanvas - холст для рисования плана помещения
  * Использует vue-konva для рендеринга
+ * 
+ * Исправления:
+ * - Бесконечная сетка
+ * - Перемещение на средней кнопке мыши
+ * - Выравнивание по сетке
  */
 <template>
-  <div class="editor-canvas" ref="canvasContainer">
+  <div class="editor-canvas" ref="canvasContainer" :style="{ cursor: canvasCursor }">
     <v-stage
       ref="stage"
       :config="stageConfig"
       @mousedown="handleStageMouseDown"
+      @mousemove="handleStageMouseMove"
+      @mouseup="handleStageMouseUp"
       @touchstart="handleStageMouseDown"
+      @touchmove="handleStageMouseMove"
+      @touchend="handleStageMouseUp"
       @wheel="handleWheel"
+      @contentMousedown="handleContentMouseDown"
     >
       <!-- Слой с сеткой -->
       <v-layer ref="gridLayer">
+        <!-- Белый фон -->
         <v-rect
-          v-if="showGrid"
           :config="{
-            x: 0,
-            y: 0,
-            width: stageWidth,
-            height: stageHeight,
-            fill: 'white'
+            x: -10000,
+            y: -10000,
+            width: 20000,
+            height: 20000,
+            fill: '#ffffff'
           }"
         />
+        
         <!-- Рисуем сетку -->
         <v-group v-if="showGrid">
           <v-line
             v-for="i in gridLinesX"
             :key="'v' + i"
             :config="{
-              points: [i * gridSize, 0, i * gridSize, stageHeight],
+              points: [i * gridSize, -10000, i * gridSize, 10000],
               stroke: '#e0e0e0',
               strokeWidth: 1
             }"
@@ -38,7 +49,7 @@
             v-for="i in gridLinesY"
             :key="'h' + i"
             :config="{
-              points: [0, i * gridSize, stageWidth, i * gridSize],
+              points: [-10000, i * gridSize, 10000, i * gridSize],
               stroke: '#e0e0e0',
               strokeWidth: 1
             }"
@@ -57,11 +68,12 @@
             fill: wall.id === selectedObjectId ? '#2196F3' : '#9e9e9e',
             stroke: wall.id === selectedObjectId ? '#1976D2' : '#757575',
             strokeWidth: wall.id === selectedObjectId ? 3 : 2,
-            draggable: currentTool === 'select',
+            draggable: currentTool === 'select' && !isPanning,
             shadowBlur: wall.id === selectedObjectId ? 10 : 0,
             shadowColor: 'blue'
           }"
           @click="() => selectObject(wall)"
+          @dragstart="handleDragStart"
           @dragend="handleDragEnd(wall, $evt)"
         />
 
@@ -74,10 +86,11 @@
             fill: door.id === selectedObjectId ? '#2196F3' : '#FF9800',
             stroke: door.id === selectedObjectId ? '#1976D2' : '#F57C00',
             strokeWidth: door.id === selectedObjectId ? 3 : 2,
-            draggable: currentTool === 'select',
+            draggable: currentTool === 'select' && !isPanning,
             shadowBlur: door.id === selectedObjectId ? 10 : 0
           }"
           @click="() => selectObject(door)"
+          @dragstart="handleDragStart"
           @dragend="handleDragEnd(door, $evt)"
         />
 
@@ -90,10 +103,11 @@
             fill: window.id === selectedObjectId ? '#2196F3' : '#4FC3F7',
             stroke: window.id === selectedObjectId ? '#1976D2' : '#039BE5',
             strokeWidth: window.id === selectedObjectId ? 3 : 2,
-            draggable: currentTool === 'select',
+            draggable: currentTool === 'select' && !isPanning,
             shadowBlur: window.id === selectedObjectId ? 10 : 0
           }"
           @click="() => selectObject(window)"
+          @dragstart="handleDragStart"
           @dragend="handleDragEnd(window, $evt)"
         />
 
@@ -106,11 +120,12 @@
             fill: workspace.id === selectedObjectId ? '#2196F3' : '#4CAF50',
             stroke: workspace.id === selectedObjectId ? '#1976D2' : '#388E3C',
             strokeWidth: workspace.id === selectedObjectId ? 3 : 2,
-            draggable: currentTool === 'select',
+            draggable: currentTool === 'select' && !isPanning,
             shadowBlur: workspace.id === selectedObjectId ? 10 : 0,
             cornerRadius: 4
           }"
           @click="() => selectObject(workspace)"
+          @dragstart="handleDragStart"
           @dragend="handleDragEnd(workspace, $evt)"
         >
           <!-- Текст с названием -->
@@ -138,11 +153,12 @@
             fill: obj.id === selectedObjectId ? '#2196F3' : '#9C27B0',
             stroke: obj.id === selectedObjectId ? '#1976D2' : '#7B1FA2',
             strokeWidth: obj.id === selectedObjectId ? 3 : 2,
-            draggable: currentTool === 'select',
+            draggable: currentTool === 'select' && !isPanning,
             shadowBlur: obj.id === selectedObjectId ? 10 : 0,
             cornerRadius: 4
           }"
           @click="() => selectObject(obj)"
+          @dragstart="handleDragStart"
           @dragend="handleDragEnd(obj, $evt)"
         >
           <v-text
@@ -160,19 +176,16 @@
           />
         </v-rect>
 
-        <!-- Трансформер для выделения -->
-        <v-transformer
-          v-if="selectedObjectId"
-          ref="transformer"
+        <!-- Линия для рисования стены (превью) -->
+        <v-line
+          v-if="isDrawingWall && wallPreview.length > 0"
           :config="{
-            nodes: transformerNodes,
-            padding: 5,
-            borderStroke: '#2196F3',
-            borderDash: [4, 4],
-            anchorStroke: '#2196F3',
-            anchorFill: '#ffffff',
-            anchorSize: 10,
-            rotateAnchorOffset: 30
+            points: wallPreview,
+            stroke: '#2196F3',
+            strokeWidth: 4,
+            dash: [10, 5],
+            lineCap: 'round',
+            lineJoin: 'round'
           }"
         />
       </v-layer>
@@ -221,23 +234,21 @@ const emit = defineEmits([
 
 const canvasContainer = ref(null)
 const stage = ref(null)
-const transformer = ref(null)
+const isPanning = ref(false)
+const isDrawingWall = ref(false)
+const wallPreview = ref([])
+const canvasCursor = ref('default')
 
 const stageWidth = computed(() => canvasContainer.value?.clientWidth || 800)
 const stageHeight = computed(() => canvasContainer.value?.clientHeight || 600)
 
-const gridLinesX = computed(() => Math.ceil(stageWidth.value / props.gridSize))
-const gridLinesY = computed(() => Math.ceil(stageHeight.value / props.gridSize))
+// Бесконечная сетка - рисуем линии с большим запасом
+const gridLinesX = computed(() => Math.ceil(stageWidth.value / props.gridSize) * 2)
+const gridLinesY = computed(() => Math.ceil(stageHeight.value / props.gridSize) * 2)
 
 const selectedObjectId = computed(() => {
   const selected = props.objects.find(obj => obj.selected)
   return selected?.id || null
-})
-
-const transformerNodes = computed(() => {
-  if (!selectedObjectId.value) return []
-  // В реальной реализации нужно возвращать Konva.Node
-  return []
 })
 
 // Фильтрация объектов по типам
@@ -287,42 +298,97 @@ const getObjectName = (type) => {
   return names[type] || type
 }
 
+// === Выравнивание по сетке ===
+
+const snapToGrid = (value) => {
+  return Math.round(value / props.gridSize) * props.gridSize
+}
+
 // === Обработчики событий ===
 
 const selectObject = (object) => {
   emit('select-object', object)
 }
 
-const handleStageMouseDown = (e) => {
-  // Клик на пустом месте - снимаем выделение
-  if (e.target === e.target.getStage()) {
-    emit('select-object', null)
+const handleContentMouseDown = (e) => {
+  // Средняя кнопка мыши (колесико) - начало перемещения
+  if (e.evt.button === 1) {
+    e.evt.preventDefault()
+    isPanning.value = true
+    canvasCursor.value = 'grabbing'
     
-    // Если активен инструмент добавления
-    if (props.currentTool !== 'select') {
-      // Получаем координаты с учетом масштаба и смещения
-      const pos = e.target.getStage().getPointerPosition()
-      const x = (pos.x - props.offset.x) / props.zoom
-      const y = (pos.y - props.offset.y) / props.zoom
+    const stageInstance = stage.value.getNode()
+    stageInstance.draggable(true)
+    stageInstance.setDragBoundFunc((pos) => {
+      emit('set-offset', pos)
+      return pos
+    })
+  }
+}
+
+const handleStageMouseDown = (e) => {
+  // Левая кнопка мыши
+  if (e.evt.button === 0) {
+    // Клик на пустом месте - снимаем выделение
+    if (e.target === e.target.getStage()) {
+      emit('select-object', null)
       
-      // Скругляем до сетки
-      const snappedX = Math.round(x / props.gridSize) * props.gridSize
-      const snappedY = Math.round(y / props.gridSize) * props.gridSize
-      
-      // Создаем новый объект
-      const newObject = {
-        object_type: props.currentTool,
-        x: snappedX,
-        y: snappedY,
-        width: props.currentTool === 'wall' ? 200 : 100,
-        height: props.currentTool === 'wall' ? 10 : 50,
-        rotation: 0,
-        name: '',
-        is_active: true
+      // Если активен инструмент добавления
+      if (props.currentTool !== 'select') {
+        // Получаем координаты с учетом масштаба и смещения
+        const pos = e.target.getStage().getPointerPosition()
+        const x = (pos.x - props.offset.x) / props.zoom
+        const y = (pos.y - props.offset.y) / props.zoom
+        
+        // Скругляем до сетки
+        const snappedX = snapToGrid(x)
+        const snappedY = snapToGrid(y)
+        
+        // Создаем новый объект
+        const newObject = {
+          object_type: props.currentTool,
+          x: snappedX,
+          y: snappedY,
+          width: props.currentTool === 'wall' ? 200 : 100,
+          height: props.currentTool === 'wall' ? 10 : 50,
+          rotation: 0,
+          name: '',
+          is_active: true
+        }
+        
+        emit('add-object', newObject)
       }
-      
-      emit('add-object', newObject)
     }
+  }
+}
+
+const handleStageMouseMove = (e) => {
+  // Обновление позиции при перемещении
+  if (isPanning.value) {
+    const stageInstance = stage.value.getNode()
+    emit('set-offset', {
+      x: stageInstance.x(),
+      y: stageInstance.y()
+    })
+  }
+}
+
+const handleStageMouseUp = (e) => {
+  // Завершение перемещения
+  if (e.evt.button === 1 || e.evt.button === undefined) {
+    isPanning.value = false
+    canvasCursor.value = 'default'
+    
+    const stageInstance = stage.value.getNode()
+    stageInstance.draggable(false)
+    stageInstance.setDragBoundFunc(null)
+  }
+}
+
+const handleDragStart = (e) => {
+  // При начале перетаскивания объекта
+  if (isPanning.value) {
+    e.target.stopDrag()
   }
 }
 
@@ -332,8 +398,8 @@ const handleDragEnd = (object, evt) => {
   const y = node.y()
   
   // Скругляем до сетки
-  const snappedX = Math.round(x / props.gridSize) * props.gridSize
-  const snappedY = Math.round(y / props.gridSize) * props.gridSize
+  const snappedX = snapToGrid(x)
+  const snappedY = snapToGrid(y)
   
   node.x(snappedX)
   node.y(snappedY)
@@ -363,6 +429,18 @@ const handleWheel = (e) => {
     y: pointer.y - mousePointTo.y * clampedScale
   })
 }
+
+// === Обновление курсора ===
+
+watch(() => props.currentTool, (newTool) => {
+  if (newTool === 'select') {
+    canvasCursor.value = 'default'
+  } else if (newTool === 'wall') {
+    canvasCursor.value = 'crosshair'
+  } else {
+    canvasCursor.value = 'copy'
+  }
+})
 </script>
 
 <style scoped>
@@ -370,13 +448,10 @@ const handleWheel = (e) => {
   flex: 1;
   background: #f5f5f5;
   overflow: hidden;
+  position: relative;
 }
 
 .editor-canvas :deep(canvas) {
-  cursor: crosshair;
-}
-
-.editor-canvas :deep(canvas.select) {
-  cursor: default;
+  outline: none;
 }
 </style>

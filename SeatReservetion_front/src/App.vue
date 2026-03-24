@@ -11,8 +11,9 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 // Показываем Header только для авторизованных пользователей
+// Исключение: страница редактора помещений (RoomEditor)
 const showHeader = computed(() => {
-  return authStore.isAuthenticated && route.name !== 'Login'
+  return authStore.isAuthenticated && route.name !== 'Login' && route.name !== 'RoomEditor'
 })
 
 // Настройки заголовка в зависимости от маршрута
