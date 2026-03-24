@@ -7,7 +7,11 @@ from typing import List, Optional
 import json
 
 from app.core.database import get_db
-from app.models.room_object import RoomObject, WorkspaceOnPlan, Wall, Door, Window
+from app.models.room_object import RoomObject
+from app.models.workspace_on_plan import WorkspaceOnPlan
+from app.models.wall import Wall
+from app.models.door import Door
+from app.models.window import Window
 from app.models.room import Room
 from app.schemas.room_object import (
     RoomObjectCreate,

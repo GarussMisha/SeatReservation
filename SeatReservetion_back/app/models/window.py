@@ -1,7 +1,7 @@
 """
 Window - окна на плане помещения
 """
-from sqlalchemy import Column, Integer, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import relationship
 from app.core.base import BaseModel
 
