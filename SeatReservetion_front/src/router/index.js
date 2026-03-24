@@ -49,6 +49,12 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
+      path: '/room-editor/:roomId',
+      name: 'RoomEditor',
+      component: () => import('../components/room-editor/RoomEditor.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
       path: '/notifications',
       name: 'Notifications',
       component: () => import('../views/Notifications.vue'),

@@ -50,6 +50,7 @@ def create_tables():
     try:
         # Импортируем модели здесь, чтобы избежать циклических импортов
         from app.models import Account, Status, Room, Workspace, Booking, Notification
+        from app.models import RoomObject, WorkspaceOnPlan, Wall, Door, Window
         Base.metadata.create_all(bind=engine)
     except Exception as e:
         print(f"Ошибка при создании таблиц: {e}")

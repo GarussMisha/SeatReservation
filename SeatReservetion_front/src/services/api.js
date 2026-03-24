@@ -712,4 +712,7 @@ export const utilsAPI = {
 // Notifications API (экспорт для удобства)
 export { notificationsAPI } from './notifications'
 
+// Room Objects API (экспорт для удобства)
+export { roomObjectsAPI } from './roomObjects'
+
 export default api

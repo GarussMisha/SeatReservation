@@ -158,6 +158,7 @@
                     </span>
                   </td>
                   <td>
+                    <button @click="openRoomEditor(room)" class="action-btn plan" title="Редактировать план">🗺️</button>
                     <button @click="editRoom(room)" class="action-btn edit" title="Редактировать">✏️</button>
                     <button @click="showDeleteConfirm('room', room.id, room.name)" class="action-btn delete" title="Удалить">🗑️</button>
                   </td>
@@ -488,6 +489,10 @@ const editUser = (user) => {
 const editRoom = (room) => {
   selectedRoom.value = { ...room }
   showRoomModal.value = true
+}
+
+const openRoomEditor = (room) => {
+  router.push(`/room-editor/${room.id}`)
 }
 
 const editWorkspace = (workspace) => {
@@ -944,6 +949,17 @@ onMounted(async () => {
 .action-btn.delete:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.action-btn.plan {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+}
+
+.action-btn.plan:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
 }
 
 .filter-section {

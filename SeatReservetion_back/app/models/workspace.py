@@ -26,6 +26,9 @@ class Workspace(BaseModel):
     # Отношение к бронированиям
     bookings = relationship("Booking", back_populates="workspace", cascade="all, delete-orphan")
 
+    # Отношение к данным на плане
+    plan_data = relationship("WorkspaceOnPlan", back_populates="workspace", uselist=False)
+
     # Уникальный индекс на название рабочего места в рамках помещения
     __table_args__ = (
         UniqueConstraint('name', 'room_id', name='uq_workspaces_name_room_id'),

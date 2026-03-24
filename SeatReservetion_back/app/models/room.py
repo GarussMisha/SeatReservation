@@ -20,6 +20,9 @@ class Room(BaseModel):
     # Отношение к рабочим местам
     workspaces = relationship("Workspace", back_populates="room", cascade="all, delete-orphan")
 
+    # Отношение к объектам на плане
+    room_objects = relationship("RoomObject", back_populates="room", cascade="all, delete-orphan")
+
     # Отношение к статусу
     status = relationship("Status", back_populates="rooms")
 
