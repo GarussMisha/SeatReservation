@@ -194,7 +194,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 const props = defineProps({
   objects: {
@@ -440,6 +440,60 @@ watch(() => props.currentTool, (newTool) => {
   } else {
     canvasCursor.value = 'copy'
   }
+})
+
+// === Глобальные обработчики для перемещения на средней кнопке ===
+
+// Добавляем глобальные обработчики при монтировании
+const addGlobalListeners = () => {
+  const container = canvasContainer.value
+  if (!container) return
+  
+  container.addEventListener('mousedown', (evt) => {
+    // Средняя кнопка мыши (button === 1)
+    if (evt.button === 1) {
+      evt.preventDefault()
+      isPanning.value = true
+      canvasCursor.value = 'grabbing'
+      
+      const stageInstance = stage.value?.getNode()
+      if (stageInstance) {
+        stageInstance.draggable(true)
+      }
+    }
+  })
+  
+  container.addEventListener('mouseup', (evt) => {
+    if (evt.button === 1) {
+      isPanning.value = false
+      canvasCursor.value = 'default'
+      
+      const stageInstance = stage.value?.getNode()
+      if (stageInstance) {
+        stageInstance.draggable(false)
+      }
+    }
+  })
+  
+  container.addEventListener('mousemove', (evt) => {
+    if (isPanning.value) {
+      evt.preventDefault()
+      const stageInstance = stage.value?.getNode()
+      if (stageInstance) {
+        const pos = stageInstance.position()
+        emit('set-offset', pos)
+      }
+    }
+  })
+  
+  // Блокируем контекстное меню при нажатии колесика
+  container.addEventListener('contextmenu', (evt) => {
+    evt.preventDefault()
+  })
+}
+
+onMounted(() => {
+  addGlobalListeners()
 })
 </script>
 
