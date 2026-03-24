@@ -21,26 +21,27 @@
       @wheel="handleWheel"
       @contentMousedown="handleContentMouseDown"
     >
-      <!-- Слой с сеткой -->
-      <v-layer ref="gridLayer">
-        <!-- Белый фон -->
+      <!-- Слой 1: Белый фон (самый нижний) -->
+      <v-layer ref="backgroundLayer">
         <v-rect
           :config="{
-            x: -10000,
-            y: -10000,
-            width: 20000,
-            height: 20000,
+            x: -50000,
+            y: -50000,
+            width: 100000,
+            height: 100000,
             fill: '#ffffff'
           }"
         />
-        
-        <!-- Рисуем сетку -->
+      </v-layer>
+
+      <!-- Слой 2: Сетка -->
+      <v-layer ref="gridLayer">
         <v-group v-if="showGrid">
           <v-line
             v-for="i in gridLinesX"
             :key="'v' + i"
             :config="{
-              points: [i * gridSize, -10000, i * gridSize, 10000],
+              points: [i * gridSize, -50000, i * gridSize, 50000],
               stroke: '#e0e0e0',
               strokeWidth: 1
             }"
@@ -49,7 +50,7 @@
             v-for="i in gridLinesY"
             :key="'h' + i"
             :config="{
-              points: [-10000, i * gridSize, 10000, i * gridSize],
+              points: [-50000, i * gridSize, 50000, i * gridSize],
               stroke: '#e0e0e0',
               strokeWidth: 1
             }"
@@ -57,8 +58,8 @@
         </v-group>
       </v-layer>
 
-      <!-- Слой с объектами -->
-      <v-layer ref="objectsLayer">
+      <!-- Слой 3: Объекты (самый верхний) -->
+      <v-layer ref="objectsLayer" name="objectsLayer">
         <!-- Стены -->
         <v-rect
           v-for="wall in walls"
@@ -343,7 +344,7 @@ const handleStageMouseDown = (e) => {
         // Скругляем до сетки
         const snappedX = snapToGrid(x)
         const snappedY = snapToGrid(y)
-        
+
         // Создаем новый объект
         const newObject = {
           object_type: props.currentTool,
@@ -355,8 +356,14 @@ const handleStageMouseDown = (e) => {
           name: '',
           is_active: true
         }
-        
+
         emit('add-object', newObject)
+        
+        // Принудительно перерисовываем слой объектов
+        const objectsLayer = stage.value?.getStage().findOne('.objectsLayer')
+        if (objectsLayer) {
+          objectsLayer.batchDraw()
+        }
       }
     }
   }

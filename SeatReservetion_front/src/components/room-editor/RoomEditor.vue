@@ -91,6 +91,20 @@ const handleSelectObject = (object) => {
 
 const handleAddObject = (object) => {
   editorStore.addObject(object)
+  
+  // Принудительно перерисовываем холст после добавления объекта
+  setTimeout(() => {
+    const canvas = document.querySelector('.editor-canvas canvas')
+    if (canvas) {
+      const stage = canvas._konva
+      if (stage) {
+        const objectsLayer = stage.findOne('.objectsLayer')
+        if (objectsLayer) {
+          objectsLayer.batchDraw()
+        }
+      }
+    }
+  }, 0)
 }
 
 const handleUpdateObject = (objectId, updates) => {
