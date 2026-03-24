@@ -91,9 +91,11 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
       properties: object.properties || {},
       ...object
     }
-    
+
+    console.log('Store: добавление объекта', newObject)
     objects.value.push(newObject)
     addToHistory()
+    console.log('Store: всего объектов', objects.value.length)
     return newObject
   }
   

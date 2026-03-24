@@ -383,20 +383,27 @@ const handleStageMouseDown = (e) => {
     // Клик на пустом месте - снимаем выделение
     if (e.target === e.target.getStage()) {
       emit('select-object', null)
-      
+
       // Если активен инструмент добавления
       if (props.currentTool !== 'select') {
         // Получаем координаты с учетом масштаба и смещения
         const pos = e.target.getStage().getPointerPosition()
         const x = (pos.x - props.offset.x) / props.zoom
         const y = (pos.y - props.offset.y) / props.zoom
-        
+
         // Скругляем до сетки
         const snappedX = snapToGrid(x)
         const snappedY = snapToGrid(y)
 
-        // Создаем новый объект
+        // Проверяем, что координаты в пределах поля
+        if (snappedX < 0 || snappedX > fieldWidthPx.value || snappedY < 0 || snappedY > fieldHeightPx.value) {
+          console.warn('Объект вне поля:', { x: snappedX, y: snappedY })
+          return
+        }
+
+        // Создаем новый объект с уникальным ID
         const newObject = {
+          id: Date.now(), // Уникальный временный ID
           object_type: props.currentTool,
           x: snappedX,
           y: snappedY,
@@ -407,13 +414,16 @@ const handleStageMouseDown = (e) => {
           is_active: true
         }
 
+        console.log('Добавление объекта:', newObject)
         emit('add-object', newObject)
         
-        // Принудительно перерисовываем слой объектов
-        const objectsLayer = stage.value?.getStage().findOne('.objectsLayer')
-        if (objectsLayer) {
-          objectsLayer.batchDraw()
-        }
+        // Принудительно перерисовываем все слои
+        setTimeout(() => {
+          const stageInstance = stage.value?.getNode()
+          if (stageInstance) {
+            stageInstance.batchDraw()
+          }
+        }, 10)
       }
     }
   }
