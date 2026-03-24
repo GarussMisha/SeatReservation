@@ -64,9 +64,9 @@ export const useServerNotificationStore = defineStore('serverNotifications', () 
       notifications.value = response.notifications || []
       totalNotifications.value = response.total || 0
 
-      // Подсчитываем непрочитанные (pending)
+      // Подсчитываем непрочитанные (pending И нет в списке прочитанных)
       unreadCount.value = notifications.value.filter(
-        n => n.status_name === 'pending'
+        n => n.status_name === 'pending' && !readNotificationsIds.value.includes(n.id)
       ).length
 
       return response
