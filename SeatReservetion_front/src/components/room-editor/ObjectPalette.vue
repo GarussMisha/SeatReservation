@@ -126,7 +126,7 @@
             id="field-width"
             type="number"
             :value="props.fieldWidth"
-            @input="$emit('update-field-size', 'width', $event.target.value)"
+            @input="handleWidthInput"
             min="50"
             max="500"
             class="size-input"
@@ -141,7 +141,7 @@
             id="field-height"
             type="number"
             :value="props.fieldHeight"
-            @input="$emit('update-field-size', 'height', $event.target.value)"
+            @input="handleHeightInput"
             min="50"
             max="500"
             class="size-input"
@@ -150,7 +150,7 @@
           <span class="size-meters">({{ heightInMeters }}м)</span>
         </div>
 
-        <p class="size-hint">1 клетка = 0.5 метра</p>
+        <p class="size-hint">1 клетка = 0.5 метра (мин: 50, макс: 500)</p>
       </div>
     </div>
   </div>
@@ -179,6 +179,21 @@ const emit = defineEmits(['select-tool', 'update-field-size'])
 // Вычисляемые значения в метрах
 const widthInMeters = computed(() => (props.fieldWidth * 0.5).toFixed(1))
 const heightInMeters = computed(() => (props.fieldHeight * 0.5).toFixed(1))
+
+// Обработчики для ограничения ввода
+const handleWidthInput = (event) => {
+  let value = parseInt(event.target.value)
+  // Ограничиваем от 50 до 500
+  value = Math.max(50, Math.min(500, value))
+  emit('update-field-size', 'width', value)
+}
+
+const handleHeightInput = (event) => {
+  let value = parseInt(event.target.value)
+  // Ограничиваем от 50 до 500
+  value = Math.max(50, Math.min(500, value))
+  emit('update-field-size', 'height', value)
+}
 </script>
 
 <style scoped>
@@ -293,11 +308,17 @@ const heightInMeters = computed(() => (props.fieldHeight * 0.5).toFixed(1))
   border-radius: 4px;
   font-size: 0.9rem;
   text-align: center;
+  transition: border-color 0.2s;
 }
 
 .size-input:focus {
   outline: none;
   border-color: #2196F3;
+}
+
+.size-input:invalid {
+  border-color: #f44336;
+  background-color: #ffebee;
 }
 
 .size-unit,
