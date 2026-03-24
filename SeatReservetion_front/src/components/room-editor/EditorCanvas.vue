@@ -449,6 +449,29 @@ let panStartX = 0
 let panStartY = 0
 let panOffsetStartX = 0
 let panOffsetStartY = 0
+let animationFrameId = null
+
+// Функция для плавного обновления позиции
+const updatePosition = (newOffsetX, newOffsetY) => {
+  const stageInstance = stage.value?.getNode()
+  if (stageInstance) {
+    // Отменяем предыдущий кадр, если он еще не выполнен
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId)
+    }
+    
+    // Используем requestAnimationFrame для плавности
+    animationFrameId = requestAnimationFrame(() => {
+      stageInstance.x(newOffsetX)
+      stageInstance.y(newOffsetY)
+      stageInstance.batchDraw()
+      animationFrameId = null
+    })
+  }
+  
+  // Отправляем новое смещение в store (без throttle)
+  emit('set-offset', { x: newOffsetX, y: newOffsetY })
+}
 
 // Добавляем глобальные обработчики при монтировании
 const addGlobalListeners = () => {
@@ -482,6 +505,12 @@ const addGlobalListeners = () => {
       evt.preventDefault()
       isPanning.value = false
       canvasCursor.value = 'default'
+      
+      // Отменяем ожидающий кадр
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId)
+        animationFrameId = null
+      }
     }
   })
   
@@ -498,16 +527,8 @@ const addGlobalListeners = () => {
       const newOffsetX = panOffsetStartX + deltaX
       const newOffsetY = panOffsetStartY + deltaY
       
-      // Применяем смещение напрямую к stage
-      const stageInstance = stage.value?.getNode()
-      if (stageInstance) {
-        stageInstance.x(newOffsetX)
-        stageInstance.y(newOffsetY)
-        stageInstance.batchDraw()
-      }
-      
-      // Отправляем новое смещение в store
-      emit('set-offset', { x: newOffsetX, y: newOffsetY })
+      // Плавное обновление позиции
+      updatePosition(newOffsetX, newOffsetY)
     }
   })
   
