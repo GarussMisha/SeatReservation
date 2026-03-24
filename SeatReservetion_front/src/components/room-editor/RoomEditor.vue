@@ -43,6 +43,7 @@
         @add-object="handleAddObject"
         @set-offset="handleSetOffset"
         @set-zoom="handleSetZoom"
+        @select-tool="handleSelectTool"
       />
 
       <!-- Правая панель - свойства объекта -->

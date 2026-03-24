@@ -431,6 +431,9 @@ const handleStageMouseDown = (e) => {
         console.log('Добавление объекта:', newObject)
         emit('add-object', newObject)
         
+        // Переключаем инструмент на select после добавления
+        emit('select-tool', 'select')
+        
         // Принудительно перерисовываем все слои
         setTimeout(() => {
           const stageInstance = stage.value?.getNode()
@@ -478,17 +481,25 @@ const handleDragStart = (e) => {
 }
 
 const handleDragEnd = (object, evt) => {
+  console.log('handleDragEnd:', { object, evt: !!evt })
+  
+  // Проверяем, что evt существует
+  if (!evt || !evt.target) {
+    console.warn('handleDragEnd: evt или evt.target не определен')
+    return
+  }
+  
   const node = evt.target
   const x = node.x()
   const y = node.y()
-  
+
   // Скругляем до сетки
   const snappedX = snapToGrid(x)
   const snappedY = snapToGrid(y)
-  
+
   node.x(snappedX)
   node.y(snappedY)
-  
+
   emit('update-object', object.id, { x: snappedX, y: snappedY })
 }
 
