@@ -29,11 +29,15 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
   const offset = ref({ x: 0, y: 0 })
   
   // Размер сетки
-  const gridSize = ref(20)
-  
+  const gridSize = ref(20) // 1 клетка = 20px
+
   // Показывать сетку
   const showGrid = ref(true)
-  
+
+  // Размеры поля (в клетках сетки)
+  const fieldWidth = ref(200) // 200 клеток = 100 метров (1 клетка = 0.5м)
+  const fieldHeight = ref(100) // 100 клеток = 50 метров
+
   // Загрузка
   const isLoading = ref(false)
   const error = ref(null)
@@ -224,7 +228,21 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
       return false
     }
   }
-  
+
+  /**
+   * Установить ширину поля
+   */
+  const setFieldWidth = (width) => {
+    fieldWidth.value = Math.max(50, Math.min(500, width)) // от 50 до 500 клеток
+  }
+
+  /**
+   * Установить высоту поля
+   */
+  const setFieldHeight = (height) => {
+    fieldHeight.value = Math.max(50, Math.min(500, height)) // от 50 до 500 клеток
+  }
+
   return {
     // Состояние
     currentRoom,
@@ -237,9 +255,11 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
     offset,
     gridSize,
     showGrid,
+    fieldWidth,
+    fieldHeight,
     isLoading,
     error,
-    
+
     // Вычисляемые свойства
     canUndo,
     canRedo,
@@ -248,7 +268,7 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
     windows,
     workspaces,
     otherObjects,
-    
+
     // Методы
     setCurrentRoom,
     loadObjects,
@@ -264,6 +284,8 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
     setOffset,
     clearEditor,
     exportToJSON,
-    importFromJSON
+    importFromJSON,
+    setFieldWidth,
+    setFieldHeight
   }
 })

@@ -111,24 +111,74 @@
 
     <div class="palette-section">
       <h3 class="palette-title">Настройки</h3>
-      
+
       <label class="checkbox-label">
         <input type="checkbox" checked />
         <span>Показывать сетку</span>
       </label>
+
+      <div class="field-size-settings">
+        <h4 class="settings-subtitle">Размеры поля</h4>
+        
+        <div class="size-input-group">
+          <label for="field-width">Ширина:</label>
+          <input
+            id="field-width"
+            type="number"
+            :value="props.fieldWidth"
+            @input="$emit('update-field-size', 'width', $event.target.value)"
+            min="50"
+            max="500"
+            class="size-input"
+          />
+          <span class="size-unit">клеток</span>
+          <span class="size-meters">({{ widthInMeters }}м)</span>
+        </div>
+
+        <div class="size-input-group">
+          <label for="field-height">Высота:</label>
+          <input
+            id="field-height"
+            type="number"
+            :value="props.fieldHeight"
+            @input="$emit('update-field-size', 'height', $event.target.value)"
+            min="50"
+            max="500"
+            class="size-input"
+          />
+          <span class="size-unit">клеток</span>
+          <span class="size-meters">({{ heightInMeters }}м)</span>
+        </div>
+
+        <p class="size-hint">1 клетка = 0.5 метра</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   currentTool: {
     type: String,
     default: 'select'
+  },
+  fieldWidth: {
+    type: Number,
+    default: 200
+  },
+  fieldHeight: {
+    type: Number,
+    default: 100
   }
 })
 
-defineEmits(['select-tool'])
+const emit = defineEmits(['select-tool', 'update-field-size'])
+
+// Вычисляемые значения в метрах
+const widthInMeters = computed(() => (props.fieldWidth * 0.5).toFixed(1))
+const heightInMeters = computed(() => (props.fieldHeight * 0.5).toFixed(1))
 </script>
 
 <style scoped>
@@ -208,6 +258,64 @@ defineEmits(['select-tool'])
 
 .checkbox-label input[type="checkbox"] {
   cursor: pointer;
+}
+
+.field-size-settings {
+  margin-top: 1rem;
+}
+
+.settings-subtitle {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.size-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.size-input-group label {
+  font-size: 0.85rem;
+  color: #666;
+  min-width: 60px;
+}
+
+.size-input {
+  width: 60px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.size-input:focus {
+  outline: none;
+  border-color: #2196F3;
+}
+
+.size-unit,
+.size-meters {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.size-meters {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.size-hint {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.75rem;
+  color: #999;
+  font-style: italic;
 }
 
 /* Scrollbar */

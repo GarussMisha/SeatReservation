@@ -21,7 +21,10 @@
       <!-- Левая панель - палитра объектов -->
       <ObjectPalette
         :current-tool="currentTool"
+        :field-width="fieldWidth"
+        :field-height="fieldHeight"
         @select-tool="handleSelectTool"
+        @update-field-size="handleUpdateFieldSize"
       />
 
       <!-- Центральная область - холст -->
@@ -32,6 +35,8 @@
         :current-tool="currentTool"
         :grid-size="gridSize"
         :show-grid="showGrid"
+        :field-width="fieldWidth"
+        :field-height="fieldHeight"
         @select-object="handleSelectObject"
         @update-object="handleUpdateObject"
         @delete-object="handleDeleteObject"
@@ -76,6 +81,8 @@ const zoom = computed(() => editorStore.zoom)
 const offset = computed(() => editorStore.offset)
 const gridSize = computed(() => editorStore.gridSize)
 const showGrid = computed(() => editorStore.showGrid)
+const fieldWidth = computed(() => editorStore.fieldWidth)
+const fieldHeight = computed(() => editorStore.fieldHeight)
 const canUndo = computed(() => editorStore.canUndo)
 const canRedo = computed(() => editorStore.canRedo)
 
@@ -87,6 +94,15 @@ const handleSelectTool = (tool) => {
 
 const handleSelectObject = (object) => {
   editorStore.selectObject(object)
+}
+
+const handleUpdateFieldSize = (dimension, value) => {
+  const numValue = parseInt(value)
+  if (dimension === 'width' && !isNaN(numValue)) {
+    editorStore.setFieldWidth(numValue)
+  } else if (dimension === 'height' && !isNaN(numValue)) {
+    editorStore.setFieldHeight(numValue)
+  }
 }
 
 const handleAddObject = (object) => {

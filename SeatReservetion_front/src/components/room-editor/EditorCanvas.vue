@@ -37,25 +37,67 @@
       <!-- Слой 2: Сетка -->
       <v-layer ref="gridLayer">
         <v-group v-if="showGrid">
+          <!-- Ограниченная сетка -->
           <v-line
-            v-for="i in gridLinesX"
+            v-for="i in Math.ceil(fieldWidth)"
             :key="'v' + i"
             :config="{
-              points: [i * gridSize, -50000, i * gridSize, 50000],
+              points: [i * gridSize, 0, i * gridSize, fieldHeight * gridSize],
               stroke: '#e0e0e0',
               strokeWidth: 1
             }"
           />
           <v-line
-            v-for="i in gridLinesY"
+            v-for="i in Math.ceil(fieldHeight)"
             :key="'h' + i"
             :config="{
-              points: [-50000, i * gridSize, 50000, i * gridSize],
+              points: [0, i * gridSize, fieldWidth * gridSize, i * gridSize],
               stroke: '#e0e0e0',
               strokeWidth: 1
             }"
           />
         </v-group>
+        
+        <!-- Границы поля -->
+        <v-rect
+          :config="{
+            x: 0,
+            y: 0,
+            width: fieldWidth * gridSize,
+            height: fieldHeight * gridSize,
+            stroke: '#4CAF50',
+            strokeWidth: 3,
+            dash: [10, 5],
+            listening: false
+          }"
+        />
+        
+        <!-- Подписи размеров -->
+        <v-text
+          :config="{
+            text: fieldWidth + ' клеток (' + (fieldWidth * 0.5) + 'м)',
+            x: fieldWidth * gridSize / 2,
+            y: -10,
+            fontSize: 12,
+            fontFamily: 'Arial',
+            fill: '#4CAF50',
+            align: 'center',
+            listening: false
+          }"
+        />
+        <v-text
+          :config="{
+            text: fieldHeight + ' клеток (' + (fieldHeight * 0.5) + 'м)',
+            x: -10,
+            y: fieldHeight * gridSize / 2,
+            fontSize: 12,
+            fontFamily: 'Arial',
+            fill: '#4CAF50',
+            align: 'center',
+            rotation: -90,
+            listening: false
+          }"
+        />
       </v-layer>
 
       <!-- Слой 3: Объекты (самый верхний) -->
@@ -221,6 +263,14 @@ const props = defineProps({
   showGrid: {
     type: Boolean,
     default: true
+  },
+  fieldWidth: {
+    type: Number,
+    default: 200
+  },
+  fieldHeight: {
+    type: Number,
+    default: 100
   }
 })
 
@@ -243,9 +293,9 @@ const canvasCursor = ref('default')
 const stageWidth = computed(() => canvasContainer.value?.clientWidth || 800)
 const stageHeight = computed(() => canvasContainer.value?.clientHeight || 600)
 
-// Бесконечная сетка - рисуем линии с большим запасом
-const gridLinesX = computed(() => Math.ceil(stageWidth.value / props.gridSize) * 2)
-const gridLinesY = computed(() => Math.ceil(stageHeight.value / props.gridSize) * 2)
+// Размеры поля в пикселях
+const fieldWidthPx = computed(() => props.fieldWidth * props.gridSize)
+const fieldHeightPx = computed(() => props.fieldHeight * props.gridSize)
 
 const selectedObjectId = computed(() => {
   const selected = props.objects.find(obj => obj.selected)
@@ -471,13 +521,18 @@ const updatePosition = (newOffsetX, newOffsetY) => {
 
     // Используем requestAnimationFrame для плавности
     animationFrameId = requestAnimationFrame(() => {
-      // Ограничиваем перемещение (не даем уйти слишком далеко)
-      const limitX = stageWidth.value * 0.8
-      const limitY = stageHeight.value * 0.8
+      // Ограничиваем перемещение, чтобы поле было видно
+      // Показываем поле с небольшим запасом (100px)
+      const margin = 100
       
-      const clampedX = Math.max(-limitX, Math.min(limitX, newOffsetX))
-      const clampedY = Math.max(-limitY, Math.min(limitY, newOffsetY))
-      
+      // Максимальное смещение влево/вправо
+      const maxOffsetX = Math.max(0, fieldWidthPx.value * props.zoom - stageWidth.value + margin)
+      // Максимальное смещение вверх/вниз
+      const maxOffsetY = Math.max(0, fieldHeightPx.value * props.zoom - stageHeight.value + margin)
+
+      const clampedX = Math.max(-maxOffsetX, Math.min(margin, newOffsetX))
+      const clampedY = Math.max(-maxOffsetY, Math.min(margin, newOffsetY))
+
       stageInstance.x(clampedX)
       stageInstance.y(clampedY)
       stageInstance.batchDraw()
@@ -485,13 +540,8 @@ const updatePosition = (newOffsetX, newOffsetY) => {
     })
   }
 
-  // Отправляем новое смещение в store (с ограничениями)
-  const limitX = stageWidth.value * 0.8
-  const limitY = stageHeight.value * 0.8
-  emit('set-offset', { 
-    x: Math.max(-limitX, Math.min(limitX, newOffsetX)), 
-    y: Math.max(-limitY, Math.min(limitY, newOffsetY)) 
-  })
+  // Отправляем новое смещение в store
+  emit('set-offset', { x: newOffsetX, y: newOffsetY })
 }
 
 // Добавляем глобальные обработчики при монтировании
