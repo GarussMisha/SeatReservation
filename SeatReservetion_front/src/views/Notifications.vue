@@ -14,6 +14,9 @@
       <!-- Заголовок -->
       <div class="page-header">
         <div class="header-content">
+          <button @click="goBack" class="back-button">
+            ← Назад
+          </button>
           <h1>📬 Мои уведомления</h1>
           <p class="subtitle">История всех ваших уведомлений</p>
         </div>
@@ -145,9 +148,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useServerNotificationStore } from '../stores/serverNotifications'
 import { useNotificationStore } from '../stores/notifications'
 
+const router = useRouter()
 const notificationStore = useServerNotificationStore()
 const toastStore = useNotificationStore()
 
@@ -216,6 +221,10 @@ const isNotificationUnread = (notification) => {
 const markAllAsRead = () => {
   notificationStore.markAllAsRead()
   toastStore.success('Все уведомления отмечены как прочитанные')
+}
+
+const goBack = () => {
+  router.push('/dashboard')
 }
 
 const getIconClass = (type) => {
@@ -371,6 +380,28 @@ onMounted(async () => {
   margin: 0 0 0.5rem 0;
   font-size: 2rem;
   color: #1f2937;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1rem;
+}
+
+.back-button:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  transform: translateX(-2px);
 }
 
 .subtitle {
