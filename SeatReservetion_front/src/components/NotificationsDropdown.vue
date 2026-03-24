@@ -60,11 +60,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useServerNotificationStore } from '../stores/serverNotifications'
 
 const router = useRouter()
+const route = useRoute()
 const notificationStore = useServerNotificationStore()
 
 const isOpen = ref(false)
@@ -73,6 +74,13 @@ const isLoading = ref(false)
 const notifications = computed(() => notificationStore.notifications)
 const unreadCount = computed(() => notificationStore.unreadCount)
 const hasUnread = computed(() => notificationStore.hasUnreadNotifications)
+
+// Закрываем dropdown при переходе на страницу уведомлений
+watch(() => route.name, (newName) => {
+  if (newName === 'Notifications') {
+    isOpen.value = false
+  }
+})
 
 // Директива для закрытия при клике вне
 const vClickOutside = {

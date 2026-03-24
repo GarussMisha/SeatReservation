@@ -194,7 +194,6 @@ const refreshNotifications = async () => {
   isLoading.value = true
   try {
     await notificationStore.fetchMyNotifications(50, 0)
-    toastStore.success('Уведомления обновлены')
   } catch (error) {
     toastStore.error('Не удалось обновить уведомления', 'Ошибка')
   } finally {
