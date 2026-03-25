@@ -118,6 +118,7 @@
           @click="() => selectObject(wall)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(wall, e)"
+          @tap="() => selectObject(wall)"
         />
 
         <!-- Двери -->
@@ -135,6 +136,7 @@
           @click="() => selectObject(door)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(door, e)"
+          @tap="() => selectObject(door)"
         />
 
         <!-- Окна -->
@@ -152,6 +154,7 @@
           @click="() => selectObject(window)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(window, e)"
+          @tap="() => selectObject(window)"
         />
 
         <!-- Рабочие места -->
@@ -170,6 +173,7 @@
           @click="() => selectObject(workspace)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(workspace, e)"
+          @tap="() => selectObject(workspace)"
         >
           <!-- Текст с названием -->
           <v-text
@@ -203,6 +207,7 @@
           @click="() => selectObject(obj)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(obj, e)"
+          @tap="() => selectObject(obj)"
         >
           <v-text
             :config="{
