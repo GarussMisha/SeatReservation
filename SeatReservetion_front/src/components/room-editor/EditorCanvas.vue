@@ -229,9 +229,9 @@
             rotation: arrow.rotation || 0,
             draggable: currentTool === 'select' && !isPanning
           }"
-          @click="() => selectObject(arrow)"
-          @dragstart="handleDragStart"
-          @dragend="(e) => handleDragEnd(arrow, e)"
+          :on-click="() => selectObject(arrow)"
+          :on-dragstart="handleDragStart"
+          :on-dragend="(e) => handleDragEnd(arrow, e)"
         >
           <!-- Линия стрелки -->
           <v-line
@@ -269,9 +269,9 @@
             rotation: text.rotation || 0,
             draggable: currentTool === 'select' && !isPanning
           }"
-          @click="() => selectObject(text)"
-          @dragstart="handleDragStart"
-          @dragend="(e) => handleDragEnd(text, e)"
+          :on-click="() => selectObject(text)"
+          :on-dragstart="handleDragStart"
+          :on-dragend="(e) => handleDragEnd(text, e)"
         >
           <!-- Фон текста -->
           <v-rect
