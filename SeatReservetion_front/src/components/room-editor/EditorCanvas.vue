@@ -280,7 +280,8 @@ const emit = defineEmits([
   'delete-object',
   'add-object',
   'set-offset',
-  'set-zoom'
+  'set-zoom',
+  'select-tool'  // Добавлено для переключения инструмента
 ])
 
 const canvasContainer = ref(null)
@@ -428,7 +429,7 @@ const handleStageMouseDown = (e) => {
           // Размеры по умолчанию для разных типов объектов
           width: props.currentTool === 'wall' ? 200 : 
                  props.currentTool === 'door' ? 80 : 
-                 props.currentTool === 'window' ? 10 : 100,
+                 props.currentTool === 'window' ? 200 : 100,
           height: props.currentTool === 'wall' ? 10 : 
                   props.currentTool === 'door' ? 10 : 
                   props.currentTool === 'window' ? 10 : 50,
