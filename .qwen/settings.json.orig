@@ -9,6 +9,5 @@
       "Bash(git commit *)",
       "Bash(git push *)"
     ]
-  },
-  "$version": 3
+  }
 }

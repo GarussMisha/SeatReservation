@@ -351,8 +351,11 @@ const getObjectName = (type) => {
 
 // === Выравнивание по сетке ===
 
+// Шаг привязки к сетке (половина клетки = 10px)
+const snapStep = props.gridSize / 2
+
 const snapToGrid = (value) => {
-  return Math.round(value / props.gridSize) * props.gridSize
+  return Math.round(value / snapStep) * snapStep
 }
 
 // === Обработчики событий ===
