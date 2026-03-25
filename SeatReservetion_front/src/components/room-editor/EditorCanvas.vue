@@ -425,8 +425,13 @@ const handleStageMouseDown = (e) => {
           object_type: props.currentTool,
           x: snappedX,
           y: snappedY,
-          width: props.currentTool === 'wall' ? 200 : 100,
-          height: props.currentTool === 'wall' ? 10 : 50,
+          // Размеры по умолчанию для разных типов объектов
+          width: props.currentTool === 'wall' ? 200 : 
+                 props.currentTool === 'door' ? 80 : 
+                 props.currentTool === 'window' ? 10 : 100,
+          height: props.currentTool === 'wall' ? 10 : 
+                  props.currentTool === 'door' ? 10 : 
+                  props.currentTool === 'window' ? 10 : 50,
           rotation: 0,
           name: '',
           is_active: true
