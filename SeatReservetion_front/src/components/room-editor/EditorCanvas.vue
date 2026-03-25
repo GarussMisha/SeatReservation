@@ -381,13 +381,14 @@ const handleContentMouseDown = (e) => {
 }
 
 const handleStageMouseDown = (e) => {
-  console.log('handleStageMouseDown:', {
-    button: e.evt.button,
-    target: e.target,
-    targetType: e.target.getClassName(),
-    currentTool: props.currentTool,
-    isSelect: props.currentTool === 'select'
-  })
+  // === ОТЛАДКА ===
+  // console.log('handleStageMouseDown:', {
+  //   button: e.evt.button,
+  //   target: e.target,
+  //   targetType: e.target.getClassName(),
+  //   currentTool: props.currentTool,
+  //   isSelect: props.currentTool === 'select'
+  // })
 
   // Левая кнопка мыши
   if (e.evt.button === 0) {
@@ -401,16 +402,16 @@ const handleStageMouseDown = (e) => {
       if (props.currentTool !== 'select') {
         // Получаем координаты с учетом масштаба и смещения
         const pos = e.target.getStage().getPointerPosition()
-        console.log('Pointer position:', pos)
+        // console.log('Pointer position:', pos)
         
         const x = (pos.x - props.offset.x) / props.zoom
         const y = (pos.y - props.offset.y) / props.zoom
-        console.log('Calculated position:', { x, y })
+        // console.log('Calculated position:', { x, y })
 
         // Скругляем до сетки
         const snappedX = snapToGrid(x)
         const snappedY = snapToGrid(y)
-        console.log('Snapped position:', { snappedX, snappedY })
+        // console.log('Snapped position:', { snappedX, snappedY })
 
         // Проверяем, что координаты в пределах поля
         if (snappedX < 0 || snappedX > fieldWidthPx.value || snappedY < 0 || snappedY > fieldHeightPx.value) {
@@ -431,7 +432,7 @@ const handleStageMouseDown = (e) => {
           is_active: true
         }
 
-        console.log('Добавление объекта:', newObject)
+        // console.log('Добавление объекта:', newObject)
         emit('add-object', newObject)
         
         // Переключаем инструмент на select после добавления
@@ -445,10 +446,10 @@ const handleStageMouseDown = (e) => {
           }
         }, 10)
       } else {
-        console.log('Инструмент select, объект не создаем')
+        // console.log('Инструмент select, объект не создаем')
       }
     } else {
-      console.log('Клик по объекту:', e.target.getClassName())
+      // console.log('Клик по объекту:', e.target.getClassName())
     }
   }
 }
@@ -484,7 +485,8 @@ const handleDragStart = (e) => {
 }
 
 const handleDragEnd = (object, evt) => {
-  console.log('handleDragEnd:', { object, evt: !!evt, evtTarget: evt?.target })
+  // === ОТЛАДКА ===
+  // console.log('handleDragEnd:', { object, evt: !!evt, evtTarget: evt?.target })
   
   // Konva передает событие как объект с target
   const node = evt?.target || object
@@ -502,7 +504,8 @@ const handleDragEnd = (object, evt) => {
   const snappedX = snapToGrid(x)
   const snappedY = snapToGrid(y)
 
-  console.log('Перемещение:', { oldX: x, oldY: y, newX: snappedX, newY: snappedY })
+  // === ОТЛАДКА ===
+  // console.log('Перемещение:', { oldX: x, oldY: y, newX: snappedX, newY: snappedY })
 
   // Обновляем позицию узла
   node.x(snappedX)
