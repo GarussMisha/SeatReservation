@@ -229,9 +229,10 @@
             rotation: arrow.rotation || 0,
             draggable: currentTool === 'select' && !isPanning
           }"
-          :on-click="() => selectObject(arrow)"
-          :on-dragstart="handleDragStart"
-          :on-dragend="(e) => handleDragEnd(arrow, e)"
+          @click="() => selectObject(arrow)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(arrow, e)"
+          @tap="() => selectObject(arrow)"
         >
           <!-- Линия стрелки -->
           <v-line
@@ -269,9 +270,10 @@
             rotation: text.rotation || 0,
             draggable: currentTool === 'select' && !isPanning
           }"
-          :on-click="() => selectObject(text)"
-          :on-dragstart="handleDragStart"
-          :on-dragend="(e) => handleDragEnd(text, e)"
+          @click="() => selectObject(text)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(text, e)"
+          @tap="() => selectObject(text)"
         >
           <!-- Фон текста -->
           <v-rect
@@ -362,7 +364,12 @@ const emit = defineEmits([
   'add-object',
   'set-offset',
   'set-zoom',
-  'select-tool'  // Добавлено для переключения инструмента
+  'select-tool',
+  // События для Konva v-group
+  'click',
+  'tap',
+  'dragstart',
+  'dragend'
 ])
 
 const canvasContainer = ref(null)
