@@ -219,6 +219,87 @@
           />
         </v-rect>
 
+        <!-- Стрелки -->
+        <v-group
+          v-for="arrow in arrows"
+          :key="arrow.id"
+          :config="{
+            x: arrow.x,
+            y: arrow.y,
+            rotation: arrow.rotation || 0,
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(arrow)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(arrow, e)"
+        >
+          <!-- Линия стрелки -->
+          <v-line
+            :config="{
+              points: [0, 0, arrow.width || 20, 0],
+              stroke: arrow.id === selectedObjectId ? '#1976D2' : '#FF5722',
+              strokeWidth: arrow.height || 5,
+              lineCap: 'round',
+              lineJoin: 'round'
+            }"
+          />
+          <!-- Наконечник стрелки -->
+          <v-line
+            :config="{
+              points: [
+                (arrow.width || 20) - 5, -3,
+                arrow.width || 20, 0,
+                (arrow.width || 20) - 5, 3
+              ],
+              stroke: arrow.id === selectedObjectId ? '#1976D2' : '#FF5722',
+              strokeWidth: arrow.height || 5,
+              lineCap: 'round',
+              lineJoin: 'round'
+            }"
+          />
+        </v-group>
+
+        <!-- Текстовые метки -->
+        <v-group
+          v-for="text in texts"
+          :key="text.id"
+          :config="{
+            x: text.x,
+            y: text.y,
+            rotation: text.rotation || 0,
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(text)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(text, e)"
+        >
+          <!-- Фон текста -->
+          <v-rect
+            :config="{
+              width: text.width || 100,
+              height: text.height || 30,
+              fill: '#ffffff',
+              stroke: text.id === selectedObjectId ? '#1976D2' : '#4CAF50',
+              strokeWidth: text.id === selectedObjectId ? 3 : 2,
+              cornerRadius: 4
+            }"
+          />
+          <!-- Текст -->
+          <v-text
+            :config="{
+              text: text.description || 'Текст',
+              fontSize: 14,
+              fontFamily: 'Arial',
+              fill: '#333',
+              align: 'center',
+              verticalAlign: 'middle',
+              width: text.width || 100,
+              height: text.height || 30,
+              listening: false
+            }"
+          />
+        </v-group>
+
         <!-- Линия для рисования стены (превью) -->
         <v-line
           v-if="isDrawingWall && wallPreview.length > 0"
@@ -308,8 +389,10 @@ const walls = computed(() => props.objects.filter(obj => obj.object_type === 'wa
 const doors = computed(() => props.objects.filter(obj => obj.object_type === 'door'))
 const windows = computed(() => props.objects.filter(obj => obj.object_type === 'window'))
 const workspaces = computed(() => props.objects.filter(obj => obj.object_type === 'workspace'))
+const arrows = computed(() => props.objects.filter(obj => obj.object_type === 'arrow'))
+const texts = computed(() => props.objects.filter(obj => obj.object_type === 'text'))
 const otherObjects = computed(() => props.objects.filter(obj =>
-  !['wall', 'door', 'window', 'workspace'].includes(obj.object_type)
+  !['wall', 'door', 'window', 'workspace', 'arrow', 'text'].includes(obj.object_type)
 ))
 
 const stageConfig = computed(() => ({
@@ -345,7 +428,9 @@ const getObjectName = (type) => {
     kitchen: 'Кухня',
     meeting_room: 'Переговорка',
     staircase: 'Лестница',
-    restroom: 'Отдых'
+    restroom: 'Отдых',
+    arrow: '',
+    text: ''
   }
   return names[type] || type
 }
@@ -421,21 +506,37 @@ const handleStageMouseDown = (e) => {
         }
 
         // Создаем новый объект с уникальным ID
-        const newObject = {
+        let newObject = {
           id: Date.now(), // Уникальный временный ID
           object_type: props.currentTool,
           x: snappedX,
           y: snappedY,
-          // Размеры по умолчанию для разных типов объектов
-          width: props.currentTool === 'wall' ? 200 : 
-                 props.currentTool === 'door' ? 80 : 
-                 props.currentTool === 'window' ? 200 : 100,
-          height: props.currentTool === 'wall' ? 10 : 
-                  props.currentTool === 'door' ? 10 : 
-                  props.currentTool === 'window' ? 10 : 50,
           rotation: 0,
           name: '',
+          description: '',
           is_active: true
+        }
+
+        // Размеры по умолчанию для разных типов объектов
+        if (props.currentTool === 'wall') {
+          newObject.width = 200
+          newObject.height = 10
+        } else if (props.currentTool === 'door') {
+          newObject.width = 80
+          newObject.height = 10
+        } else if (props.currentTool === 'window') {
+          newObject.width = 200
+          newObject.height = 10
+        } else if (props.currentTool === 'arrow') {
+          newObject.width = 20
+          newObject.height = 5
+        } else if (props.currentTool === 'text') {
+          newObject.width = 100
+          newObject.height = 30
+          newObject.description = 'Текст'
+        } else {
+          newObject.width = 100
+          newObject.height = 50
         }
 
         // console.log('Добавление объекта:', newObject)

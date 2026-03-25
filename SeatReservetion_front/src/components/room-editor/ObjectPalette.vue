@@ -104,6 +104,24 @@
           <span class="tool-icon">🛋️</span>
           <span class="tool-label">Отдых</span>
         </button>
+
+        <button
+          @click="$emit('select-tool', 'arrow')"
+          :class="['tool-btn', { active: currentTool === 'arrow' }]"
+          title="Стрелка"
+        >
+          <span class="tool-icon">➡️</span>
+          <span class="tool-label">Стрелка</span>
+        </button>
+
+        <button
+          @click="$emit('select-tool', 'text')"
+          :class="['tool-btn', { active: currentTool === 'text' }]"
+          title="Текст"
+        >
+          <span class="tool-icon">📝</span>
+          <span class="tool-label">Текст</span>
+        </button>
       </div>
     </div>
 
