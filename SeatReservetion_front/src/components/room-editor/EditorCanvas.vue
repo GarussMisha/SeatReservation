@@ -117,7 +117,7 @@
           }"
           @click="() => selectObject(wall)"
           @dragstart="handleDragStart"
-          @dragend="handleDragEnd(wall, $evt)"
+          @dragend="(e) => handleDragEnd(wall, e)"
         />
 
         <!-- Двери -->
@@ -134,7 +134,7 @@
           }"
           @click="() => selectObject(door)"
           @dragstart="handleDragStart"
-          @dragend="handleDragEnd(door, $evt)"
+          @dragend="(e) => handleDragEnd(door, e)"
         />
 
         <!-- Окна -->
@@ -151,7 +151,7 @@
           }"
           @click="() => selectObject(window)"
           @dragstart="handleDragStart"
-          @dragend="handleDragEnd(window, $evt)"
+          @dragend="(e) => handleDragEnd(window, e)"
         />
 
         <!-- Рабочие места -->
@@ -169,7 +169,7 @@
           }"
           @click="() => selectObject(workspace)"
           @dragstart="handleDragStart"
-          @dragend="handleDragEnd(workspace, $evt)"
+          @dragend="(e) => handleDragEnd(workspace, e)"
         >
           <!-- Текст с названием -->
           <v-text
@@ -202,7 +202,7 @@
           }"
           @click="() => selectObject(obj)"
           @dragstart="handleDragStart"
-          @dragend="handleDragEnd(obj, $evt)"
+          @dragend="(e) => handleDragEnd(obj, e)"
         >
           <v-text
             :config="{
@@ -484,22 +484,27 @@ const handleDragStart = (e) => {
 }
 
 const handleDragEnd = (object, evt) => {
-  console.log('handleDragEnd:', { object, evt: !!evt })
+  console.log('handleDragEnd:', { object, evt: !!evt, evtTarget: evt?.target })
   
-  // Проверяем, что evt существует
-  if (!evt || !evt.target) {
-    console.warn('handleDragEnd: evt или evt.target не определен')
+  // Konva передает событие как объект с target
+  const node = evt?.target || object
+  
+  // Если node это сам объект (не Konva Node), пропускаем
+  if (!node || typeof node.x !== 'function') {
+    console.warn('handleDragEnd: node не является Konva Node')
     return
   }
   
-  const node = evt.target
   const x = node.x()
   const y = node.y()
 
-  // Скругляем до сетки
+  // Скругляем до сетки (10px)
   const snappedX = snapToGrid(x)
   const snappedY = snapToGrid(y)
 
+  console.log('Перемещение:', { oldX: x, oldY: y, newX: snappedX, newY: snappedY })
+
+  // Обновляем позицию узла
   node.x(snappedX)
   node.y(snappedY)
 
