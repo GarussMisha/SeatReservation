@@ -32,55 +32,37 @@
         <span class="label-icon">📅</span>
         Дата
       </label>
-      <div class="date-selector">
-        <button
-          @click="previousMonth"
-          class="nav-btn"
-          title="Предыдущий месяц"
-        >
-          ‹
+      <div class="calendar-wrapper">
+        <button @click="toggleCalendar" class="date-display">
+          {{ formattedDate }}
+          <span class="calendar-icon">📅</span>
         </button>
-        
-        <div class="calendar-wrapper">
-          <button @click="toggleCalendar" class="date-display">
-            {{ formattedDate }}
-            <span class="calendar-icon">📅</span>
-          </button>
-          
-          <transition name="calendar-slide">
-            <div v-if="showCalendar" class="mini-calendar">
-              <div class="calendar-header">
-                <span class="calendar-month-year">{{ currentMonthYear }}</span>
-              </div>
 
-              <div class="calendar-grid">
-                <div
-                  v-for="day in calendarDays"
-                  :key="day.date"
-                  :class="[
-                    'calendar-day',
-                    day.isToday ? 'today' : '',
-                    day.isPast ? 'past' : '',
-                    day.isSelected ? 'selected' : '',
-                    day.hasBooking ? 'has-booking' : ''
-                  ]"
-                  @click="selectDate(day.date)"
-                >
-                  <span class="day-number">{{ day.day }}</span>
-                  <div v-if="day.hasBooking" class="booking-dot"></div>
-                </div>
+        <transition name="calendar-slide">
+          <div v-if="showCalendar" class="mini-calendar">
+            <div class="calendar-header">
+              <span class="calendar-month-year">{{ currentMonthYear }}</span>
+            </div>
+
+            <div class="calendar-grid">
+              <div
+                v-for="day in calendarDays"
+                :key="day.date"
+                :class="[
+                  'calendar-day',
+                  day.isToday ? 'today' : '',
+                  day.isPast ? 'past' : '',
+                  day.isSelected ? 'selected' : '',
+                  day.hasBooking ? 'has-booking' : ''
+                ]"
+                @click="selectDate(day.date)"
+              >
+                <span class="day-number">{{ day.day }}</span>
+                <div v-if="day.hasBooking" class="booking-dot"></div>
               </div>
             </div>
-          </transition>
-        </div>
-        
-        <button
-          @click="nextMonth"
-          class="nav-btn"
-          title="Следующий месяц"
-        >
-          ›
-        </button>
+          </div>
+        </transition>
       </div>
     </div>
 
@@ -213,22 +195,6 @@ const toggleCalendar = () => {
   showCalendar.value = !showCalendar.value
 }
 
-const previousMonth = () => {
-  currentDate.value = new Date(
-    currentDate.value.getFullYear(),
-    currentDate.value.getMonth() - 1,
-    1
-  )
-}
-
-const nextMonth = () => {
-  currentDate.value = new Date(
-    currentDate.value.getFullYear(),
-    currentDate.value.getMonth() + 1,
-    1
-  )
-}
-
 const formatDateForAPI = (date) => {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -346,32 +312,6 @@ onUnmounted(() => {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.date-selector {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.nav-btn {
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #667eea;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.nav-btn:hover {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-  border-color: rgba(102, 126, 234, 0.4);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-  transform: translateY(-1px);
 }
 
 .calendar-wrapper {
