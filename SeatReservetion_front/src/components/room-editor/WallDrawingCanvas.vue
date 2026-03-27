@@ -97,6 +97,16 @@ onMounted(() => {
   const c = canvas.value
   ctx.value = c.getContext('2d')
   
+  // Инициализируем начальное смещение для центрирования поля
+  if (props.offset.x === 0 && props.offset.y === 0) {
+    const fieldWidthPx = props.fieldWidth * props.gridSize
+    const fieldHeightPx = props.fieldHeight * props.gridSize
+    emit('update-offset', {
+      x: (canvasWidth.value - fieldWidthPx * props.zoom) / 2,
+      y: (canvasHeight.value - fieldHeightPx * props.zoom) / 2
+    })
+  }
+  
   draw()
   
   document.addEventListener('keydown', handleKeyDown)
@@ -148,6 +158,10 @@ const draw = () => {
   const c = ctx.value
   c.clearRect(0, 0, canvasWidth.value, canvasHeight.value)
   
+  // Рисуем белый фон
+  c.fillStyle = '#ffffff'
+  c.fillRect(0, 0, canvasWidth.value, canvasHeight.value)
+  
   // Сохраняем контекст для трансформаций
   c.save()
   
@@ -161,7 +175,14 @@ const draw = () => {
   // Рисуем границы поля
   drawFieldBounds()
   
-  // Рисуем готовые стены из store
+  // Восстанавливаем контекст перед рисованием объектов
+  c.restore()
+  
+  // Рисуем готовые стены из store (уже с трансформациями)
+  c.save()
+  c.translate(props.offset.x, props.offset.y)
+  c.scale(props.zoom, props.zoom)
+  
   const walls = store.objects.filter(obj => obj.object_type === 'wall')
   walls.forEach(wall => {
     drawWall(wall, '#1e293b', 8)
@@ -172,9 +193,6 @@ const draw = () => {
   partitions.forEach(part => {
     drawWall(part, '#94a3b8', 3)
   })
-  
-  // Рисуем SVG объекты (иконки)
-  drawSvgObjects()
   
   // Рисуем текущую линию
   if (currentLine.value.length > 0 && isDrawing.value) {
@@ -219,42 +237,43 @@ const drawGrid = () => {
   const fieldWidthPx = props.fieldWidth * props.gridSize
   const fieldHeightPx = props.fieldHeight * props.gridSize
   
+  // Рисуем только видимую часть сетки для производительности
+  c.beginPath()
+  
   for (let x = 0; x <= fieldWidthPx; x += props.gridSize) {
-    c.beginPath()
     c.moveTo(x, 0)
     c.lineTo(x, fieldHeightPx)
-    c.stroke()
   }
   
   for (let y = 0; y <= fieldHeightPx; y += props.gridSize) {
-    c.beginPath()
     c.moveTo(0, y)
     c.lineTo(fieldWidthPx, y)
-    c.stroke()
   }
+  
+  c.stroke()
 }
 
 const drawFieldBounds = () => {
   const c = ctx.value
   const fieldWidthPx = props.fieldWidth * props.gridSize
   const fieldHeightPx = props.fieldHeight * props.gridSize
-  
+
   c.strokeStyle = '#4CAF50'
   c.lineWidth = 3 / props.zoom
   c.setLineDash([10, 5])
   c.strokeRect(0, 0, fieldWidthPx, fieldHeightPx)
   c.setLineDash([])
-  
-  // Подписи размеров
+
+  // Подписи размеров (рисуем внутри поля чтобы не обрезалось)
   c.fillStyle = '#4CAF50'
   c.font = `${14 / props.zoom}px Arial`
   c.textAlign = 'center'
-  c.fillText(`${props.fieldWidth} клеток (${props.fieldWidth * 0.5}м)`, fieldWidthPx / 2, -10 / props.zoom)
-  
+  c.fillText(`${props.fieldWidth} кл. (${props.fieldWidth * 0.5}м)`, fieldWidthPx / 2, 30 / props.zoom)
+
   c.save()
-  c.translate(-10 / props.zoom, fieldHeightPx / 2)
+  c.translate(30 / props.zoom, fieldHeightPx / 2)
   c.rotate(-Math.PI / 2)
-  c.fillText(`${props.fieldHeight} клеток (${props.fieldHeight * 0.5}м)`, 0, 0)
+  c.fillText(`${props.fieldHeight} кл. (${props.fieldHeight * 0.5}м)`, 0, 0)
   c.restore()
 }
 
