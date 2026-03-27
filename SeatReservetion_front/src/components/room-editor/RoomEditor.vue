@@ -6,11 +6,8 @@
   <div class="room-editor">
     <!-- Верхняя панель инструментов -->
     <EditorToolbar
-      :zoom="zoom"
       :can-undo="canUndo"
       :can-redo="canRedo"
-      @zoom-in="handleZoomIn"
-      @zoom-out="handleZoomOut"
       @undo="handleUndo"
       @redo="handleRedo"
       @save="handleSave"
@@ -24,8 +21,11 @@
         :current-tool="currentTool"
         :field-width="fieldWidth"
         :field-height="fieldHeight"
+        :is-drawing="isDrawing"
+        :current-line-length="currentLineLength"
         @select-tool="handleSelectTool"
         @update-field-size="handleUpdateFieldSize"
+        @toggle-snap="handleToggleSnap"
       />
 
       <!-- Центральная область - холст -->
@@ -37,9 +37,10 @@
           :offset="offset"
           :field-width="fieldWidth"
           :field-height="fieldHeight"
-          @wall-completed="handleWallCompleted"
+          :snap-to-grid="snapToGrid"
           @update-zoom="handleUpdateZoom"
           @update-offset="handleUpdateOffset"
+          @drawing-state="handleDrawingState"
         />
       </div>
 
@@ -50,6 +51,8 @@
         @delete="handleDeleteObject"
       />
     </div>
+
+    <!-- Нижняя панель с подсказками (общая для всех панелей) -->
   </div>
 </template>
 
@@ -69,6 +72,22 @@ const router = useRouter()
 const route = useRoute()
 const editorStore = useRoomEditorStore()
 const notificationStore = useNotificationStore()
+
+// Состояние рисования (получаем от WallDrawingCanvas)
+const isDrawing = ref(false)
+const currentLineLength = ref('0')
+const snapToGrid = ref(true) // Привязка к сетке
+
+// Обработчик состояния рисования
+const handleDrawingState = (state) => {
+  isDrawing.value = state.isDrawing
+  currentLineLength.value = state.currentLineLength
+}
+
+// Обработчик переключения привязки к сетке
+const handleToggleSnap = (enabled) => {
+  snapToGrid.value = enabled
+}
 
 // Состояние из store
 const currentRoom = computed(() => editorStore.currentRoom)
@@ -121,10 +140,6 @@ const handleAddObject = (object) => {
   }, 0)
 }
 
-const handleWallCompleted = (wall) => {
-  notificationStore.success(`Стена добавлена (${wall.points.length} точек)`, 'Успешно')
-}
-
 const handleUpdateZoom = (newZoom) => {
   editorStore.setZoom(newZoom)
 }
@@ -142,19 +157,11 @@ const handleDeleteObject = (objectId) => {
 }
 
 const handleSetOffset = (newOffset) => {
-  editorStore.setOffset(newOffset)
+  editorStore.setOffset(newOffset || { x: 0, y: 0 })
 }
 
 const handleSetZoom = (newZoom) => {
   editorStore.setZoom(newZoom)
-}
-
-const handleZoomIn = () => {
-  editorStore.setZoom(zoom.value + 0.1)
-}
-
-const handleZoomOut = () => {
-  editorStore.setZoom(zoom.value - 0.1)
 }
 
 const handleUndo = () => {
@@ -171,8 +178,16 @@ const handleSave = async () => {
     return
   }
 
+  console.log('Сохранение плана. Объекты:', objects.value)
+  console.log('Размеры поля:', fieldWidth.value, fieldHeight.value)
+
   try {
-    await roomObjectsAPI.saveRoomPlan(currentRoom.value.id, objects.value)
+    await roomObjectsAPI.saveRoomPlan(
+      currentRoom.value.id,
+      objects.value,
+      fieldWidth.value,
+      fieldHeight.value
+    )
     notificationStore.success('План помещения сохранен', 'Успешно')
   } catch (error) {
     console.error('Ошибка сохранения плана:', error)
@@ -219,8 +234,31 @@ const loadRoomData = async () => {
   try {
     // Получаем план помещения
     const plan = await roomObjectsAPI.getRoomPlan(roomId)
+    console.log('Загруженный план:', plan)
+    
     editorStore.loadObjects(plan.objects || [])
+
+    // Восстанавливаем размеры поля если они сохранены
+    if (plan.fieldWidth) {
+      editorStore.setFieldWidth(plan.fieldWidth)
+    }
+    if (plan.fieldHeight) {
+      editorStore.setFieldHeight(plan.fieldHeight)
+    }
+
     editorStore.setCurrentRoom({ id: roomId })
+    
+    // Перерисовываем холст после загрузки с небольшой задержкой
+    setTimeout(() => {
+      const canvas = document.querySelector('.wall-canvas')
+      if (canvas) {
+        const stage = canvas._konva
+        if (stage) {
+          // Перерисовываем все слои
+          stage.batchDraw()
+        }
+      }
+    }, 200)
   } catch (error) {
     console.error('Ошибка загрузки плана:', error)
     // Если план не найден, продолжаем с пустым редактором
@@ -249,6 +287,7 @@ onUnmounted(() => {
   display: flex;
   flex: 1;
   overflow: hidden;
+  min-width: fit-content;
 }
 
 .canvas-wrapper {
@@ -256,5 +295,6 @@ onUnmounted(() => {
   overflow: hidden;
   background: #f5f5f5;
   position: relative;
+  min-width: 0;
 }
 </style>

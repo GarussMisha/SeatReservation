@@ -11,16 +11,6 @@
     </div>
 
     <div class="toolbar-center">
-      <div class="zoom-controls">
-        <button @click="$emit('zoom-out')" class="toolbar-btn" title="Уменьшить">
-          🔍-
-        </button>
-        <span class="zoom-level">{{ Math.round(zoom * 100) }}%</span>
-        <button @click="$emit('zoom-in')" class="toolbar-btn" title="Увеличить">
-          🔍+
-        </button>
-      </div>
-
       <div class="history-controls">
         <button
           @click="$emit('undo')"
@@ -54,10 +44,6 @@
 
 <script setup>
 defineProps({
-  zoom: {
-    type: Number,
-    default: 1
-  },
   canUndo: {
     type: Boolean,
     default: false
@@ -68,7 +54,7 @@ defineProps({
   }
 })
 
-defineEmits(['zoom-in', 'zoom-out', 'undo', 'redo', 'save', 'cancel', 'clear'])
+defineEmits(['undo', 'redo', 'save', 'cancel', 'clear'])
 </script>
 
 <style scoped>
@@ -116,7 +102,6 @@ defineEmits(['zoom-in', 'zoom-out', 'undo', 'redo', 'save', 'cancel', 'clear'])
   gap: 1.5rem;
 }
 
-.zoom-controls,
 .history-controls {
   display: flex;
   align-items: center;
@@ -140,14 +125,6 @@ defineEmits(['zoom-in', 'zoom-out', 'undo', 'redo', 'save', 'cancel', 'clear'])
 .toolbar-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.zoom-level {
-  min-width: 50px;
-  text-align: center;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #666;
 }
 
 .toolbar-right {

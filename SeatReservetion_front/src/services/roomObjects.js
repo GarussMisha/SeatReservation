@@ -138,9 +138,13 @@ export const roomObjectsAPI = {
   /**
    * Сохранить весь план помещения
    */
-  async saveRoomPlan(roomId, objects) {
+  async saveRoomPlan(roomId, objects, fieldWidth, fieldHeight) {
     try {
-      const response = await api.post(`/api/v1/rooms/${roomId}/plan`, { objects })
+      const response = await api.post(`/api/v1/rooms/${roomId}/plan`, {
+        objects,
+        fieldWidth,
+        fieldHeight
+      })
       return response.data
     } catch (error) {
       console.error('Ошибка сохранения плана:', error)

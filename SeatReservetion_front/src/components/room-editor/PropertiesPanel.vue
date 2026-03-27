@@ -43,58 +43,24 @@
         ></textarea>
       </div>
 
-      <!-- Позиция -->
-      <div class="property-group">
-        <label class="property-label">Позиция</label>
+      <!-- Позиция и размеры (только для объектов, не для стен) -->
+      <div v-if="!['wall', 'internal_wall', 'window'].includes(selectedObject.object_type)" class="property-group">
+        <label class="property-label">Масштаб (%)</label>
         <div class="property-row">
-          <label for="obj-x" class="property-sublabel">X</label>
+          <label for="obj-scale" class="property-sublabel">Масштаб</label>
           <input
-            id="obj-x"
-            v-model.number="localX"
+            id="obj-scale"
+            v-model.number="localScale"
             type="number"
             class="property-input small"
-            @change="updateProperty('x', localX)"
+            @change="updateScale(localScale)"
           />
-        </div>
-        <div class="property-row">
-          <label for="obj-y" class="property-sublabel">Y</label>
-          <input
-            id="obj-y"
-            v-model.number="localY"
-            type="number"
-            class="property-input small"
-            @change="updateProperty('y', localY)"
-          />
+          <span class="size-unit">%</span>
         </div>
       </div>
 
-      <!-- Размеры -->
-      <div class="property-group">
-        <label class="property-label">Размеры</label>
-        <div class="property-row">
-          <label for="obj-width" class="property-sublabel">Ширина</label>
-          <input
-            id="obj-width"
-            v-model.number="localWidth"
-            type="number"
-            class="property-input small"
-            @change="updateProperty('width', localWidth)"
-          />
-        </div>
-        <div class="property-row">
-          <label for="obj-height" class="property-sublabel">Высота</label>
-          <input
-            id="obj-height"
-            v-model.number="localHeight"
-            type="number"
-            class="property-input small"
-            @change="updateProperty('height', localHeight)"
-          />
-        </div>
-      </div>
-
-      <!-- Поворот -->
-      <div class="property-group">
+      <!-- Поворот (только для рабочих мест) -->
+      <div v-if="selectedObject.object_type === 'workspace'" class="property-group">
         <label for="obj-rotation" class="property-label">Поворот (градусы)</label>
         <div class="rotation-control">
           <button @click="rotateObject(-90)" class="btn-rotate">↺</button>
@@ -121,12 +87,6 @@
         </label>
       </div>
     </div>
-
-    <div class="panel-footer">
-      <button @click="duplicateObject" class="btn-duplicate">
-        📋 Дублировать
-      </button>
-    </div>
   </div>
 
   <div v-else class="properties-panel empty">
@@ -138,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   selectedObject: {
@@ -152,10 +112,7 @@ const emit = defineEmits(['update', 'delete'])
 // Локальные копии для двухстороннего связывания
 const localName = ref('')
 const localDescription = ref('')
-const localX = ref(0)
-const localY = ref(0)
-const localWidth = ref(0)
-const localHeight = ref(0)
+const localScale = ref(100) // Масштаб в процентах (100% = базовый размер)
 const localRotation = ref(0)
 const localActive = ref(true)
 
@@ -164,10 +121,8 @@ watch(() => props.selectedObject, (newObj) => {
   if (newObj) {
     localName.value = newObj.name || ''
     localDescription.value = newObj.description || ''
-    localX.value = newObj.x || 0
-    localY.value = newObj.y || 0
-    localWidth.value = newObj.width || 100
-    localHeight.value = newObj.height || 50
+    // Вычисляем масштаб в процентах (базовый размер 100px = 100%)
+    localScale.value = Math.round((newObj.width || 100) / 100 * 100)
     localRotation.value = newObj.rotation || 0
     localActive.value = newObj.is_active !== undefined ? newObj.is_active : true
   }
@@ -194,24 +149,24 @@ const updateProperty = (property, value) => {
   }
 }
 
+// Обновление масштаба (в процентах)
+const updateScale = (scalePercent) => {
+  if (props.selectedObject) {
+    // Базовый размер 100px = 100%
+    const newSize = Math.round(scalePercent / 100 * 100)
+    emit('update', props.selectedObject.id, { 
+      width: newSize, 
+      height: newSize 
+    })
+  }
+}
+
+// Поворот объекта
 const rotateObject = (degrees) => {
   if (props.selectedObject) {
     const newRotation = (localRotation.value + degrees + 360) % 360
     localRotation.value = newRotation
     emit('update', props.selectedObject.id, { rotation: newRotation })
-  }
-}
-
-const duplicateObject = () => {
-  if (props.selectedObject) {
-    const duplicated = {
-      ...props.selectedObject,
-      id: Date.now(),
-      x: props.selectedObject.x + 20,
-      y: props.selectedObject.y + 20,
-      name: (props.selectedObject.name || '') + ' (копия)'
-    }
-    emit('update', props.selectedObject.id, duplicated)
   }
 }
 </script>
@@ -318,6 +273,19 @@ const duplicateObject = () => {
   min-width: 20px;
 }
 
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.size-unit {
+  font-size: 0.85rem;
+  color: #999;
+}
+
 .rotation-control {
   display: flex;
   align-items: center;
@@ -335,35 +303,6 @@ const duplicateObject = () => {
 }
 
 .btn-rotate:hover {
-  background: #e8e8e8;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.panel-footer {
-  padding: 1rem;
-  border-top: 1px solid #e0e0e0;
-}
-
-.btn-duplicate {
-  width: 100%;
-  padding: 0.75rem;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.btn-duplicate:hover {
   background: #e8e8e8;
 }
 

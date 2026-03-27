@@ -26,17 +26,17 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
   
   // Масштаб и позиционирование
   const zoom = ref(1)
-  const offset = ref({ x: 0, y: 0 })
-  
+  const offset = ref(null)
+
   // Размер сетки
   const gridSize = ref(20) // 1 клетка = 20px
 
   // Показывать сетку
   const showGrid = ref(true)
 
-  // Размеры поля (в клетках сетки)
-  const fieldWidth = ref(200) // 200 клеток = 100 метров (1 клетка = 0.5м)
-  const fieldHeight = ref(100) // 100 клеток = 50 метров
+  // Размеры поля (в клетках сетки) - 50x50 квадратов
+  const fieldWidth = ref(50) // 50 клеток = 25 метров (1 клетка = 0.5м)
+  const fieldHeight = ref(50) // 50 клеток = 25 метров
 
   // Загрузка
   const isLoading = ref(false)
@@ -68,7 +68,26 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
    * Загрузить объекты плана
    */
   const loadObjects = (loadedObjects) => {
-    objects.value = loadedObjects || []
+    console.log('Загруженные объекты с сервера:', loadedObjects)
+    
+    // Восстанавливаем points из properties для стен, перегородок и окон
+    const restoredObjects = (loadedObjects || []).map(obj => {
+      if (obj.object_type && ['wall', 'internal_wall', 'window'].includes(obj.object_type)) {
+        if (obj.properties && obj.properties.points) {
+          console.log('Восстанавливаем points для объекта:', obj.object_type, obj.properties.points)
+          return {
+            ...obj,
+            points: obj.properties.points
+          }
+        } else {
+          console.log('Нет points для объекта:', obj.object_type, obj)
+        }
+      }
+      return obj
+    })
+    
+    console.log('Восстановленные объекты:', restoredObjects)
+    objects.value = restoredObjects
     addToHistory()
   }
   
@@ -204,7 +223,7 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
     history.value = []
     historyIndex.value = -1
     zoom.value = 1
-    offset.value = { x: 0, y: 0 }
+    // offset не сбрасываем, чтобы не было ошибок при отрисовке
     error.value = null
     // currentRoom сохраняем
   }

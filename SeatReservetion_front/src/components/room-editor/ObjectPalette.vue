@@ -5,7 +5,7 @@
   <div class="object-palette">
     <div class="palette-section">
       <h3 class="palette-title">Инструменты</h3>
-      
+
       <div class="tools-grid">
         <button
           @click="$emit('select-tool', 'select')"
@@ -35,15 +35,6 @@
         </button>
 
         <button
-          @click="$emit('select-tool', 'door')"
-          :class="['tool-btn', { active: currentTool === 'door' }]"
-          title="Дверь"
-        >
-          <span class="tool-icon">🚪</span>
-          <span class="tool-label">Дверь</span>
-        </button>
-
-        <button
           @click="$emit('select-tool', 'window')"
           :class="['tool-btn', { active: currentTool === 'window' }]"
           title="Окно"
@@ -65,7 +56,7 @@
           :class="['tool-btn', { active: currentTool === 'workspace' }]"
           title="Рабочее место"
         >
-          <span class="tool-icon">🪑</span>
+          <img :src="icons.desktop" class="tool-icon svg-icon" alt="Рабочее место" />
           <span class="tool-label">Место</span>
         </button>
 
@@ -74,7 +65,7 @@
           :class="['tool-btn', { active: currentTool === 'printer' }]"
           title="Принтер"
         >
-          <span class="tool-icon">🖨️</span>
+          <img :src="icons.printer" class="tool-icon svg-icon" alt="Принтер" />
           <span class="tool-label">Принтер</span>
         </button>
 
@@ -83,7 +74,7 @@
           :class="['tool-btn', { active: currentTool === 'kitchen' }]"
           title="Кухня"
         >
-          <span class="tool-icon">☕</span>
+          <img :src="icons.kitchen" class="tool-icon svg-icon" alt="Кухня" />
           <span class="tool-label">Кухня</span>
         </button>
 
@@ -92,7 +83,7 @@
           :class="['tool-btn', { active: currentTool === 'staircase' }]"
           title="Лестница"
         >
-          <span class="tool-icon">🪜</span>
+          <img :src="icons.ladder" class="tool-icon svg-icon" alt="Лестница" />
           <span class="tool-label">Лестница</span>
         </button>
 
@@ -101,7 +92,7 @@
           :class="['tool-btn', { active: currentTool === 'restroom' }]"
           title="Раздевалка"
         >
-          <span class="tool-icon">👔</span>
+          <img :src="icons.hanger" class="tool-icon svg-icon" alt="Раздевалка" />
           <span class="tool-label">Раздевалка</span>
         </button>
 
@@ -110,7 +101,7 @@
           :class="['tool-btn', { active: currentTool === 'toilet_female' }]"
           title="Женский туалет"
         >
-          <span class="tool-icon">♀️</span>
+          <img :src="icons.toiletWoman" class="tool-icon svg-icon" alt="Женский" />
           <span class="tool-label">Женский</span>
         </button>
 
@@ -119,7 +110,7 @@
           :class="['tool-btn', { active: currentTool === 'toilet_male' }]"
           title="Мужской туалет"
         >
-          <span class="tool-icon">♂️</span>
+          <img :src="icons.toiletMan" class="tool-icon svg-icon" alt="Мужской" />
           <span class="tool-label">Мужской</span>
         </button>
 
@@ -128,7 +119,7 @@
           :class="['tool-btn', { active: currentTool === 'meeting_room' }]"
           title="Переговорная"
         >
-          <span class="tool-icon">💬</span>
+          <img :src="icons.conferenceRoom" class="tool-icon svg-icon" alt="Переговорная" />
           <span class="tool-label">Переговорка</span>
         </button>
       </div>
@@ -138,6 +129,15 @@
 
     <div class="palette-section">
       <h3 class="palette-title">Настройки</h3>
+
+      <label class="checkbox-label">
+        <input 
+          v-model="snapToGridEnabled"
+          type="checkbox"
+          @change="$emit('toggle-snap', snapToGridEnabled)"
+        />
+        <span>Привязка к сетке</span>
+      </label>
 
       <label class="checkbox-label">
         <input type="checkbox" checked />
@@ -180,11 +180,37 @@
         <p class="size-hint">1 клетка = 0.5 метра (мин: 50, макс: 500)</p>
       </div>
     </div>
+
+    <!-- Подсказки для рисования стен (внизу панели) -->
+    <div class="palette-divider"></div>
+
+    <!-- Подсказка перед началом рисования -->
+    <div v-if="!isDrawing && (currentTool === 'wall' || currentTool === 'internal_wall')" class="drawing-hint info">
+      <div class="hint-content">
+        <span class="hint-icon">🎯</span>
+        <div class="hint-text">
+          <p><strong>Кликните</strong> для начала рисования</p>
+          <p><strong>ПКМ</strong> для завершения линии</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Подсказка при рисовании -->
+    <div v-if="isDrawing" class="drawing-hint">
+      <div class="hint-content">
+        <span class="hint-icon">✏️</span>
+        <div class="hint-text">
+          <p><strong>Длина:</strong> {{ currentLineLength }} м</p>
+          <p><strong>ПКМ</strong> для завершения</p>
+          <p><strong>ESC</strong> для отмены</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { icons } from '@/components/accets/index.js'
 
 const props = defineProps({
@@ -199,10 +225,21 @@ const props = defineProps({
   fieldHeight: {
     type: Number,
     default: 100
+  },
+  isDrawing: {
+    type: Boolean,
+    default: false
+  },
+  currentLineLength: {
+    type: [String, Number],
+    default: '0'
   }
 })
 
-const emit = defineEmits(['select-tool', 'update-field-size'])
+const emit = defineEmits(['select-tool', 'update-field-size', 'toggle-snap'])
+
+// Состояние привязки к сетке
+const snapToGridEnabled = ref(true)
 
 // Вычисляемые значения в метрах
 const widthInMeters = computed(() => (props.fieldWidth * 0.5).toFixed(1))
@@ -248,11 +285,66 @@ const handleHeightInput = (event) => {
 
 <style scoped>
 .object-palette {
-  width: 180px;
+  width: 220px;
+  min-width: 220px;
   background: #ffffff;
   border-right: 1px solid #e0e0e0;
   padding: 1rem;
   overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* Подсказка при рисовании */
+.drawing-hint {
+  margin-top: 1rem;
+  background: rgba(255, 243, 199, 0.95);
+  border: 2px solid #f59e0b;
+  padding: 16px 20px;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 10;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.drawing-hint.info {
+  background: rgba(227, 242, 253, 0.95);
+  border-color: #2196F3;
+}
+
+.drawing-hint.info .hint-text strong {
+  color: #1976D2;
+}
+
+.hint-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.hint-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.hint-text {
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+}
+
+.hint-text p {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 4px 0;
+  line-height: 1.3;
+  word-wrap: break-word;
+}
+
+.hint-text strong {
+  color: #f59e0b;
+  font-weight: 600;
 }
 
 .palette-section {
@@ -306,13 +398,9 @@ const handleHeightInput = (event) => {
 }
 
 .tool-icon.svg-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
-.tool-icon.svg-icon :deep(svg) {
-  width: 100%;
-  height: 100%;
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
 }
 
 .tool-label {

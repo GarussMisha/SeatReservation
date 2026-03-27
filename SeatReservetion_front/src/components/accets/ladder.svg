@@ -5,11 +5,11 @@
    fill="#000000"
    version="1.1"
    id="Layer_1"
-   viewBox="0 0 512 387"
+   viewBox="0 0 512 512"
    xml:space="preserve"
    sodipodi:docname="ladder.svg"
    width="512"
-   height="387"
+   height="512"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -24,66 +24,96 @@
    inkscape:pageopacity="0.0"
    inkscape:pagecheckerboard="0"
    inkscape:deskcolor="#d1d1d1"
-   inkscape:zoom="1.1396484"
-   inkscape:cx="123.72236"
-   inkscape:cy="234.72151"
+   inkscape:zoom="2.2792968"
+   inkscape:cx="204.66839"
+   inkscape:cy="334.97173"
    inkscape:window-width="2121"
    inkscape:window-height="1239"
    inkscape:window-x="1004"
    inkscape:window-y="27"
    inkscape:window-maximized="0"
-   inkscape:current-layer="Layer_1" />
+   inkscape:current-layer="Layer_1"
+   showgrid="true"><inkscape:grid
+     id="grid1"
+     units="px"
+     originx="0"
+     originy="0"
+     spacingx="1"
+     spacingy="1"
+     empcolor="#0099e5"
+     empopacity="0.30196078"
+     color="#0099e5"
+     opacity="0.14901961"
+     empspacing="5"
+     enabled="true"
+     visible="true" /></sodipodi:namedview>
 <g
    id="g2"
-   transform="translate(0.07755756,-63.286966)">
+   transform="matrix(0.99984781,0,0,0.99984781,0.0462396,-13.976926)"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 	<g
-   id="g1">
+   id="g1"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 		<polygon
-   points="125.754,444.632 512,444.632 512,426.667 125.754,426.667 125.754,363.789 107.789,363.789 107.789,426.667 0,426.667 0,444.632 107.789,444.632 "
-   id="polygon1" />
+   points="107.789,363.789 107.789,426.667 0,426.667 0,444.632 107.789,444.632 125.754,444.632 512,444.632 512,426.667 125.754,426.667 125.754,363.789 "
+   id="polygon1"
+   style="stroke-width:14.60222231;stroke-dasharray:none" />
 	</g>
 </g>
 <g
    id="g4"
-   transform="translate(0.07755756,-63.286966)">
+   transform="matrix(0.99984781,0,0,0.99984781,0.0462396,-13.976926)"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 	<g
-   id="g3">
+   id="g3"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 		<polygon
-   points="197.614,354.807 215.579,354.807 215.579,336.842 197.614,336.842 197.614,273.965 179.649,273.965 179.649,336.842 80.842,336.842 80.842,354.807 179.649,354.807 "
-   id="polygon2" />
+   points="179.649,273.965 179.649,336.842 80.842,336.842 80.842,354.807 179.649,354.807 197.614,354.807 215.579,354.807 215.579,336.842 197.614,336.842 197.614,273.965 "
+   id="polygon2"
+   style="stroke-width:14.60222231;stroke-dasharray:none" />
 	</g>
 </g>
 <g
    id="g6"
-   transform="translate(0.07755756,-63.286966)">
+   transform="matrix(0.99984781,0,0,0.99984781,0.0462396,-13.976926)"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 	<g
-   id="g5">
+   id="g5"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 		<polygon
-   points="269.474,264.982 287.439,264.982 287.439,247.018 269.474,247.018 269.474,184.14 251.509,184.14 251.509,247.018 152.702,247.018 152.702,264.982 251.509,264.982 "
-   id="polygon4" />
+   points="251.509,184.14 251.509,247.018 152.702,247.018 152.702,264.982 251.509,264.982 269.474,264.982 287.439,264.982 287.439,247.018 269.474,247.018 269.474,184.14 "
+   id="polygon4"
+   style="stroke-width:14.60222231;stroke-dasharray:none" />
 	</g>
 </g>
 <g
-   id="g8">
+   id="g8"
+   transform="matrix(0.99984781,0,0,0.99984781,-0.031305,49.300399)"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 	<g
-   id="g7">
+   id="g7"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 		<polygon
-   points="341.333,175.158 359.298,175.158 359.298,157.193 341.333,157.193 341.333,94.316 323.368,94.316 323.368,157.193 224.561,157.193 224.561,175.158 323.368,175.158 "
+   points="323.368,94.316 323.368,157.193 224.561,157.193 224.561,175.158 323.368,175.158 341.333,175.158 359.298,175.158 359.298,157.193 341.333,157.193 341.333,94.316 "
    id="polygon6"
-   transform="translate(0.07755756,-63.286966)" />
+   transform="translate(0.07755756,-63.286966)"
+   style="stroke-width:14.60222231;stroke-dasharray:none" />
 	</g>
 </g>
 <g
    id="g10"
-   transform="translate(0.07755756,-63.286966)">
+   transform="matrix(0.99984781,0,0,0.99984781,0.0462396,-13.976926)"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 	<g
-   id="g9">
+   id="g9"
+   style="stroke-width:14.60222231;stroke-dasharray:none">
 		<rect
    x="296.42099"
    y="67.367996"
    width="134.737"
    height="17.965"
-   id="rect8" />
+   id="rect8"
+   style="stroke-width:14.60222231;stroke-dasharray:none" />
 	</g>
 </g>
 </svg>

@@ -5,18 +5,22 @@
 
 // Импорт SVG файлов как URL
 import conferenceRoomUrl from './conference-room.svg'
+import desktopUrl from './desktop.svg'
 import hangerUrl from './hanger.svg'
 import kitchenUrl from './kitchen-pack-knife.svg'
 import ladderUrl from './ladder.svg'
+import printerUrl from './printer.svg'
 import toiletManUrl from './toilet_man.svg'
 import toiletWomanUrl from './toilet_woman.svg'
 
 // Экспорт URL иконок
 export const icons = {
   conferenceRoom: conferenceRoomUrl,
+  desktop: desktopUrl,
   hanger: hangerUrl,
   kitchen: kitchenUrl,
   ladder: ladderUrl,
+  printer: printerUrl,
   toiletMan: toiletManUrl,
   toiletWoman: toiletWomanUrl
 }
