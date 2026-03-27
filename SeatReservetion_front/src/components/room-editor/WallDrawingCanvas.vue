@@ -4,7 +4,7 @@
  * С привязкой к сетке и предпросмотром
  */
 <template>
-  <div class="wall-canvas-container" @wheel.passive="handleWheel">
+  <div class="wall-canvas-container" ref="container">
     <canvas
       ref="canvas"
       class="wall-canvas"
@@ -66,6 +66,7 @@ const emit = defineEmits(['wall-completed', 'update-zoom', 'update-offset'])
 
 const canvas = ref(null)
 const ctx = ref(null)
+const container = ref(null)
 const store = useRoomEditorStore()
 
 // Состояние рисования
@@ -117,11 +118,21 @@ onMounted(async () => {
   
   document.addEventListener('keydown', handleKeyDown)
   window.addEventListener('resize', updateCanvasSize)
+  
+  // Добавляем не-пассивный обработчик для wheel
+  if (container.value) {
+    container.value.addEventListener('wheel', handleWheel, { passive: false })
+  }
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('resize', updateCanvasSize)
+  
+  // Удаляем обработчик wheel
+  if (container.value) {
+    container.value.removeEventListener('wheel', handleWheel)
+  }
 })
 
 // === Обновление размеров ===
