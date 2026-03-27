@@ -50,11 +50,9 @@
           <transition name="calendar-slide">
             <div v-if="showCalendar" class="mini-calendar">
               <div class="calendar-header">
-                <button @click="previousMonth" class="calendar-nav">‹</button>
                 <span class="calendar-month-year">{{ currentMonthYear }}</span>
-                <button @click="nextMonth" class="calendar-nav">›</button>
               </div>
-              
+
               <div class="calendar-grid">
                 <div
                   v-for="day in calendarDays"
