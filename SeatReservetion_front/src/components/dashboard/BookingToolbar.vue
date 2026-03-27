@@ -41,7 +41,9 @@
         <transition name="calendar-slide">
           <div v-if="showCalendar" class="mini-calendar">
             <div class="calendar-header">
+              <button @click="previousMonth" class="calendar-nav" title="Предыдущий месяц">‹</button>
               <span class="calendar-month-year">{{ currentMonthYear }}</span>
+              <button @click="nextMonth" class="calendar-nav" title="Следующий месяц">›</button>
             </div>
 
             <div class="calendar-grid">
@@ -193,6 +195,22 @@ const selectDate = (date) => {
 
 const toggleCalendar = () => {
   showCalendar.value = !showCalendar.value
+}
+
+const previousMonth = () => {
+  currentDate.value = new Date(
+    currentDate.value.getFullYear(),
+    currentDate.value.getMonth() - 1,
+    1
+  )
+}
+
+const nextMonth = () => {
+  currentDate.value = new Date(
+    currentDate.value.getFullYear(),
+    currentDate.value.getMonth() + 1,
+    1
+  )
 }
 
 const formatDateForAPI = (date) => {
