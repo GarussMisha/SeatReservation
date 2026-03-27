@@ -12,16 +12,36 @@
       <nav class="admin-nav">
         <ul>
           <li :class="{ active: currentView === 'overview' }">
-            <button @click="currentView = 'overview'">📊 Обзор</button>
+            <button @click="currentView = 'overview'">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+              Обзор
+            </button>
           </li>
           <li :class="{ active: currentView === 'users' }">
-            <button @click="currentView = 'users'">👥 Пользователи</button>
+            <button @click="currentView = 'users'">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+              </svg>
+              Пользователи
+            </button>
           </li>
           <li :class="{ active: currentView === 'rooms' }">
-            <button @click="currentView = 'rooms'">🏢 Помещения</button>
+            <button @click="currentView = 'rooms'">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+              Помещения
+            </button>
           </li>
           <li :class="{ active: currentView === 'workspaces' }">
-            <button @click="currentView = 'workspaces'">🪑 Рабочие места</button>
+            <button @click="currentView = 'workspaces'">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+              </svg>
+              Рабочие места
+            </button>
           </li>
         </ul>
       </nav>
@@ -55,8 +75,18 @@
           <div class="section-header">
             <h2>Управление пользователями</h2>
             <div class="header-buttons">
-              <button @click="refreshUsers" class="refresh-btn">🔄 Обновить</button>
-              <button @click="showUserModal = true" class="add-btn">➕ Добавить</button>
+              <button @click="refreshUsers" class="refresh-btn">
+                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Обновить
+              </button>
+              <button @click="showUserModal = true" class="add-btn">
+                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                Добавить
+              </button>
             </div>
           </div>
           
@@ -90,8 +120,16 @@
                     </span>
                   </td>
                   <td>
-                    <button @click="editUser(user)" class="action-btn edit" title="Редактировать">✏️</button>
-                    <button @click="showDeleteConfirm('user', user.id, user.login)" class="action-btn delete" title="Удалить">🗑️</button>
+                    <button @click="editUser(user)" class="action-btn edit" title="Редактировать">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                    <button @click="showDeleteConfirm('user', user.id, user.login)" class="action-btn delete" title="Удалить">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -125,8 +163,18 @@
           <div class="section-header">
             <h2>Управление помещениями</h2>
             <div class="header-buttons">
-              <button @click="refreshRooms" class="refresh-btn">🔄 Обновить</button>
-              <button @click="showRoomModal = true" class="add-btn">➕ Добавить</button>
+              <button @click="refreshRooms" class="refresh-btn">
+                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Обновить
+              </button>
+              <button @click="showRoomModal = true" class="add-btn">
+                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                Добавить
+              </button>
             </div>
           </div>
           
@@ -158,9 +206,21 @@
                     </span>
                   </td>
                   <td>
-                    <button @click="openRoomEditor(room)" class="action-btn plan" title="Редактировать план">🗺️</button>
-                    <button @click="editRoom(room)" class="action-btn edit" title="Редактировать">✏️</button>
-                    <button @click="showDeleteConfirm('room', room.id, room.name)" class="action-btn delete" title="Удалить">🗑️</button>
+                    <button @click="openRoomEditor(room)" class="action-btn plan" title="Редактировать план">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                      </svg>
+                    </button>
+                    <button @click="editRoom(room)" class="action-btn edit" title="Редактировать">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                    <button @click="showDeleteConfirm('room', room.id, room.name)" class="action-btn delete" title="Удалить">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -173,16 +233,23 @@
           <div class="section-header">
             <h2>Управление рабочими местами</h2>
             <div class="header-buttons">
-              <button @click="refreshWorkspaces" class="refresh-btn">🔄 Обновить</button>
+              <button @click="refreshWorkspaces" class="refresh-btn">
+                <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Обновить
+              </button>
             </div>
           </div>
-          
+
           <!-- Подсказка что рабочие места создаются через план помещения -->
           <div class="info-banner">
-            <span class="info-icon">ℹ️</span>
+            <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
             <p class="info-text">
               <strong>Рабочие места создаются через план помещения.</strong>
-              Перейдите в редактор помещения (кнопка 🗺️) и добавьте рабочие места на план.
+              Перейдите в редактор помещения и добавьте рабочие места на план.
             </p>
           </div>
           
@@ -229,8 +296,16 @@
                     </span>
                   </td>
                   <td>
-                    <button @click="editWorkspace(workspace)" class="action-btn edit" title="Редактировать">✏️</button>
-                    <button @click="showDeleteConfirm('workspace', workspace.id, workspace.name)" class="action-btn delete" title="Удалить">🗑️</button>
+                    <button @click="editWorkspace(workspace)" class="action-btn edit" title="Редактировать">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                    <button @click="showDeleteConfirm('workspace', workspace.id, workspace.name)" class="action-btn delete" title="Удалить">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
                   </td>
                 </tr>
                 <tr v-if="filteredWorkspaces.length === 0">
@@ -669,12 +744,12 @@ onMounted(async () => {
   width: 280px;
   flex-shrink: 0;
   align-self: stretch;
-  background: white;
-  padding: 2rem 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  border-radius: 24px;
+  background: var(--bg-white);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-3xl);
   border: 1px solid rgba(0, 0, 0, 0.1);
-  margin: 1rem 0;
+  margin: var(--spacing-lg) 0;
 }
 
 .admin-nav ul {
@@ -689,18 +764,27 @@ onMounted(async () => {
 
 .admin-nav button {
   width: 100%;
-  padding: 1rem 2rem;
+  padding: var(--spacing-lg);
   border: none;
   background: none;
   text-align: left;
   cursor: pointer;
-  transition: all 0.3s;
-  font-size: 1rem;
-  color: #666;
+  transition: var(--transition-base);
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
-  margin-bottom: 0.5rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .admin-nav button:hover {
@@ -773,40 +857,51 @@ onMounted(async () => {
   font-weight: 600;
 }
 
+.btn-icon-sm {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
 .refresh-btn {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-  color: white;
+  background: var(--gradient-gray);
+  color: var(--text-white);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.3s;
-  font-weight: 500;
+  transition: var(--transition-base);
+  font-weight: var(--font-weight-medium);
   box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+  display: inline-flex;
+  align-items: center;
 }
 
 .refresh-btn:hover {
-  transform: translateY(-2px);
+  transform: var(--hover-transform);
   box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
   background: linear-gradient(135deg, #7c8691 0%, #6c757d 100%);
 }
 
 .add-btn {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-  color: white;
+  background: var(--gradient-success);
+  color: var(--text-white);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.3s;
-  font-weight: 500;
+  transition: var(--transition-base);
+  font-weight: var(--font-weight-medium);
   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  display: inline-flex;
+  align-items: center;
 }
 
 .add-btn:hover {
-  transform: translateY(-2px);
+  transform: var(--hover-transform);
   box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-  background: linear-gradient(135deg, #34ce57 0%, #28a745 100%);
+  background: var(--gradient-success-hover);
 }
 
 

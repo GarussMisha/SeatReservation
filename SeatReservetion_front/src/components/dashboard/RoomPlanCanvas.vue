@@ -27,6 +27,7 @@
 
     <!-- Легенда -->
     <div class="legend">
+      <div class="legend-title">Рабочие места</div>
       <div class="legend-item">
         <span class="legend-color available"></span>
         <span class="legend-label">Свободно</span>
@@ -51,7 +52,8 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { roomObjectsAPI } from '@/services/roomObjects'
 import { useAuthStore } from '@/stores/auth'
-import { icons } from '@/components/accets/index.js'
+import { getIconUrl } from '@/components/accets/index.js'
+import desktopSvg from '@/components/accets/desktop.svg'
 
 const props = defineProps({
   roomId: {
@@ -86,6 +88,9 @@ const ctx = ref(null)
 // Состояние
 const workspaces = ref([])
 const walls = ref([])
+const roomObjects = ref([]) // Другие объекты (туалеты, кухня и т.д.)
+const loadedIcons = ref({}) // Кэш загруженных SVG иконок
+const desktopImage = ref(null) // Кэш изображения рабочего места
 const zoom = ref(1)
 const offset = ref({ x: 50, y: 50 })
 const isPanning = ref(false)
@@ -150,9 +155,9 @@ const draw = async () => {
   // Рисуем сетку
   drawGrid(c)
 
-  // Рисуем стены
+  // Рисуем стены (основные)
   walls.value.forEach(wall => {
-    if (wall.points && wall.points.length >= 4) {
+    if (wall.object_type === 'wall' && wall.points && wall.points.length >= 4) {
       c.beginPath()
       c.moveTo(wall.points[0], wall.points[1])
       for (let i = 2; i < wall.points.length; i += 2) {
@@ -166,11 +171,74 @@ const draw = async () => {
     }
   })
 
+  // Рисуем перегородки (тоньше основных стен)
+  walls.value.forEach(wall => {
+    if (wall.object_type === 'internal_wall' && wall.points && wall.points.length >= 4) {
+      c.beginPath()
+      c.moveTo(wall.points[0], wall.points[1])
+      for (let i = 2; i < wall.points.length; i += 2) {
+        c.lineTo(wall.points[i], wall.points[i + 1])
+      }
+      c.strokeStyle = '#999'
+      c.lineWidth = wall.thickness || 5
+      c.lineCap = 'round'
+      c.lineJoin = 'round'
+      c.stroke()
+    }
+  })
+
+  // Рисуем окна
+  walls.value.forEach(wall => {
+    if (wall.object_type === 'window' && wall.points && wall.points.length >= 4) {
+      c.beginPath()
+      c.moveTo(wall.points[0], wall.points[1])
+      for (let i = 2; i < wall.points.length; i += 2) {
+        c.lineTo(wall.points[i], wall.points[i + 1])
+      }
+      c.strokeStyle = '#87CEEB'
+      c.lineWidth = wall.thickness || 8
+      c.lineCap = 'round'
+      c.lineJoin = 'round'
+      c.setLineDash([5, 3])
+      c.stroke()
+      c.setLineDash([])
+    }
+  })
+
   // Рисуем рабочие места
   for (const workspace of workspaces.value) {
     await drawWorkspace(c, workspace)
   }
 
+  // Рисуем обозначения помещений (туалеты, кухня и т.д.)
+  roomObjects.value.forEach(obj => {
+    drawRoomLabel(c, obj)
+  })
+
+  c.restore()
+}
+
+// Отрисовка обозначений помещений (с SVG иконками)
+const drawRoomLabel = (c, obj) => {
+  const iconImg = loadedIcons.value[obj.object_type]
+  
+  if (!iconImg) return
+  
+  const width = obj.width || 80
+  const height = obj.height || 80
+  
+  // Используем x,y как ЦЕНТР объекта (как в редакторе админа)
+  const centerX = obj.x || 0
+  const centerY = obj.y || 0
+  
+  c.save()
+  // Транслируем в центр объекта
+  c.translate(centerX, centerY)
+  
+  // Рисуем SVG иконку в центре (без фона и текста)
+  const iconSize = Math.min(width, height) * 0.6
+  c.drawImage(iconImg, -iconSize / 2, -iconSize / 2, iconSize, iconSize)
+  
   c.restore()
 }
 
@@ -239,19 +307,10 @@ const drawWorkspace = async (c, workspace) => {
   c.shadowBlur = 0
   c.globalAlpha = 1
 
-  // SVG иконка или эмодзи
-  const iconSrc = icons.desktop
-  if (imageCache.value[iconSrc]) {
-    const img = imageCache.value[iconSrc]
-    const iconSize = Math.min(width, height) * 0.8
-    c.drawImage(img, -iconSize / 2, -iconSize / 2, iconSize, iconSize)
-  } else {
-    // Запасной вариант - эмодзи
-    c.font = `${Math.min(width, height) * 0.5}px Arial`
-    c.textAlign = 'center'
-    c.textBaseline = 'middle'
-    c.fillStyle = '#000'
-    c.fillText('🪑', 0, 0)
+  // SVG иконка рабочего места
+  if (desktopImage.value) {
+    const iconSize = Math.min(width, height) * 0.6
+    c.drawImage(desktopImage.value, -iconSize / 2, -iconSize / 2, iconSize, iconSize)
   }
 
   c.restore()
@@ -419,6 +478,26 @@ const centerView = () => {
   }
 }
 
+// Предзагрузка SVG иконок
+const loadIconsForObjects = async (objects) => {
+  const iconTypes = [...new Set(objects.map(obj => obj.object_type))]
+  const promises = iconTypes.map(async (type) => {
+    const iconUrl = getIconUrl(type)
+    if (iconUrl && !loadedIcons.value[type]) {
+      return new Promise((resolve) => {
+        const img = new Image()
+        img.src = iconUrl
+        img.onload = () => {
+          loadedIcons.value[type] = img
+          resolve()
+        }
+        img.onerror = () => resolve()
+      })
+    }
+  })
+  await Promise.all(promises)
+}
+
 // Загрузка данных
 const loadRoomPlan = async () => {
   if (!props.roomId) return
@@ -428,14 +507,17 @@ const loadRoomPlan = async () => {
     const plan = await roomObjectsAPI.getRoomPlan(props.roomId)
     const allObjects = plan.objects || []
 
+    // Предзагружаем SVG иконки для объектов
+    await loadIconsForObjects(allObjects)
+
     // Обрабатываем стены
     walls.value = allObjects
-      .filter(obj => ['wall', 'internal_wall'].includes(obj.object_type))
+      .filter(obj => ['wall', 'internal_wall', 'window'].includes(obj.object_type))
       .map(obj => {
         if (obj.properties && obj.properties.points) {
           const rawPoints = obj.properties.points
           let flatPoints = []
-          
+
           if (Array.isArray(rawPoints)) {
             if (rawPoints.length > 0 && typeof rawPoints[0] === 'object') {
               flatPoints = rawPoints.flatMap(p => [p.x || 0, p.y || 0])
@@ -443,10 +525,36 @@ const loadRoomPlan = async () => {
               flatPoints = rawPoints.map(p => typeof p === 'number' ? p : 0)
             }
           }
-          
+
           return { ...obj, points: flatPoints }
         }
         return { ...obj, points: [obj.x || 0, obj.y || 0, (obj.x || 0) + (obj.width || 100), (obj.y || 0)] }
+      })
+
+    // Обрабатываем другие объекты (туалеты, кухня и т.д.)
+    roomObjects.value = allObjects
+      .filter(obj => ['toilet_female', 'toilet_male', 'kitchen', 'restroom', 'meeting_room', 'printer', 'staircase'].includes(obj.object_type))
+      .map(obj => {
+        // Получаем координаты из points или из x,y
+        let x = obj.x || 0
+        let y = obj.y || 0
+        
+        // Если есть points, берём первую точку
+        if (obj.properties && obj.properties.points && obj.properties.points.length > 0) {
+          const points = obj.properties.points
+          if (Array.isArray(points) && points.length >= 2) {
+            x = typeof points[0] === 'object' ? points[0].x : points[0]
+            y = typeof points[0] === 'object' ? points[0].y : points[1]
+          }
+        }
+        
+        return {
+          ...obj,
+          x: x,
+          y: y,
+          width: obj.width || 80,
+          height: obj.height || 80
+        }
       })
 
     // Загружаем рабочие места
@@ -503,19 +611,25 @@ onMounted(() => {
     const resize = () => {
       if (container.value && canvas.value) {
         canvas.value.width = container.value.clientWidth
-        canvas.value.height = container.value.clientHeight
+        canvas.value.height = container.value.clientHeight * 2  // Увеличиваем высоту в 2 раза
         draw()
       }
     }
     
     resize()
     window.addEventListener('resize', resize)
+
+    // Предзагружаем SVG иконку рабочего места
+    const img = new Image()
+    img.src = desktopSvg
+    img.onload = () => {
+      desktopImage.value = img
+      draw()
+    }
     
-    // Предзагружаем иконку
-    loadSvgImage(icons.desktop).then(() => {
-      loadRoomPlan()
-    })
-    
+    // Загружаем план
+    loadRoomPlan()
+
     onUnmounted(() => {
       window.removeEventListener('resize', resize)
     })
@@ -635,5 +749,38 @@ defineExpose({
 .legend-label {
   font-size: 0.85rem;
   color: #333;
+}
+
+.legend-title {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.legend-line {
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.legend-line.wall {
+  background: #333;
+  height: 8px;
+}
+
+.legend-line.internal-wall {
+  background: #999;
+  height: 4px;
+}
+
+.legend-line.window {
+  background: #87CEEB;
+  border: 2px dashed #666;
+}
+
+.legend-icon {
+  font-size: 1.25rem;
 }
 </style>

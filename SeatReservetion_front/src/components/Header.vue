@@ -15,7 +15,11 @@
           @click="goToAdmin"
           class="header-action-btn admin-btn"
         >
-          ⚙️ Админка
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Админка
         </button>
 
         <div v-if="hasActions" class="header-actions">
@@ -25,6 +29,10 @@
             :class="['header-action-btn', action.className]"
             @click="action.onClick"
           >
+            <svg v-if="action.icon === 'settings'" class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
             {{ action.text }}
           </button>
         </div>
@@ -113,24 +121,24 @@ const handleLogout = () => {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
-  padding: 1rem 20px 0 20px;
+  z-index: var(--z-sticky);
+  padding: var(--spacing-lg) 20px 0 20px;
   background: transparent;
   min-height: 80px;
   border-bottom: none;
 }
 
 .header-content {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--bg-card-transparent);
   padding: 1.2rem 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   max-width: 1400px;
   margin: 0 auto;
-  backdrop-filter: blur(20px) saturate(1.8);
+  backdrop-filter: var(--backdrop-filter);
   border: 1px solid rgba(129, 119, 119, 0.2);
   background: linear-gradient(135deg,
     rgba(179, 49, 157, 0.2) 0%,
@@ -143,16 +151,16 @@ const handleLogout = () => {
 
 .header-title {
   margin: 0;
-  color: #ffffff;
-  font-size: 1.5rem;
-  font-weight: 600;
+  color: var(--text-white);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: var(--spacing-lg);
 }
 
 /* Уведомления */
@@ -164,138 +172,147 @@ const handleLogout = () => {
 .user-section {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-lg);
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  border-radius: var(--radius-full);
+  background: var(--primary-gradient);
+  color: var(--text-white);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  transition: all 0.3s ease;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-primary);
+  transition: var(--transition-base);
   cursor: pointer;
 }
 
 .user-avatar:hover {
-  transform: translateY(-2px);
+  transform: var(--hover-transform);
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 .header-actions {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-lg);
   align-items: center;
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }
 
 .header-action-btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: var(--transition-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-md);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
 }
 
 .header-action-btn.back-btn {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  color: white;
+  background: var(--gradient-blue);
+  color: var(--text-white);
 }
 
 .header-action-btn.back-btn:hover {
-  background: linear-gradient(135deg, #5dade2 0%, #3498db 100%);
-  transform: translateY(-2px);
+  background: var(--gradient-blue-hover);
+  transform: var(--hover-transform);
   box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
 }
 
 .header-action-btn.toggle-btn {
-  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-  color: white;
+  background: var(--gradient-green);
+  color: var(--text-white);
 }
 
 .header-action-btn.toggle-btn:hover {
-  background: linear-gradient(135deg, #58d68d 0%, #27ae60 100%);
-  transform: translateY(-2px);
+  background: var(--gradient-green-hover);
+  transform: var(--hover-transform);
   box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
 }
 
 .header-action-btn.admin-btn {
-  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-  color: white;
+  background: var(--gradient-purple);
+  color: var(--text-white);
 }
 
 .header-action-btn.admin-btn:hover {
-  background: linear-gradient(135deg, #af7ac5 0%, #9b59b6 100%);
-  transform: translateY(-2px);
+  background: var(--gradient-purple-hover);
+  transform: var(--hover-transform);
   box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
 }
 
 .logout-btn {
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-  color: white;
+  background: var(--gradient-danger);
+  color: var(--text-white);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-  font-weight: 600;
+  transition: var(--transition-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
 .logout-btn:hover {
-  background: linear-gradient(135deg, #ec7063 0%, #e74c3c 100%);
-  transform: translateY(-2px);
+  background: var(--gradient-danger-hover);
+  transform: var(--hover-transform);
   box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
   .app-header {
-    padding: 0.8rem 10px 0 10px;
+    padding: var(--spacing-sm) 10px 0 10px;
     min-height: 70px;
   }
-  
+
   .header-content {
-    padding: 1rem;
+    padding: var(--spacing-lg);
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--spacing-lg);
     text-align: center;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
   }
-  
+
   .header-right {
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--spacing-lg);
     width: 100%;
   }
-  
+
   .header-actions {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .header-action-btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .user-section {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--spacing-xs);
   }
-  
+
   .header-title {
-    font-size: 1.2rem;
+    font-size: var(--font-size-xl);
   }
 }
 
@@ -304,24 +321,29 @@ const handleLogout = () => {
     padding: 0.6rem 8px 0 8px;
     min-height: 60px;
   }
-  
+
   .header-content {
     padding: 0.8rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
   }
-  
+
   .header-title {
-    font-size: 1rem;
+    font-size: var(--font-size-lg);
   }
-  
+
   .user-greeting {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
   }
-  
+
   .header-action-btn,
   .logout-btn {
     padding: 0.6rem 1rem;
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
+  }
+  
+  .btn-icon {
+    width: 16px;
+    height: 16px;
   }
 }
 </style>

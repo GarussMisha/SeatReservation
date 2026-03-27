@@ -78,8 +78,7 @@
                 <button @click="closeModal" class="close-button">&times;</button>
               </div>
               <div class="modal-body">
-                <p>Жаль, что вы забыли пароль)</p>
-                <p>Обратитесь к администратору системы для восстановления доступа.</p>
+                <p>Не переживайте! Обратитесь к администратору системы для восстановления доступа.</p>
               </div>
               <div class="modal-footer">
                 <button @click="closeModal" class="modal-button">Понятно</button>
@@ -235,7 +234,7 @@ onMounted(async () => {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -252,87 +251,87 @@ onMounted(async () => {
 }
 
 .login-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  padding: 40px;
-  backdrop-filter: blur(10px);
+  background: var(--bg-card);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--spacing-xl);
+  backdrop-filter: var(--backdrop-blur-sm);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-xl);
 }
 
 .logo {
-  margin: 0 auto 20px;
+  margin: 0 auto var(--spacing-lg);
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 15px;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--text-white);
 }
 
 .login-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 8px;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
 }
 
 .login-subtitle {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
   margin: 0;
 }
 
 .login-form {
-  margin-bottom: 30px;
+  margin-bottom: var(--spacing-xl);
 }
 
 .error-message {
   background: #fef2f2;
   border: 1px solid #fecaca;
   color: #dc2626;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-lg);
   display: flex;
   align-items: center;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .form-label {
   display: flex;
   align-items: center;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   color: #374151;
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-xs);
 }
 
 .form-input {
   width: 100%;
   padding: 12px 16px;
   border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 14px;
-  transition: all 0.2s;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  transition: var(--transition-fast);
   background: #f9fafb;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  background: white;
+  border-color: var(--primary-start);
+  background: var(--bg-white);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -356,20 +355,20 @@ onMounted(async () => {
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
-  transition: color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .password-toggle:hover {
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .field-error {
   color: #dc2626;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   margin-top: 4px;
   margin-left: 4px;
 }
@@ -378,14 +377,14 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: var(--spacing-xl);
 }
 
 .forgot-password {
-  font-size: 14px;
-  color: #667eea;
+  font-size: var(--font-size-sm);
+  color: var(--primary-start);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .forgot-password:hover {
@@ -395,15 +394,15 @@ onMounted(async () => {
 
 .login-button {
   width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--primary-gradient);
+  color: var(--text-white);
   border: none;
   padding: 14px 20px;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -411,7 +410,7 @@ onMounted(async () => {
 }
 
 .login-button:hover:not(:disabled) {
-  transform: translateY(-1px);
+  transform: var(--hover-transform-sm);
   box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
 }
 
@@ -425,8 +424,8 @@ onMounted(async () => {
   width: 20px;
   height: 20px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
-  border-radius: 50%;
+  border-top: 2px solid var(--text-white);
+  border-radius: var(--radius-full);
   animation: spin 1s linear infinite;
 }
 
@@ -438,14 +437,13 @@ onMounted(async () => {
 .login-footer {
   text-align: center;
   border-top: 1px solid #e5e7eb;
-  padding-top: 20px;
-  margin-top: 20px;
+  padding-top: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
 }
-
 
 .version-info {
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--text-light);
   margin: 0;
 }
 
@@ -468,7 +466,7 @@ onMounted(async () => {
 .shape {
   position: absolute;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   animation: float 6s ease-in-out infinite;
 }
 
@@ -533,20 +531,19 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
-
-  border-radius: 20px;
-  padding: 40px;
-  backdrop-filter: blur(10px);
+  z-index: var(--z-modal-overlay);
+  animation: fadeIn var(--animation-duration) var(--animation-timing);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-xl);
+  backdrop-filter: var(--backdrop-blur-sm);
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-white);
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  animation: slideIn 0.3s ease;
+  box-shadow: var(--shadow-xl);
+  animation: slideIn var(--animation-duration) var(--animation-timing);
   overflow: hidden;
 }
 
@@ -554,68 +551,68 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: var(--spacing-lg) var(--spacing-xl);
   border-bottom: 1px solid #e5e7eb;
 }
 
 .modal-header h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .close-button {
   background: none;
   border: none;
-  font-size: 24px;
-  color: #6b7280;
+  font-size: var(--font-size-2xl);
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
   line-height: 1;
-  transition: color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .close-button:hover {
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .modal-body {
-  padding: 24px;
+  padding: var(--spacing-xl);
   text-align: center;
 }
 
 .modal-body p {
-  margin: 0 0 12px 0;
-  color: #4b5563;
-  line-height: 1.5;
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-body);
+  line-height: var(--line-height-normal);
 }
 
 .modal-body p:last-child {
   margin-bottom: 0;
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
 }
 
 .modal-footer {
-  padding: 0 24px 24px 24px;
+  padding: 0 var(--spacing-xl) var(--spacing-xl) var(--spacing-xl);
   text-align: center;
 }
 
 .modal-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: var(--primary-gradient);
+  color: var(--text-white);
   border: none;
   padding: 10px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition-base);
 }
 
 .modal-button:hover {
-  transform: translateY(-1px);
+  transform: var(--hover-transform-sm);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 

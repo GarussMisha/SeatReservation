@@ -5,6 +5,7 @@ import Header from './components/Header.vue'
 import { useAuthStore } from './stores/auth'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import './styles/variables.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -19,7 +20,7 @@ const showHeader = computed(() => {
 // Настройки заголовка в зависимости от маршрута
 const headerConfig = computed(() => {
   const isAdmin = authStore.user?.is_admin || false
-  
+
   switch (route.name) {
     case 'Dashboard':
       return {
@@ -27,7 +28,8 @@ const headerConfig = computed(() => {
         showLogout: true,
         actions: isAdmin ? [{
           key: 'admin',
-          text: '⚙️ Админка',
+          text: 'Админка',
+          icon: 'settings',
           className: 'admin-btn',
           onClick: () => router.push('/admin')
         }] : []
@@ -67,7 +69,8 @@ const headerConfig = computed(() => {
           },
           ...(isAdmin ? [{
             key: 'admin',
-            text: '⚙️ Админка',
+            text: 'Админка',
+            icon: 'settings',
             className: 'admin-btn',
             onClick: () => router.push('/admin')
           }] : [])
@@ -99,7 +102,8 @@ const headerConfig = computed(() => {
           },
           ...(isAdmin ? [{
             key: 'admin',
-            text: '⚙️ Админка',
+            text: 'Админка',
+            icon: 'settings',
             className: 'admin-btn',
             onClick: () => router.push('/admin')
           }] : [])
@@ -111,7 +115,8 @@ const headerConfig = computed(() => {
         showLogout: true,
         actions: isAdmin ? [{
           key: 'admin',
-          text: '⚙️ Админка',
+          text: 'Админка',
+          icon: 'settings',
           className: 'admin-btn',
           onClick: () => router.push('/admin')
         }] : []
@@ -141,11 +146,13 @@ const handleLogout = () => {
 </template>
 
 <style>
+@import './styles/variables.css';
+
 #app {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+  color: var(--text-body);
 }
 
 * {
@@ -177,10 +184,14 @@ button,
   appearance: button;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  transition: var(--transition-base);
 }
 
 body {
   font-family: inherit;
-  line-height: 1.6;
+  line-height: var(--line-height-normal);
 }
 </style>

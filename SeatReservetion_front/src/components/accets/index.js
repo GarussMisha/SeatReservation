@@ -37,7 +37,8 @@ export const getIconUrl = (type) => {
     'toilet_woman': toiletWomanUrl,
     'restroom': hangerUrl,
     'toilet_female': toiletWomanUrl,
-    'toilet_male': toiletManUrl
+    'toilet_male': toiletManUrl,
+    'printer': printerUrl
   }
   return iconMap[type] || null
 }

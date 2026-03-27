@@ -85,41 +85,50 @@
         <!-- Секция с бронированиями пользователя -->
         <div class="my-bookings-section">
           <h3>Мои бронирования</h3>
-          
+
           <div v-if="loadingMyBookings" class="loading">
             Загрузка бронирований...
           </div>
-          
+
           <div v-else-if="sortedMyBookings.length === 0" class="no-bookings">
             <span class="no-bookings-icon">📅</span>
             <p>У вас пока нет бронирований</p>
           </div>
-          
-          <div v-else class="bookings-list">
-            <div
-              v-for="booking in sortedMyBookings"
-              :key="booking.id"
-              :class="['booking-item', booking.status_name]"
-            >
-              <div class="booking-info">
-                <h4>{{ booking.workspace_name }}</h4>
-                <p class="booking-room">{{ booking.workspace_room_name }}</p>
-                <p class="booking-date">
-                  <strong>Дата:</strong> {{ formatDate(booking.booking_date) }}
-                </p>
-                <p class="booking-status" :class="getStatusClass(booking.status_name)">
-                  <strong>Статус:</strong> {{ getStatusDisplayName(booking.status_name) }}
-                </p>
+
+          <div v-else>
+            <div class="bookings-list" :class="{ 'bookings-list-scrollable': sortedMyBookings.length > 2 && !showAllBookings }">
+              <div
+                v-for="(booking, index) in displayedBookings"
+                :key="booking.id"
+                :class="['booking-item', booking.status_name]"
+              >
+                <div class="booking-info">
+                  <h4>{{ booking.workspace_name }}</h4>
+                  <p class="booking-room">{{ booking.workspace_room_name }}</p>
+                  <p class="booking-date">
+                    <strong>Дата:</strong> {{ formatDate(booking.booking_date) }}
+                  </p>
+                  <p class="booking-status" :class="getStatusClass(booking.status_name)">
+                    <strong>Статус:</strong> {{ getStatusDisplayName(booking.status_name) }}
+                  </p>
+                </div>
+                <div class="booking-actions" v-if="canCancelBooking(booking)">
+                  <button
+                    @click="confirmCancelBooking(booking)"
+                    class="cancel-btn"
+                    :disabled="cancelling === booking.id"
+                  >
+                    {{ cancelling === booking.id ? 'Отмена...' : 'Отменить' }}
+                  </button>
+                </div>
               </div>
-              <div class="booking-actions" v-if="canCancelBooking(booking)">
-                <button
-                  @click="confirmCancelBooking(booking)"
-                  class="cancel-btn"
-                  :disabled="cancelling === booking.id"
-                >
-                  {{ cancelling === booking.id ? 'Отмена...' : 'Отменить' }}
-                </button>
-              </div>
+            </div>
+            
+            <!-- Кнопка показать все/скрыть -->
+            <div v-if="sortedMyBookings.length > 2" class="show-all-toggle">
+              <button @click="showAllBookings = !showAllBookings" class="toggle-btn">
+                {{ showAllBookings ? 'Скрыть' : `Показать все (${sortedMyBookings.length})` }}
+              </button>
             </div>
           </div>
         </div>
@@ -174,6 +183,7 @@ const handleLogout = () => {
 const rooms = ref([])
 const myBookings = ref([])
 const loadingMyBookings = ref(false)
+const showAllBookings = ref(false)  // Показывать все брони или только первые 2
 const cancelling = ref(null)
 
 // Модальное окно
@@ -215,11 +225,16 @@ const updateWorkspacesStats = (workspaces) => {
 }
 
 const sortedMyBookings = computed(() => {
-  return [...myBookings.value].sort((a, b) => {
-    const dateA = new Date(a.booking_date)
-    const dateB = new Date(b.booking_date)
-    return dateA - dateB
-  })
+  // Брони уже отсортированы в loadMyBookings
+  return myBookings.value
+})
+
+// Отображаем только первые 2 брони если не нажата кнопка "показать все"
+const displayedBookings = computed(() => {
+  if (showAllBookings.value) {
+    return sortedMyBookings.value
+  }
+  return sortedMyBookings.value.slice(0, 2)  // Только первые 2
 })
 
 // Обработчики
@@ -324,7 +339,21 @@ const loadMyBookings = async () => {
   try {
     loadingMyBookings.value = true
     const bookings = await bookingsAPI.getBookingsByAccount(authStore.user.id, false)
-    myBookings.value = bookings
+    // Сортируем: сначала активные (confirmed), потом отменённые
+    // Внутри групп сортируем по дате (новые сверху)
+    myBookings.value = bookings.sort((a, b) => {
+      // Сначала сортируем по статусу (активные сверху)
+      const isActiveA = a.status_name === 'confirmed'
+      const isActiveB = b.status_name === 'confirmed'
+      
+      if (isActiveA && !isActiveB) return -1  // Активные выше
+      if (!isActiveA && isActiveB) return 1   // Активные выше
+      
+      // Если статусы одинаковые, сортируем по дате (новые сверху)
+      const dateA = new Date(a.booking_date)
+      const dateB = new Date(b.booking_date)
+      return dateB - dateA
+    })
   } catch (error) {
     console.error('Ошибка загрузки бронирований:', error)
   } finally {
@@ -606,6 +635,7 @@ onMounted(async () => {
   background: white;
   border-radius: 16px;
   padding: 2rem;
+  margin-top: 2rem;
   box-shadow: 0 4px 24px rgba(102, 126, 234, 0.15);
 }
 
@@ -643,6 +673,36 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.bookings-list.bookings-list-scrollable {
+  max-height: 420px;  /* Высота для 2 бронирований без прокрутки */
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.show-all-toggle {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.toggle-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #667eea;
+  transition: all 0.3s;
+}
+
+.toggle-btn:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border-color: rgba(102, 126, 234, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
 .booking-item {
