@@ -87,13 +87,18 @@ async def health_check():
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Глобальный обработчик исключений"""
-    return JSONResponse(
+    response = JSONResponse(
         status_code=500,
         content={
             "error": "Внутренняя ошибка сервера",
             "detail": str(exc) if settings.debug else "Произошла ошибка"
         }
     )
+    # Добавляем CORS заголовки
+    origin = request.headers.get("origin")
+    if origin and origin in settings.allowed_origins:
+        response.headers["access-control-allow-origin"] = origin
+    return response
 
 
 # Подключаем API роуты

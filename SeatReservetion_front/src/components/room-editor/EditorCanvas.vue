@@ -102,18 +102,18 @@
 
       <!-- Слой 3: Объекты (самый верхний) -->
       <v-layer ref="objectsLayer">
-        <!-- Стены -->
+        <!-- Стены - черные прямоугольники -->
         <v-rect
           v-for="wall in walls"
           :key="wall.id"
           :config="{
             ...getWallConfig(wall),
-            fill: wall.id === selectedObjectId ? '#2196F3' : '#9e9e9e',
-            stroke: wall.id === selectedObjectId ? '#1976D2' : '#757575',
-            strokeWidth: wall.id === selectedObjectId ? 3 : 2,
+            fill: '#000000',
+            stroke: wall.id === selectedObjectId ? '#2196F3' : '#000000',
+            strokeWidth: wall.id === selectedObjectId ? 3 : 1,
             draggable: currentTool === 'select' && !isPanning,
-            shadowBlur: wall.id === selectedObjectId ? 10 : 0,
-            shadowColor: 'blue'
+            shadowBlur: wall.id === selectedObjectId ? 5 : 0,
+            shadowColor: '#000000'
           }"
           @click="() => selectObject(wall)"
           @dragstart="handleDragStart"
@@ -121,88 +121,340 @@
           @tap="() => selectObject(wall)"
         />
 
-        <!-- Двери -->
-        <v-rect
+        <!-- Двери - дуга открытия + прямоугольник полотна -->
+        <v-group
           v-for="door in doors"
           :key="door.id"
           :config="{
-            ...getObjectConfig(door),
-            fill: door.id === selectedObjectId ? '#2196F3' : '#FF9800',
-            stroke: door.id === selectedObjectId ? '#1976D2' : '#F57C00',
-            strokeWidth: door.id === selectedObjectId ? 3 : 2,
-            draggable: currentTool === 'select' && !isPanning,
-            shadowBlur: door.id === selectedObjectId ? 10 : 0
+            x: door.x,
+            y: door.y,
+            rotation: door.rotation || 0,
+            draggable: currentTool === 'select' && !isPanning
           }"
           @click="() => selectObject(door)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(door, e)"
           @tap="() => selectObject(door)"
-        />
+        >
+          <!-- Полотно двери -->
+          <v-rect
+            :config="{
+              x: 0,
+              y: 0,
+              width: door.width || 80,
+              height: 4,
+              fill: '#000000',
+              stroke: door.id === selectedObjectId ? '#2196F3' : '#000000',
+              strokeWidth: door.id === selectedObjectId ? 3 : 1
+            }"
+          />
+          <!-- Дуга открытия двери -->
+          <v-arc
+            :config="{
+              x: 0,
+              y: 0,
+              radius: door.width || 80,
+              angle: 90,
+              stroke: '#666666',
+              strokeWidth: 1,
+              dash: [5, 5]
+            }"
+          />
+          <!-- Линия траектории -->
+          <v-line
+            :config="{
+              points: [0, 0, 0, -(door.width || 80)],
+              stroke: '#666666',
+              strokeWidth: 1,
+              dash: [3, 3]
+            }"
+          />
+        </v-group>
 
-        <!-- Окна -->
-        <v-rect
+        <!-- Окна - прямоугольник с диагональными линиями -->
+        <v-group
           v-for="window in windows"
           :key="window.id"
           :config="{
-            ...getObjectConfig(window),
-            fill: window.id === selectedObjectId ? '#2196F3' : '#4FC3F7',
-            stroke: window.id === selectedObjectId ? '#1976D2' : '#039BE5',
-            strokeWidth: window.id === selectedObjectId ? 3 : 2,
-            draggable: currentTool === 'select' && !isPanning,
-            shadowBlur: window.id === selectedObjectId ? 10 : 0
+            x: window.x,
+            y: window.y,
+            rotation: window.rotation || 0,
+            draggable: currentTool === 'select' && !isPanning
           }"
           @click="() => selectObject(window)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(window, e)"
           @tap="() => selectObject(window)"
-        />
+        >
+          <!-- Основная рамка окна -->
+          <v-rect
+            :config="{
+              x: 0,
+              y: 0,
+              width: window.width || 200,
+              height: window.height || 10,
+              fill: '#ffffff',
+              stroke: window.id === selectedObjectId ? '#2196F3' : '#000000',
+              strokeWidth: window.id === selectedObjectId ? 3 : 2
+            }"
+          />
+          <!-- Диагональные линии (штриховка стекла) -->
+          <v-line
+            :config="{
+              points: [5, 0, window.width - 5, window.height],
+              stroke: '#666666',
+              strokeWidth: 1
+            }"
+          />
+          <v-line
+            :config="{
+              points: [window.width - 5, 0, 5, window.height],
+              stroke: '#666666',
+              strokeWidth: 1
+            }"
+          />
+        </v-group>
 
-        <!-- Рабочие места -->
-        <v-rect
+        <!-- Рабочие места - прямоугольник со стулом (полукруг) -->
+        <v-group
           v-for="workspace in workspaces"
           :key="workspace.id"
           :config="{
-            ...getObjectConfig(workspace),
-            fill: workspace.id === selectedObjectId ? '#2196F3' : '#4CAF50',
-            stroke: workspace.id === selectedObjectId ? '#1976D2' : '#388E3C',
-            strokeWidth: workspace.id === selectedObjectId ? 3 : 2,
-            draggable: currentTool === 'select' && !isPanning,
-            shadowBlur: workspace.id === selectedObjectId ? 10 : 0,
-            cornerRadius: 4
+            x: workspace.x,
+            y: workspace.y,
+            rotation: workspace.rotation || 0,
+            draggable: currentTool === 'select' && !isPanning
           }"
           @click="() => selectObject(workspace)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(workspace, e)"
           @tap="() => selectObject(workspace)"
         >
-          <!-- Текст с названием -->
-          <v-text
+          <!-- Стол - прямоугольник -->
+          <v-rect
             :config="{
-              text: workspace.name || 'Место',
-              fontSize: 10,
-              fontFamily: 'Arial',
-              fill: '#333',
-              align: 'center',
-              verticalAlign: 'middle',
-              width: workspace.width,
-              height: workspace.height,
-              listening: false
+              x: 20,
+              y: 10,
+              width: 50,
+              height: 30,
+              stroke: workspace.id === selectedObjectId ? '#2196F3' : '#757575',
+              strokeWidth: workspace.id === selectedObjectId ? 3 : 3,
+              fill: 'none',
+              cornerRadius: 4
             }"
           />
-        </v-rect>
+          <!-- Стул - полукруг с широкой стороны стола -->
+          <v-arc
+            :config="{
+              x: 70,
+              y: 25,
+              radius: 12,
+              angle: 180,
+              stroke: '#757575',
+              strokeWidth: 3,
+              fill: 'none',
+              rotation: 90
+            }"
+          />
+        </v-group>
 
-        <!-- Другие объекты -->
+        <!-- Принтер - прямоугольник с надписью -->
+        <v-rect
+          v-for="printer in printers"
+          :key="printer.id"
+          :config="{
+            x: printer.x,
+            y: printer.y,
+            rotation: printer.rotation || 0,
+            width: printer.width || 100,
+            height: printer.height || 50,
+            stroke: printer.id === selectedObjectId ? '#2196F3' : '#757575',
+            strokeWidth: printer.id === selectedObjectId ? 3 : 3,
+            fill: 'none',
+            cornerRadius: 8,
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(printer)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(printer, e)"
+          @tap="() => selectObject(printer)"
+        />
+
+        <!-- Переговорные - SVG иконка -->
+        <v-image
+          v-for="meeting in meetingRooms"
+          :key="meeting.id"
+          :config="{
+            x: meeting.x,
+            y: meeting.y,
+            rotation: meeting.rotation || 0,
+            image: getIconImage('conferenceRoom'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(meeting)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(meeting, e)"
+          @tap="() => selectObject(meeting)"
+        />
+
+        <!-- Принтеры - SVG иконка -->
+        <v-image
+          v-for="printer in printers"
+          :key="printer.id"
+          :config="{
+            x: printer.x,
+            y: printer.y,
+            rotation: printer.rotation || 0,
+            image: getIconImage('text'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(printer)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(printer, e)"
+          @tap="() => selectObject(printer)"
+        />
+
+        <!-- Кухня - SVG иконка -->
+        <v-image
+          v-for="kitchen in kitchens"
+          :key="kitchen.id"
+          :config="{
+            x: kitchen.x,
+            y: kitchen.y,
+            rotation: kitchen.rotation || 0,
+            image: getIconImage('kitchen'),
+            width: kitchen.width || 40,
+            height: kitchen.height || 40,
+            offset: { x: (kitchen.width || 40) / 2, y: (kitchen.height || 40) / 2 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(kitchen)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(kitchen, e)"
+          @tap="() => selectObject(kitchen)"
+        />
+
+        <!-- Женский туалет - SVG иконка -->
+        <v-image
+          v-for="toiletFemale in toiletsFemale"
+          :key="toiletFemale.id"
+          :config="{
+            x: toiletFemale.x,
+            y: toiletFemale.y,
+            rotation: toiletFemale.rotation || 0,
+            image: getIconImage('toiletWoman'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(toiletFemale)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(toiletFemale, e)"
+          @tap="() => selectObject(toiletFemale)"
+        />
+
+        <!-- Мужской туалет - SVG иконка -->
+        <v-image
+          v-for="toiletMale in toiletsMale"
+          :key="toiletMale.id"
+          :config="{
+            x: toiletMale.x,
+            y: toiletMale.y,
+            rotation: toiletMale.rotation || 0,
+            image: getIconImage('toiletMan'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(toiletMale)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(toiletMale, e)"
+          @tap="() => selectObject(toiletMale)"
+        >
+          <!-- Мужской туалет (круг + перевернутый треугольник) -->
+          <v-circle
+            :config="{
+              x: 50,
+              y: 12,
+              radius: 8,
+              stroke: toiletMale.id === selectedObjectId ? '#2196F3' : '#757575',
+              strokeWidth: toiletMale.id === selectedObjectId ? 3 : 3,
+              fill: 'none'
+            }"
+          />
+          <v-path
+            :config="{
+              x: 50,
+              y: 20,
+              data: 'M -12,18 L 12,18 L 0,0 Z',
+              stroke: '#757575',
+              strokeWidth: 3,
+              fill: 'none',
+              lineCap: 'round',
+              lineJoin: 'round'
+            }"
+          />
+        </v-group>
+
+        <!-- Лестница - SVG иконка -->
+        <v-image
+          v-for="staircase in staircases"
+          :key="staircase.id"
+          :config="{
+            x: staircase.x,
+            y: staircase.y,
+            rotation: staircase.rotation || 0,
+            image: getIconImage('ladder'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(staircase)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(staircase, e)"
+          @tap="() => selectObject(staircase)"
+        />
+
+        <!-- Зона отдыха / Раздевалка - SVG иконка -->
+        <v-image
+          v-for="restroom in restrooms"
+          :key="restroom.id"
+          :config="{
+            x: restroom.x,
+            y: restroom.y,
+            rotation: restroom.rotation || 0,
+            image: getIconImage('hanger'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(restroom)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(restroom, e)"
+          @tap="() => selectObject(restroom)"
+        />
+
+        <!-- Другие объекты - серый прямоугольник -->
         <v-rect
           v-for="obj in otherObjects"
           :key="obj.id"
           :config="{
             ...getObjectConfig(obj),
-            fill: obj.id === selectedObjectId ? '#2196F3' : '#9C27B0',
-            stroke: obj.id === selectedObjectId ? '#1976D2' : '#7B1FA2',
-            strokeWidth: obj.id === selectedObjectId ? 3 : 2,
+            fill: '#f5f5f5',
+            stroke: '#000000',
+            strokeWidth: 2,
             draggable: currentTool === 'select' && !isPanning,
-            shadowBlur: obj.id === selectedObjectId ? 10 : 0,
-            cornerRadius: 4
+            cornerRadius: 2
           }"
           @click="() => selectObject(obj)"
           @dragstart="handleDragStart"
@@ -212,9 +464,9 @@
           <v-text
             :config="{
               text: getObjectName(obj.object_type),
-              fontSize: 10,
+              fontSize: 11,
               fontFamily: 'Arial',
-              fill: '#333',
+              fill: '#000000',
               align: 'center',
               verticalAlign: 'middle',
               width: obj.width,
@@ -224,48 +476,27 @@
           />
         </v-rect>
 
-        <!-- Стрелки -->
-        <v-group
+        <!-- Стрелки - SVG иконка -->
+        <v-image
           v-for="arrow in arrows"
           :key="arrow.id"
           :config="{
             x: arrow.x,
             y: arrow.y,
             rotation: arrow.rotation || 0,
+            image: getIconImage('arrow'),
+            width: arrow.width || 40,
+            height: arrow.height || 40,
+            offset: { x: (arrow.width || 40) / 2, y: (arrow.height || 40) / 2 },
             draggable: currentTool === 'select' && !isPanning
           }"
           @click="() => selectObject(arrow)"
           @dragstart="handleDragStart"
           @dragend="(e) => handleDragEnd(arrow, e)"
           @tap="() => selectObject(arrow)"
-        >
-          <!-- Линия стрелки -->
-          <v-line
-            :config="{
-              points: [0, 0, arrow.width || 20, 0],
-              stroke: arrow.id === selectedObjectId ? '#1976D2' : '#FF5722',
-              strokeWidth: arrow.height || 5,
-              lineCap: 'round',
-              lineJoin: 'round'
-            }"
-          />
-          <!-- Наконечник стрелки -->
-          <v-line
-            :config="{
-              points: [
-                (arrow.width || 20) - 5, -3,
-                arrow.width || 20, 0,
-                (arrow.width || 20) - 5, 3
-              ],
-              stroke: arrow.id === selectedObjectId ? '#1976D2' : '#FF5722',
-              strokeWidth: arrow.height || 5,
-              lineCap: 'round',
-              lineJoin: 'round'
-            }"
-          />
-        </v-group>
+        />
 
-        <!-- Текстовые метки -->
+        <!-- Текстовые метки - SVG иконка -->
         <v-group
           v-for="text in texts"
           :key="text.id"
@@ -280,24 +511,33 @@
           @dragend="(e) => handleDragEnd(text, e)"
           @tap="() => selectObject(text)"
         >
+          <!-- SVG иконка текста -->
+          <v-image
+            :config="{
+              image: getIconImage('text'),
+              width: 40,
+              height: 40,
+              offset: { x: 20, y: 20 }
+            }"
+          />
           <!-- Фон текста -->
           <v-rect
             :config="{
               width: text.width || 100,
               height: text.height || 30,
               fill: '#ffffff',
-              stroke: text.id === selectedObjectId ? '#1976D2' : '#4CAF50',
-              strokeWidth: text.id === selectedObjectId ? 3 : 2,
-              cornerRadius: 4
+              stroke: '#000000',
+              strokeWidth: 1,
+              cornerRadius: 2
             }"
           />
           <!-- Текст -->
           <v-text
             :config="{
               text: text.description || 'Текст',
-              fontSize: 14,
+              fontSize: 12,
               fontFamily: 'Arial',
-              fill: '#333',
+              fill: '#000000',
               align: 'center',
               verticalAlign: 'middle',
               width: text.width || 100,
@@ -312,8 +552,8 @@
           v-if="isDrawingWall && wallPreview.length > 0"
           :config="{
             points: wallPreview,
-            stroke: '#2196F3',
-            strokeWidth: 4,
+            stroke: '#000000',
+            strokeWidth: 2,
             dash: [10, 5],
             lineCap: 'round',
             lineJoin: 'round'
@@ -326,6 +566,26 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { icons } from '@/components/accets/index.js'
+
+// Helper функция для создания SVG строки
+const createSvgDataUrl = (svgString) => {
+  const svg = svgString.trim()
+  const encoded = encodeURIComponent(svg)
+  return `data:image/svg+xml,${encoded}`
+}
+
+// Кэшированные изображения для иконок
+const iconImages = {}
+
+const getIconImage = (iconName) => {
+  if (!iconImages[iconName] && icons[iconName]) {
+    const img = new Image()
+    img.src = createSvgDataUrl(icons[iconName])
+    iconImages[iconName] = img
+  }
+  return iconImages[iconName]
+}
 
 const props = defineProps({
   objects: {
@@ -403,8 +663,15 @@ const windows = computed(() => props.objects.filter(obj => obj.object_type === '
 const workspaces = computed(() => props.objects.filter(obj => obj.object_type === 'workspace'))
 const arrows = computed(() => props.objects.filter(obj => obj.object_type === 'arrow'))
 const texts = computed(() => props.objects.filter(obj => obj.object_type === 'text'))
+const printers = computed(() => props.objects.filter(obj => obj.object_type === 'printer'))
+const meetingRooms = computed(() => props.objects.filter(obj => obj.object_type === 'meeting_room'))
+const kitchens = computed(() => props.objects.filter(obj => obj.object_type === 'kitchen'))
+const staircases = computed(() => props.objects.filter(obj => obj.object_type === 'staircase'))
+const restrooms = computed(() => props.objects.filter(obj => obj.object_type === 'restroom'))
+const toiletsFemale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_female'))
+const toiletsMale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_male'))
 const otherObjects = computed(() => props.objects.filter(obj =>
-  !['wall', 'door', 'window', 'workspace', 'arrow', 'text'].includes(obj.object_type)
+  !['wall', 'door', 'window', 'workspace', 'arrow', 'text', 'printer', 'meeting_room', 'kitchen', 'staircase', 'restroom', 'toilet_female', 'toilet_male'].includes(obj.object_type)
 ))
 
 const stageConfig = computed(() => ({
@@ -438,9 +705,9 @@ const getObjectName = (type) => {
   const names = {
     printer: 'Принтер',
     kitchen: 'Кухня',
-    meeting_room: 'Переговорка',
+    meeting_room: 'Переговорная',
     staircase: 'Лестница',
-    restroom: 'Отдых',
+    restroom: 'Зона отдыха',
     arrow: '',
     text: ''
   }

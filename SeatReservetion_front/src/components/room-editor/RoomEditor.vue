@@ -14,6 +14,7 @@
       @undo="handleUndo"
       @redo="handleRedo"
       @save="handleSave"
+      @clear="handleClear"
       @cancel="handleCancel"
     />
 
@@ -168,6 +169,27 @@ const handleSave = async () => {
   } catch (error) {
     console.error('Ошибка сохранения плана:', error)
     notificationStore.error('Не удалось сохранить план помещения', 'Ошибка')
+  }
+}
+
+const handleClear = async () => {
+  if (!currentRoom.value) {
+    notificationStore.error('Помещение не выбрано', 'Ошибка')
+    return
+  }
+
+  if (!confirm('Вы уверены, что хотите удалить все объекты на плане? Это действие нельзя отменить.')) {
+    return
+  }
+
+  try {
+    await roomObjectsAPI.clearRoomPlan(currentRoom.value.id)
+    editorStore.clearEditor()
+    editorStore.setCurrentRoom(currentRoom.value)
+    notificationStore.success('План помещения очищен', 'Успешно')
+  } catch (error) {
+    console.error('Ошибка очистки плана:', error)
+    notificationStore.error('Не удалось очистить план помещения', 'Ошибка')
   }
 }
 

@@ -74,17 +74,8 @@
           :class="['tool-btn', { active: currentTool === 'kitchen' }]"
           title="Кухня"
         >
-          <span class="tool-icon">🍳</span>
+          <span class="tool-icon">☕</span>
           <span class="tool-label">Кухня</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'meeting_room')"
-          :class="['tool-btn', { active: currentTool === 'meeting_room' }]"
-          title="Переговорная"
-        >
-          <span class="tool-icon">💬</span>
-          <span class="tool-label">Переговорка</span>
         </button>
 
         <button
@@ -99,10 +90,37 @@
         <button
           @click="$emit('select-tool', 'restroom')"
           :class="['tool-btn', { active: currentTool === 'restroom' }]"
-          title="Комната отдыха"
+          title="Раздевалка"
         >
-          <span class="tool-icon">🛋️</span>
-          <span class="tool-label">Отдых</span>
+          <span class="tool-icon">👔</span>
+          <span class="tool-label">Раздевалка</span>
+        </button>
+
+        <button
+          @click="$emit('select-tool', 'toilet_female')"
+          :class="['tool-btn', { active: currentTool === 'toilet_female' }]"
+          title="Женский туалет"
+        >
+          <span class="tool-icon">♀️</span>
+          <span class="tool-label">Женский</span>
+        </button>
+
+        <button
+          @click="$emit('select-tool', 'toilet_male')"
+          :class="['tool-btn', { active: currentTool === 'toilet_male' }]"
+          title="Мужской туалет"
+        >
+          <span class="tool-icon">♂️</span>
+          <span class="tool-label">Мужской</span>
+        </button>
+
+        <button
+          @click="$emit('select-tool', 'meeting_room')"
+          :class="['tool-btn', { active: currentTool === 'meeting_room' }]"
+          title="Переговорная"
+        >
+          <span class="tool-icon">💬</span>
+          <span class="tool-label">Переговорка</span>
         </button>
 
         <button
@@ -176,6 +194,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { icons } from '@/components/accets/index.js'
 
 const props = defineProps({
   currentTool: {
@@ -197,6 +216,28 @@ const emit = defineEmits(['select-tool', 'update-field-size'])
 // Вычисляемые значения в метрах
 const widthInMeters = computed(() => (props.fieldWidth * 0.5).toFixed(1))
 const heightInMeters = computed(() => (props.fieldHeight * 0.5).toFixed(1))
+
+// Функция для получения SVG иконки
+const getToolIcon = (toolName) => {
+  const iconMap = {
+    select: null,
+    wall: '🧱',
+    door: '🚪',
+    window: '🪟',
+    workspace: '🪑',
+    printer: '🖨️',
+    kitchen: icons.kitchen,
+    meeting_room: icons.conferenceRoom,
+    staircase: icons.ladder,
+    ladder: icons.ladder,
+    restroom: icons.toiletMan,
+    toilet_man: icons.toiletMan,
+    toilet_woman: icons.toiletWoman,
+    arrow: icons.arrow,
+    text: icons.text
+  }
+  return iconMap[toolName] || null
+}
 
 // Обработчики для ограничения ввода
 const handleWidthInput = (event) => {
@@ -268,6 +309,19 @@ const handleHeightInput = (event) => {
 
 .tool-icon {
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-icon.svg-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.tool-icon.svg-icon :deep(svg) {
+  width: 100%;
+  height: 100%;
 }
 
 .tool-label {

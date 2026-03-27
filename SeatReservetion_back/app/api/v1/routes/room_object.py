@@ -296,16 +296,25 @@ def update_workspace_on_plan(wp_id: int, update_data: WorkspaceOnPlanUpdate, db:
 def save_room_plan(room_id: int, plan_data: RoomPlanCreate, db: Session = Depends(get_db)):
     """
     Сохранить весь план помещения
-    
+
     - **objects**: Список всех объектов с их свойствами
+    
+    ВАЖНО: Все существующие объекты помещения удаляются и создаются заново
     """
     # Проверяем помещение
     room = db.query(Room).filter(Room.id == room_id).first()
     if not room:
         raise HTTPException(status_code=404, detail="Помещение не найдено")
-    
+
+    # === Удаляем все существующие объекты помещения ===
+    # Загружаем объекты по одному, чтобы сработало каскадное удаление связанных записей
+    existing_objects = db.query(RoomObject).filter(RoomObject.room_id == room_id).all()
+    for obj in existing_objects:
+        db.delete(obj)
+    db.commit()
+
     created_objects = []
-    
+
     for obj_data in plan_data.objects:
         # Создаем RoomObject
         room_object = RoomObject(
@@ -324,7 +333,7 @@ def save_room_plan(room_id: int, plan_data: RoomPlanCreate, db: Session = Depend
         db.add(room_object)
         db.flush()  # Получаем ID
         created_objects.append(room_object)
-        
+
         # Если это рабочее место, создаем запись в workspace_on_plan
         if obj_data.get("object_type") == "workspace":
             workspace_on_plan = WorkspaceOnPlan(
@@ -333,9 +342,9 @@ def save_room_plan(room_id: int, plan_data: RoomPlanCreate, db: Session = Depend
                 workspace_number=obj_data.get("workspace_number"),
             )
             db.add(workspace_on_plan)
-    
+
     db.commit()
-    
+
     return RoomPlanResponse(
         room_id=room_id,
         objects=created_objects,
@@ -349,9 +358,32 @@ def get_room_plan(room_id: int, db: Session = Depends(get_db)):
     Получить весь план помещения
     """
     objects = db.query(RoomObject).filter(RoomObject.room_id == room_id).all()
-    
+
     return RoomPlanResponse(
         room_id=room_id,
         objects=objects,
         total_objects=len(objects)
     )
+
+
+@router.delete("/{room_id}/plan", status_code=status.HTTP_204_NO_CONTENT)
+def clear_room_plan(room_id: int, db: Session = Depends(get_db)):
+    """
+    Очистить весь план помещения (удалить все объекты)
+
+    - Удаляет все объекты помещения (стены, двери, окна, рабочие места и др.)
+    - Связанные записи (Wall, Door, Window, WorkspaceOnPlan) удаляются каскадно
+    """
+    # Проверяем помещение
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Помещение не найдено")
+
+    # === Удаляем все существующие объекты помещения ===
+    # Загружаем объекты по одному, чтобы сработало каскадное удаление связанных записей
+    existing_objects = db.query(RoomObject).filter(RoomObject.room_id == room_id).all()
+    for obj in existing_objects:
+        db.delete(obj)
+    db.commit()
+
+    return None

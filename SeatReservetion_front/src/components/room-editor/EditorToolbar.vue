@@ -42,6 +42,9 @@
     </div>
 
     <div class="toolbar-right">
+      <button @click="$emit('clear')" class="btn-clear" title="Очистить весь план">
+        🗑️ Очистить
+      </button>
       <button @click="$emit('save')" class="btn-save">
         💾 Сохранить
       </button>
@@ -65,7 +68,7 @@ defineProps({
   }
 })
 
-defineEmits(['zoom-in', 'zoom-out', 'undo', 'redo', 'save', 'cancel'])
+defineEmits(['zoom-in', 'zoom-out', 'undo', 'redo', 'save', 'cancel', 'clear'])
 </script>
 
 <style scoped>
@@ -167,5 +170,22 @@ defineEmits(['zoom-in', 'zoom-out', 'undo', 'redo', 'save', 'cancel'])
 .btn-save:hover {
   background: #45a049;
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.btn-clear {
+  padding: 0.5rem 1rem;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-clear:hover {
+  background: #d32f2f;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
 }
 </style>

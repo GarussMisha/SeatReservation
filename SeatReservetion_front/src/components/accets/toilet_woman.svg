@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="58mm"
+   height="127mm"
+   viewBox="0 0 58 127"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   sodipodi:docname="toilet_man.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:lockguides="true"
+     inkscape:zoom="1.4702523"
+     inkscape:cx="330.89558"
+     inkscape:cy="274.44269"
+     inkscape:window-width="2112"
+     inkscape:window-height="1211"
+     inkscape:window-x="916"
+     inkscape:window-y="132"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showguides="true" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Слой 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       class="st0"
+       d="m 28.630591,21.545028 c 5.785643,0 10.47697,-4.691063 10.47697,-10.479088 0,-5.7856427 -4.691062,-10.47458865 -10.47697,-10.47458865 -5.790407,0 -10.476971,4.68894595 -10.476971,10.47458865 0,5.788025 4.686564,10.479088 10.476971,10.479088 z"
+       id="path1"
+       style="fill:#000000;stroke-width:0.264583" />
+    <path
+       class="st0"
+       d="M 49.054836,36.488694 C 46.93129,29.31928 42.17514,24.568157 36.819445,24.568157 c -3.967163,0 -8.188854,0 -8.188854,0 0,0 -4.221692,0 -8.18859,0 -5.355959,0 -10.117136,4.751387 -12.2406823,11.920537 L 0.48739175,63.85984 c -0.5696479,2.305843 0.83925835,4.658783 3.14245615,5.223404 2.308225,0.569648 4.61645,-0.779463 5.1858333,-3.085042 L 16.505001,38.711723 h 2.268273 L 5.3932958,86.175327 H 18.008628 V 121.3829 c 0,2.69055 2.183342,4.87124 4.871244,4.87124 2.692929,0 4.876006,-2.18069 4.876006,-4.87124 V 86.175327 h 2.68314 V 121.3829 c 0,2.69055 2.183341,4.87124 4.87627,4.87124 2.687902,0 4.871244,-2.18069 4.871244,-4.87124 V 86.175327 H 51.862594 L 38.48288,38.711988 h 2.268273 l 7.689056,27.286479 c 0.569383,2.305579 2.882635,3.654689 5.185833,3.085041 2.308225,-0.56462 3.712104,-2.917825 3.142457,-5.223404 z"
+       id="path2"
+       style="fill:#000000;stroke-width:0.264583" />
+  </g>
+</svg>

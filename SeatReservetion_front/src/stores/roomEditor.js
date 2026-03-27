@@ -195,10 +195,9 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
   }
   
   /**
-   * Очистить редактор
+   * Очистить редактор (удалить все объекты)
    */
   const clearEditor = () => {
-    currentRoom.value = null
     objects.value = []
     selectedObject.value = null
     currentTool.value = 'select'
@@ -207,6 +206,7 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
     zoom.value = 1
     offset.value = { x: 0, y: 0 }
     error.value = null
+    // currentRoom сохраняем
   }
   
   /**

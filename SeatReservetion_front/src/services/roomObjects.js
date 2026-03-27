@@ -159,6 +159,19 @@ export const roomObjectsAPI = {
       console.error('Ошибка получения плана:', error)
       throw error
     }
+  },
+
+  /**
+   * Очистить весь план помещения (удалить все объекты)
+   */
+  async clearRoomPlan(roomId) {
+    try {
+      const response = await api.delete(`/api/v1/rooms/${roomId}/plan`)
+      return response.data
+    } catch (error) {
+      console.error('Ошибка очистки плана:', error)
+      throw error
+    }
   }
 }
 
