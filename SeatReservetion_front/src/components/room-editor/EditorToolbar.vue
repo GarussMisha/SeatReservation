@@ -63,10 +63,11 @@ defineEmits(['undo', 'redo', 'save', 'cancel', 'clear'])
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1.5rem;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 249, 250, 0.98) 100%);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
   z-index: 100;
+  backdrop-filter: blur(10px);
 }
 
 .toolbar-left {
@@ -77,23 +78,31 @@ defineEmits(['undo', 'redo', 'save', 'cancel', 'clear'])
 
 .btn-back {
   padding: 0.5rem 1rem;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: all 0.2s;
+  font-weight: 500;
+  color: #667eea;
+  transition: all 0.3s ease;
 }
 
 .btn-back:hover {
-  background: #e8e8e8;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
 
 .editor-title {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #1f2937;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .toolbar-center {
@@ -110,16 +119,20 @@ defineEmits(['undo', 'redo', 'save', 'cancel', 'clear'])
 
 .toolbar-btn {
   padding: 0.5rem 0.75rem;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.2s;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  color: #667eea;
 }
 
 .toolbar-btn:hover:not(:disabled) {
-  background: #e8e8e8;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+  border-color: rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
 }
 
 .toolbar-btn:disabled {
@@ -134,35 +147,39 @@ defineEmits(['undo', 'redo', 'save', 'cancel', 'clear'])
 
 .btn-save {
   padding: 0.5rem 1.5rem;
-  background: #4CAF50;
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
 }
 
 .btn-save:hover {
-  background: #45a049;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  background: linear-gradient(135deg, #34ce57 0%, #28a745 100%);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-clear {
   padding: 0.5rem 1rem;
-  background: #f44336;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
 }
 
 .btn-clear:hover {
-  background: #d32f2f;
-  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+  background: linear-gradient(135deg, #e74a3b 0%, #d32f2f 100%);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  transform: translateY(-2px);
 }
 </style>

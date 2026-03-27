@@ -263,7 +263,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
 }
 
 .editor-body {
@@ -276,8 +276,9 @@ onMounted(() => {
 .canvas-wrapper {
   flex: 1;
   overflow: hidden;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
   position: relative;
   min-width: 0;
+  box-shadow: inset 0 2px 8px rgba(102, 126, 234, 0.1);
 }
 </style>
