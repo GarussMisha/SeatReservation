@@ -42,15 +42,15 @@
           >
         </div>
 
-        <div class="form-group" v-if="statuses && statuses.length > 0">
+        <div class="form-group">
           <label for="status_id">Статус</label>
-          <select 
+          <select
             id="status_id"
             v-model="formData.status_id"
           >
-            <option 
-              v-for="status in statuses" 
-              :key="status.id" 
+            <option
+              v-for="status in roomStatuses"
+              :key="status.id"
               :value="status.id"
             >
               {{ status.name }}
@@ -95,6 +95,15 @@ const formData = ref({
 
 // Вычисляемые свойства
 const isEdit = computed(() => !!props.room)
+
+// Фильтруем статусы - для помещений только active (1) и inactive (2)
+const roomStatuses = computed(() => {
+  if (!props.statuses || props.statuses.length === 0) return []
+  
+  return props.statuses.filter(status => 
+    status.id === 1 || status.id === 2  // Только active и inactive
+  )
+})
 
 // Инициализация формы
 watch(() => props.room, (newRoom) => {

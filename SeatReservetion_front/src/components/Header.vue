@@ -215,6 +215,17 @@ const handleLogout = () => {
   box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
 }
 
+.header-action-btn.admin-btn {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  color: white;
+}
+
+.header-action-btn.admin-btn:hover {
+  background: linear-gradient(135deg, #af7ac5 0%, #9b59b6 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+}
+
 .logout-btn {
   padding: 0.5rem 1rem;
   background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);

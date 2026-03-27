@@ -3,8 +3,9 @@ Pydantic схемы для модели Room (помещения/комнаты)
 Определяют структуру данных для API запросов и ответов, связанных с помещениями
 """
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from datetime import datetime
+from app.core.status_constants import RoomStatuses
 
 
 class RoomBase(BaseModel):
@@ -24,8 +25,16 @@ class RoomBase(BaseModel):
         description="Описание помещения"
     )
     status_id: int = Field(
-        description="ID статуса помещения"
+        description="ID статуса помещения (1=active, 2=inactive)"
     )
+    
+    @validator('status_id')
+    def validate_status_id(cls, v):
+        """Проверка что статус разрешён для помещения"""
+        if v not in RoomStatuses.ALLOWED:
+            allowed_names = [RoomStatuses.NAMES.get(s) for s in RoomStatuses.ALLOWED]
+            raise ValueError(f"Недопустимый статус помещения: {v}. Разрешены: {allowed_names}")
+        return v
 
 
 class RoomCreate(RoomBase):
@@ -52,8 +61,16 @@ class RoomUpdate(BaseModel):
     )
     status_id: Optional[int] = Field(
         default=None,
-        description="ID статуса помещения"
+        description="ID статуса помещения (1=active, 2=inactive)"
     )
+    
+    @validator('status_id')
+    def validate_status_id(cls, v):
+        """Проверка что статус разрешён для помещения"""
+        if v is not None and v not in RoomStatuses.ALLOWED:
+            allowed_names = [RoomStatuses.NAMES.get(s) for s in RoomStatuses.ALLOWED]
+            raise ValueError(f"Недопустимый статус помещения: {v}. Разрешены: {allowed_names}")
+        return v
 
 
 class RoomResponse(RoomBase):

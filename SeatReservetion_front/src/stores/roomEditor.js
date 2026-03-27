@@ -61,9 +61,11 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
    */
   const loadObjects = (loadedObjects) => {
     console.log('Загруженные объекты с сервера:', loadedObjects)
-    
+
     // Восстанавливаем points из properties для стен, перегородок и окон
+    // И добавляем workspace_on_plan_id для рабочих мест
     const restoredObjects = (loadedObjects || []).map(obj => {
+      // Восстанавливаем points для стен, перегородок и окон
       if (obj.object_type && ['wall', 'internal_wall', 'window'].includes(obj.object_type)) {
         if (obj.properties && obj.properties.points) {
           console.log('Восстанавливаем points для объекта:', obj.object_type, obj.properties.points)
@@ -75,9 +77,19 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
           console.log('Нет points для объекта:', obj.object_type, obj)
         }
       }
+      
+      // Для рабочих мест сохраняем workspace_on_plan_id
+      if (obj.object_type === 'workspace' && obj.workspace_on_plan_id) {
+        console.log('Рабочее место с workspace_on_plan_id:', obj.workspace_on_plan_id)
+        return {
+          ...obj,
+          workspace_on_plan_id: obj.workspace_on_plan_id
+        }
+      }
+      
       return obj
     })
-    
+
     console.log('Восстановленные объекты:', restoredObjects)
     objects.value = restoredObjects
     addToHistory()

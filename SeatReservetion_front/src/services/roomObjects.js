@@ -176,6 +176,39 @@ export const roomObjectsAPI = {
       console.error('Ошибка очистки плана:', error)
       throw error
     }
+  },
+
+  /**
+   * Обновить название рабочего места
+   */
+  async updateWorkspaceName(roomId, workspaceOnPlanId, newName) {
+    try {
+      const response = await api.put(`/api/v1/rooms/${roomId}/workspaces-on-plan/${workspaceOnPlanId}/name`, {
+        name: newName
+      })
+      return response.data
+    } catch (error) {
+      console.error('Ошибка обновления названия рабочего места:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Получить рабочие места с координатами
+   */
+  async getWorkspacesWithLocations(roomId, bookingDate = null) {
+    try {
+      const params = new URLSearchParams()
+      if (bookingDate) {
+        params.append('booking_date', bookingDate)
+      }
+      const url = `/api/v1/rooms/${roomId}/workspaces/with-locations${params.toString() ? '?' + params.toString() : ''}`
+      const response = await api.get(url)
+      return response.data
+    } catch (error) {
+      console.error('Ошибка получения рабочих мест с координатами:', error)
+      throw error
+    }
   }
 }
 

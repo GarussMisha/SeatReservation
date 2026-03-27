@@ -16,6 +16,8 @@ class Room(BaseModel):
     address = Column(String(500), nullable=True, comment="Адрес помещения")
     description = Column(String(1000), nullable=True, comment="Описание помещения")
     status_id = Column(Integer, ForeignKey("statuses.id"), nullable=False, comment="ID статуса помещения")
+    field_width = Column(Integer, default=50, comment="Ширина поля редактора в клетках")
+    field_height = Column(Integer, default=50, comment="Высота поля редактора в клетках")
 
     # Отношение к рабочим местам
     workspaces = relationship("Workspace", back_populates="room", cascade="all, delete-orphan")

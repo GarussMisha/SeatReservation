@@ -27,22 +27,6 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/booking',
-      name: 'Booking',
-      beforeEnter: (to, from, next) => {
-        // Если дата не указана в URL, добавляем текущую дату
-        if (!to.query.date) {
-          const today = new Date()
-          const todayString = today.toISOString().split('T')[0]
-          next(`/booking?date=${todayString}`)
-        } else {
-          next()
-        }
-      },
-      component: () => import('../views/Booking.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
       path: '/admin',
       name: 'AdminPanel',
       component: () => import('../views/AdminPanel.vue'),

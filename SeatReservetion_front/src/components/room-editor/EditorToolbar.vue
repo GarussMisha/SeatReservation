@@ -7,7 +7,12 @@
       <button @click="$emit('cancel')" class="btn-back">
         ← Назад
       </button>
-      <h2 class="editor-title">Редактор помещения</h2>
+      <div class="room-info">
+        <h2 class="editor-title">Редактор помещения</h2>
+        <span v-if="workspaceCount > 0" class="workspace-count">
+          🪑 {{ workspaceCount }} {{ declension(workspaceCount, ['рабочее место', 'рабочих места', 'рабочих мест']) }}
+        </span>
+      </div>
     </div>
 
     <div class="toolbar-center">
@@ -32,18 +37,20 @@
     </div>
 
     <div class="toolbar-right">
-      <button @click="$emit('clear')" class="btn-clear" title="Очистить весь план">
+      <button @click="handleClear" class="btn-clear" title="Очистить весь план">
         🗑️ Очистить
       </button>
-      <button @click="$emit('save')" class="btn-save">
-        💾 Сохранить
+      <button @click="handleSave" class="btn-save" :disabled="isSaving">
+        {{ isSaving ? '💾 Сохранение...' : '💾 Сохранить' }}
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   canUndo: {
     type: Boolean,
     default: false
@@ -51,10 +58,53 @@ defineProps({
   canRedo: {
     type: Boolean,
     default: false
+  },
+  objects: {
+    type: Array,
+    default: () => []
+  },
+  isSaving: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['undo', 'redo', 'save', 'cancel', 'clear'])
+const emit = defineEmits(['undo', 'redo', 'save', 'cancel', 'clear'])
+
+// Подсчитываем количество рабочих мест
+const workspaceCount = computed(() => {
+  return props.objects.filter(obj => obj.object_type === 'workspace').length
+})
+
+// Склонение слов
+const declension = (number, words) => {
+  const cases = [2, 0, 1, 1, 1, 2]
+  const index = (number % 100 < 4 || number % 100 > 20) ? cases[number % 10] : 2
+  return words[index]
+}
+
+// Обработчик сохранения
+const handleSave = () => {
+  if (workspaceCount.value === 0) {
+    const confirmed = confirm('На плане нет рабочих мест. Вы уверены, что хотите сохранить пустой план?')
+    if (!confirmed) return
+  }
+  
+  emit('save')
+}
+
+// Обработчик очистки
+const handleClear = () => {
+  if (workspaceCount.value === 0) {
+    const confirmed = confirm('Вы уверены, что хотите очистить план помещения? Все объекты будут удалены.')
+    if (!confirmed) return
+  } else {
+    const confirmed = confirm(`Вы уверены, что хотите очистить план помещения? Будет удалено ${workspaceCount.value} ${declension(workspaceCount.value, ['рабочее место', 'рабочих места', 'рабочих мест'])}. Это действие нельзя отменить.`)
+    if (!confirmed) return
+  }
+  
+  emit('clear')
+}
 </script>
 
 <style scoped>
@@ -74,6 +124,22 @@ defineEmits(['undo', 'redo', 'save', 'cancel', 'clear'])
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.room-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.workspace-count {
+  font-size: 0.9rem;
+  color: #667eea;
+  font-weight: 500;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .btn-back {

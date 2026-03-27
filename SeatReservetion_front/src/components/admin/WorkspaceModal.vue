@@ -39,15 +39,15 @@
         </div>
 
         <div class="form-group">
-          <label for="status_id">Статус *</label>
+          <label for="status_id">Status *</label>
           <select
             id="status_id"
             v-model="formData.status_id"
             required
           >
-            <option value="1">Свободно</option>
-            <option value="2">Занято</option>
-            <option value="3">Не активно</option>
+            <option :value="10">Free</option>
+            <option :value="11">Occupied</option>
+            <option :value="2">Inactive</option>
           </select>
           <p class="form-hint">
             {{ getStatusHint(formData.status_id) }}
@@ -96,9 +96,9 @@ const emit = defineEmits(['close', 'save'])
 
 // Статусы по умолчанию (должны совпадать с бэкендом)
 const defaultStatuses = {
-  FREE: 1,
-  OCCUPIED: 2,
-  INACTIVE: 3
+  FREE: 10,         // ✅ free (Свободно)
+  OCCUPIED: 11,     // ✅ occupied (Занято)
+  INACTIVE: 2       // ✅ inactive (Не активно)
 }
 
 // Локальные данные
@@ -115,9 +115,9 @@ const isEdit = computed(() => !!props.workspace)
 // Подсказка для статуса
 const getStatusHint = (statusId) => {
   const hints = {
-    [defaultStatuses.FREE]: 'Рабочее место доступно для бронирования',
-    [defaultStatuses.OCCUPIED]: 'Рабочее место занято (есть активное бронирование)',
-    [defaultStatuses.INACTIVE]: 'Рабочее место отключено и недоступно для бронирования'
+    [defaultStatuses.FREE]: 'Workspace is available for booking',
+    [defaultStatuses.OCCUPIED]: 'Workspace is occupied (has active booking)',
+    [defaultStatuses.INACTIVE]: 'Workspace is disabled and unavailable for booking'
   }
   return hints[statusId] || ''
 }

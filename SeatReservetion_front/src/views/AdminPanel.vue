@@ -174,8 +174,16 @@
             <h2>Управление рабочими местами</h2>
             <div class="header-buttons">
               <button @click="refreshWorkspaces" class="refresh-btn">🔄 Обновить</button>
-              <button @click="showWorkspaceModal = true" class="add-btn">➕ Добавить</button>
             </div>
+          </div>
+          
+          <!-- Подсказка что рабочие места создаются через план помещения -->
+          <div class="info-banner">
+            <span class="info-icon">ℹ️</span>
+            <p class="info-text">
+              <strong>Рабочие места создаются через план помещения.</strong>
+              Перейдите в редактор помещения (кнопка 🗺️) и добавьте рабочие места на план.
+            </p>
           </div>
           
           <!-- Фильтр по помещениям -->
@@ -254,14 +262,6 @@
       @save="saveUser"
     />
 
-    <WorkspaceModal
-      v-if="showWorkspaceModal"
-      :workspace="selectedWorkspace"
-      :rooms="rooms"
-      @close="closeWorkspaceModal"
-      @save="saveWorkspace"
-    />
-
     <!-- Модальное окно подтверждения удаления -->
     <ConfirmModal
       v-if="showConfirmModal"
@@ -288,7 +288,6 @@ import { getStatusConfig } from '../utils/statusHelpers'
 import Header from '../components/Header.vue'
 import RoomModal from '../components/admin/RoomModal.vue'
 import UserModal from '../components/admin/UserModal.vue'
-import WorkspaceModal from '../components/admin/WorkspaceModal.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
 const authStore = useAuthStore()
@@ -306,7 +305,6 @@ const workspaces = ref([])
 const statuses = ref([])
 const showRoomModal = ref(false)
 const showUserModal = ref(false)
-const showWorkspaceModal = ref(false)
 const selectedRoom = ref(null)
 const selectedUser = ref(null)
 const selectedWorkspace = ref(null)
@@ -495,11 +493,6 @@ const openRoomEditor = (room) => {
   router.push(`/room-editor/${room.id}`)
 }
 
-const editWorkspace = (workspace) => {
-  selectedWorkspace.value = { ...workspace }
-  showWorkspaceModal.value = true
-}
-
 // Показать модальное окно подтверждения удаления
 const showDeleteConfirm = (itemType, itemId, itemName) => {
   const types = {
@@ -599,11 +592,6 @@ const closeRoomModal = () => {
   selectedRoom.value = null
 }
 
-const closeWorkspaceModal = () => {
-  showWorkspaceModal.value = false
-  selectedWorkspace.value = null
-}
-
 const saveUser = async (userData) => {
   try {
     if (selectedUser.value) {
@@ -635,23 +623,6 @@ const saveRoom = async (roomData) => {
   } catch (error) {
     console.error('Ошибка сохранения помещения:', error)
     notificationStore.error('Не удалось сохранить данные помещения', 'Ошибка сохранения')
-  }
-}
-
-const saveWorkspace = async (workspaceData) => {
-  try {
-    if (selectedWorkspace.value) {
-      await workspacesApi.updateWorkspace(selectedWorkspace.value.id, workspaceData)
-    } else {
-      await workspacesApi.createWorkspace(workspaceData)
-    }
-    
-    await refreshWorkspaces()
-    closeWorkspaceModal()
-    notificationStore.success('Данные о рабочем месте успешно обновлены', 'Сохранение выполнено')
-  } catch (error) {
-    console.error('Ошибка сохранения рабочего места:', error)
-    notificationStore.error('Не удалось сохранить данные о рабочем месте', 'Ошибка сохранения')
   }
 }
 
@@ -771,6 +742,35 @@ onMounted(async () => {
 .header-buttons {
   display: flex;
   gap: 1rem;
+}
+
+.info-banner {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-left: 4px solid #667eea;
+  background-color: #ffffffb6;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.info-text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.6;
+}
+
+.info-text strong {
+  color: #667eea;
+  font-weight: 600;
 }
 
 .refresh-btn {

@@ -20,14 +20,22 @@
       <!-- Название -->
       <div class="property-group">
         <label for="obj-name" class="property-label">Название</label>
-        <input
-          id="obj-name"
-          v-model="localName"
-          type="text"
-          class="property-input"
-          placeholder="Введите название"
-          @change="updateProperty('name', localName)"
-        />
+        <div class="name-input-wrapper">
+          <input
+            id="obj-name"
+            v-model="localName"
+            type="text"
+            class="property-input"
+            placeholder="Введите название"
+            :disabled="isSavingName"
+            @blur="updateWorkspaceName(localName)"
+            @keyup.enter="updateWorkspaceName(localName)"
+          />
+          <span v-if="isSavingName" class="saving-indicator">💾</span>
+        </div>
+        <small v-if="selectedObject.object_type === 'workspace'" class="help-text">
+          Нажмите Enter или кликните вне поля для сохранения
+        </small>
       </div>
 
       <!-- Описание -->
@@ -101,6 +109,9 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useRoomEditorStore } from '@/stores/roomEditor'
+import { roomObjectsAPI } from '@/services/roomObjects'
+import { useNotificationStore } from '@/stores/notifications'
 
 const props = defineProps({
   selectedObject: {
@@ -111,12 +122,19 @@ const props = defineProps({
 
 const emit = defineEmits(['update', 'delete'])
 
+const editorStore = useRoomEditorStore()
+const notificationStore = useNotificationStore()
+
 // Локальные копии для двухстороннего связывания
 const localName = ref('')
 const localDescription = ref('')
 const localScale = ref(100) // Масштаб в процентах (100% = базовый размер)
 const localRotation = ref(0)
 const localActive = ref(true)
+
+// Состояние для сохранения названия
+const isSavingName = ref(false)
+const workspaceOnPlanId = ref(null)
 
 // Обновляем локальные значения при изменении выбранного объекта
 watch(() => props.selectedObject, (newObj) => {
@@ -127,6 +145,11 @@ watch(() => props.selectedObject, (newObj) => {
     localScale.value = Math.round((newObj.width || 100) / 100 * 100)
     localRotation.value = newObj.rotation || 0
     localActive.value = newObj.is_active !== undefined ? newObj.is_active : true
+    
+    // Получаем workspace_on_plan_id для рабочих мест
+    if (newObj.object_type === 'workspace' && newObj.workspace_on_plan_id) {
+      workspaceOnPlanId.value = newObj.workspace_on_plan_id
+    }
   }
 }, { immediate: true })
 
@@ -157,14 +180,44 @@ const handleDelete = () => {
   }
 }
 
+// Обновление названия рабочего места через API
+const updateWorkspaceName = async (newName) => {
+  if (!props.selectedObject || !workspaceOnPlanId.value) return
+  
+  const roomId = editorStore.currentRoom?.id
+  if (!roomId) {
+    notificationStore.error('Помещение не выбрано', 'Ошибка')
+    return
+  }
+  
+  if (!newName || !newName.trim()) {
+    notificationStore.error('Название не может быть пустым', 'Ошибка')
+    return
+  }
+  
+  try {
+    isSavingName.value = true
+    await roomObjectsAPI.updateWorkspaceName(roomId, workspaceOnPlanId.value, newName.trim())
+    notificationStore.success('Название рабочего места обновлено', 'Успешно')
+  } catch (error) {
+    console.error('Ошибка обновления названия:', error)
+    const errorMessage = error.response?.data?.detail || 'Не удалось обновить название'
+    notificationStore.error(errorMessage, 'Ошибка')
+    // Возвращаем старое название при ошибке
+    localName.value = props.selectedObject.name || ''
+  } finally {
+    isSavingName.value = false
+  }
+}
+
 // Обновление масштаба (в процентах)
 const updateScale = (scalePercent) => {
   if (!props.selectedObject) return
-  
+
   // Ограничиваем от 10% до 500%
   const clampedScale = Math.max(10, Math.min(500, scalePercent))
   const newSize = Math.round(clampedScale / 100 * 100)
-  
+
   emit('update', props.selectedObject.id, {
     width: newSize,
     height: newSize
@@ -264,6 +317,37 @@ const rotateObject = (degrees) => {
 .property-textarea:focus {
   outline: none;
   border-color: #2196F3;
+}
+
+.name-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.name-input-wrapper .property-input {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+
+.saving-indicator {
+  position: absolute;
+  right: 0.75rem;
+  font-size: 1rem;
+  opacity: 0.7;
+  animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.help-text {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #999;
 }
 
 .property-input.small {

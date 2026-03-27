@@ -21,7 +21,7 @@ class WorkspaceOnPlan(BaseModel):
 
     room_object_id = Column(Integer, ForeignKey("room_objects.id", ondelete="CASCADE"), nullable=False, unique=True, comment="ID объекта")
     workspace_id = Column(Integer, ForeignKey("workspaces.id", ondelete="SET NULL"), nullable=True, comment="ID рабочего места")
-    status_id = Column(Integer, ForeignKey("statuses.id"), nullable=False, default=1, comment="ID статуса")
+    status_id = Column(Integer, ForeignKey("statuses.id"), nullable=False, default=10, comment="ID статуса (10=free)")
     workspace_number = Column(Integer, nullable=True, comment="Номер рабочего места")
 
     # Отношения

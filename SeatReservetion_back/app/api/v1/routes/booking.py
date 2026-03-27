@@ -176,13 +176,25 @@ async def create_booking(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Рабочее место с ID {booking_data.workspace_id} не найдено"
             )
-        
+
         # Проверяем, что рабочее место активно
         if not getattr(workspace, 'is_active', True):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Рабочее место '{workspace.name}' не активно и не может быть забронировано"
             )
+
+        # Проверяем статус помещения - нельзя бронировать в неактивном помещении
+        from app.models.room import Room
+        room = db.query(Room).filter(Room.id == workspace.room_id).first()
+        if room:
+            # Получаем статус "inactive"
+            inactive_status = db.query(Status).filter(Status.name == "inactive").first()
+            if room.status_id == inactive_status.id if inactive_status else 2:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Помещение '{room.name}' не активно. Бронирование недоступно."
+                )
         
         # Проверяем существование статуса
         status_obj = db.query(Status).filter(Status.id == booking_data.status_id).first()
@@ -192,36 +204,44 @@ async def create_booking(
                 detail=f"Статус с ID {booking_data.status_id} не найден"
             )
         
-        # Проверяем, что у пользователя нет других бронирований на эту дату (исключая отмененные)
+        # Проверяем, что у пользователя нет других бронирований на эту дату (исключая отмененные и завершенные)
         from sqlalchemy import not_
-        
+
         # Формируем запрос для проверки существующих бронирований пользователя на эту дату
         user_bookings_query = db.query(Booking).filter(
             Booking.account_id == booking_data.account_id,
             Booking.booking_date == booking_data.booking_date
         )
-        
-        # Получаем статус "cancelled" для исключения отмененных бронирований
+
+        # Получаем статусы "cancelled" и "completed" для исключения неактивных бронирований
         cancelled_status = db.query(Status).filter(Status.name == "cancelled").first()
-        if cancelled_status:
-            user_bookings_query = user_bookings_query.filter(Booking.status_id != cancelled_status.id)
+        completed_status = db.query(Status).filter(Status.name == "completed").first()
         
+        excluded_statuses = []
+        if cancelled_status:
+            excluded_statuses.append(cancelled_status.id)
+        if completed_status:
+            excluded_statuses.append(completed_status.id)
+        
+        if excluded_statuses:
+            user_bookings_query = user_bookings_query.filter(Booking.status_id.notin_(excluded_statuses))
+
         existing_user_booking = user_bookings_query.first()
         if existing_user_booking:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"У вас уже есть бронирование на {booking_data.booking_date}. Один пользователь может забронировать только одно рабочее место в день."
             )
-        
-        # Проверяем, что рабочее место не забронировано на эту дату (исключая отмененные)
+
+        # Проверяем, что рабочее место не забронировано на эту дату (исключая отмененные и завершенные)
         workspace_bookings_query = db.query(Booking).filter(
             Booking.workspace_id == booking_data.workspace_id,
             Booking.booking_date == booking_data.booking_date
         )
-        
-        if cancelled_status:
-            workspace_bookings_query = workspace_bookings_query.filter(Booking.status_id != cancelled_status.id)
-        
+
+        if excluded_statuses:
+            workspace_bookings_query = workspace_bookings_query.filter(Booking.status_id.notin_(excluded_statuses))
+
         existing_workspace_booking = workspace_bookings_query.first()
         if existing_workspace_booking:
             raise HTTPException(

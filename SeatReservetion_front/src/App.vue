@@ -18,12 +18,19 @@ const showHeader = computed(() => {
 
 // Настройки заголовка в зависимости от маршрута
 const headerConfig = computed(() => {
+  const isAdmin = authStore.user?.is_admin || false
+  
   switch (route.name) {
     case 'Dashboard':
       return {
         title: 'Панель управления',
         showLogout: true,
-        actions: [] // Убираем кнопки на дашборде - мы уже на дашборде
+        actions: isAdmin ? [{
+          key: 'admin',
+          text: '⚙️ Админка',
+          className: 'admin-btn',
+          onClick: () => router.push('/admin')
+        }] : []
       }
     case 'Booking':
       return {
@@ -57,7 +64,13 @@ const headerConfig = computed(() => {
             text: '← Назад к дашборду',
             className: 'back-btn',
             onClick: () => router.push('/dashboard')
-          }
+          },
+          ...(isAdmin ? [{
+            key: 'admin',
+            text: '⚙️ Админка',
+            className: 'admin-btn',
+            onClick: () => router.push('/admin')
+          }] : [])
         ]
       }
     case 'AdminPanel':
@@ -83,13 +96,25 @@ const headerConfig = computed(() => {
             text: '← Назад к дашборду',
             className: 'back-btn',
             onClick: () => router.push('/dashboard')
-          }
+          },
+          ...(isAdmin ? [{
+            key: 'admin',
+            text: '⚙️ Админка',
+            className: 'admin-btn',
+            onClick: () => router.push('/admin')
+          }] : [])
         ]
       }
     default:
       return {
         title: 'Система бронирования',
-        showLogout: true
+        showLogout: true,
+        actions: isAdmin ? [{
+          key: 'admin',
+          text: '⚙️ Админка',
+          className: 'admin-btn',
+          onClick: () => router.push('/admin')
+        }] : []
       }
   }
 })

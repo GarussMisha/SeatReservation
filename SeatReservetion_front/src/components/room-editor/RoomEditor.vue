@@ -8,6 +8,8 @@
     <EditorToolbar
       :can-undo="canUndo"
       :can-redo="canRedo"
+      :objects="objects"
+      :is-saving="isSaving"
       @undo="handleUndo"
       @redo="handleRedo"
       @save="handleSave"
@@ -79,6 +81,7 @@ const notificationStore = useNotificationStore()
 const isDrawing = ref(false)
 const currentLineLength = ref('0')
 const snapToGrid = ref(true) // Привязка к сетке
+const isSaving = ref(false) // Состояние сохранения
 
 // Обработчик состояния рисования
 const handleDrawingState = (state) => {
@@ -178,16 +181,19 @@ const handleSave = async () => {
   console.log('Размеры поля:', fieldWidth.value, fieldHeight.value)
 
   try {
+    isSaving.value = true
     await roomObjectsAPI.saveRoomPlan(
       currentRoom.value.id,
       objects.value,
       fieldWidth.value,
       fieldHeight.value
     )
-    notificationStore.success('План помещения сохранен', 'Успешно')
+    notificationStore.success('План помещения сохранён', 'Успешно')
   } catch (error) {
     console.error('Ошибка сохранения плана:', error)
     notificationStore.error('Не удалось сохранить план помещения', 'Ошибка')
+  } finally {
+    isSaving.value = false
   }
 }
 

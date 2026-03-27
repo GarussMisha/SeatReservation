@@ -1,9 +1,10 @@
 """
 Pydantic схемы для объектов помещения
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List, Dict, Any
 from datetime import datetime
+import json
 
 
 # === Базовые схемы ===
@@ -46,9 +47,23 @@ class RoomObjectResponse(RoomObjectBase):
     room_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
+    
+    # Дополнительная информация для рабочих мест
+    workspace_on_plan_id: Optional[int] = None
 
     class Config:
         from_attributes = True
+
+    @field_validator('properties', mode='before')
+    @classmethod
+    def parse_properties(cls, value):
+        """Распарсиваем JSON строку properties в словарь"""
+        if isinstance(value, str):
+            try:
+                return json.loads(value)
+            except:
+                return None
+        return value
 
 
 # === Схемы для стен ===
@@ -159,6 +174,8 @@ class WorkspaceOnPlanResponse(WorkspaceOnPlanBase):
 class RoomPlanCreate(BaseModel):
     """Схема для создания всего плана помещения"""
     objects: List[Dict[str, Any]] = Field(..., description="Список всех объектов плана")
+    fieldWidth: Optional[int] = Field(None, description="Ширина поля в клетках")
+    fieldHeight: Optional[int] = Field(None, description="Высота поля в клетках")
 
 
 class RoomPlanResponse(BaseModel):
@@ -166,3 +183,5 @@ class RoomPlanResponse(BaseModel):
     room_id: int
     objects: List[RoomObjectResponse]
     total_objects: int
+    fieldWidth: Optional[int] = None
+    fieldHeight: Optional[int] = None
