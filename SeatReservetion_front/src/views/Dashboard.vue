@@ -4,25 +4,33 @@
  */
 <template>
   <div class="dashboard-page">
-    <!-- Фоновая декорация -->
-    <div class="background-decoration">
-      <div class="floating-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
-        <div class="shape shape-4"></div>
-      </div>
-    </div>
+    <Header
+      title="Бронирование рабочих мест"
+      :userGreeting="`Добро пожаловать, ${authStore.userName || 'Пользователь'}`"
+      showLogout
+      @logout="handleLogout"
+    />
 
-    <div class="dashboard-container">
-      <main class="dashboard-content">
-        <!-- Верхняя панель с выбором помещения и даты -->
-        <BookingToolbar
-          v-model="selection"
-          :my-bookings="myBookings"
-          @room-change="handleRoomChange"
-          @date-change="handleDateChange"
-        />
+    <div class="dashboard-content-wrapper">
+      <!-- Фоновая декорация -->
+      <div class="background-decoration">
+        <div class="floating-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
+          <div class="shape shape-4"></div>
+        </div>
+      </div>
+
+      <div class="dashboard-container">
+        <main class="dashboard-main">
+          <!-- Верхняя панель с выбором помещения и даты -->
+          <BookingToolbar
+            v-model="selection"
+            :my-bookings="myBookings"
+            @room-change="handleRoomChange"
+            @date-change="handleDateChange"
+          />
 
         <!-- Основная область с планом помещения -->
         <div class="plan-section">
@@ -117,6 +125,7 @@
         </div>
       </main>
     </div>
+  </div>
 
     <!-- Модальное окно подтверждения -->
     <BookingConfirmModal
@@ -141,7 +150,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { bookingsAPI, roomsAPI } from '@/services/api'
 import { useNotificationStore } from '@/stores/notifications'
-
+import Header from '@/components/Header.vue'
 import BookingToolbar from '@/components/dashboard/BookingToolbar.vue'
 import RoomPlanCanvas from '@/components/dashboard/RoomPlanCanvas.vue'
 import BookingConfirmModal from '@/components/dashboard/BookingConfirmModal.vue'
@@ -154,6 +163,12 @@ const notificationStore = useNotificationStore()
 const selection = ref({ roomId: null, date: null })
 const selectedRoom = ref(null)
 const selectedDate = ref(null)
+
+// Метод logout
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 
 // Данные
 const rooms = ref([])
@@ -396,8 +411,75 @@ onMounted(async () => {
 <style scoped>
 .dashboard-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
   position: relative;
+  overflow: hidden;
+  padding-top: 100px;
+}
+
+.dashboard-content-wrapper {
+  flex: 1;
+  position: relative;
+  z-index: 10;
+  min-height: calc(100vh - 180px);
+}
+
+.background-decoration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floating-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  filter: blur(60px);
+}
+
+.shape-1 {
+  width: 400px;
+  height: 400px;
+  top: -100px;
+  right: -100px;
+  background: rgba(102, 126, 234, 0.2);
+}
+
+.shape-2 {
+  width: 300px;
+  height: 300px;
+  bottom: -50px;
+  left: -50px;
+  background: rgba(118, 75, 162, 0.2);
+}
+
+.shape-3 {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  background: rgba(102, 126, 234, 0.15);
+}
+
+.shape-4 {
+  width: 250px;
+  height: 250px;
+  bottom: 20%;
+  right: 10%;
+  background: rgba(118, 75, 162, 0.1);
 }
 
 .dashboard-container {
@@ -406,10 +488,12 @@ onMounted(async () => {
   padding: 2rem;
 }
 
-.dashboard-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+.dashboard-main {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 2rem;
+  min-height: calc(100vh - 260px);
 }
 
 .plan-section {

@@ -287,9 +287,10 @@ onUnmounted(() => {
   align-items: flex-start;
   gap: 2rem;
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 249, 250, 0.98) 100%);
-  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(102, 126, 234, 0.15);
+  margin-bottom: 2rem;
 }
 
 .toolbar-section {
@@ -319,18 +320,28 @@ onUnmounted(() => {
 
 .room-select {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
   background: white;
-  font-size: 0.95rem;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
   color: #333;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25rem 1.25rem;
+  padding-right: 3rem;
 }
 
 .room-select:hover {
-  border-color: rgba(102, 126, 234, 0.5);
+  border-color: rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-1px);
 }
 
 .room-select:focus {
@@ -346,19 +357,23 @@ onUnmounted(() => {
 }
 
 .nav-btn {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.25rem;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-radius: 8px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
   cursor: pointer;
   font-size: 1.25rem;
+  font-weight: 600;
   color: #667eea;
-  transition: all 0.2s;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .nav-btn:hover {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-  border-color: rgba(102, 126, 234, 0.5);
+  border-color: rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-1px);
 }
 
 .calendar-wrapper {
@@ -369,18 +384,22 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1.25rem;
   background: white;
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-radius: 8px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
   cursor: pointer;
   font-size: 0.95rem;
+  font-weight: 500;
   color: #333;
-  transition: all 0.2s;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .date-display:hover {
-  border-color: rgba(102, 126, 234, 0.5);
+  border-color: rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-1px);
 }
 
 .calendar-icon {
