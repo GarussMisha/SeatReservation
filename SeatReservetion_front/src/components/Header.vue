@@ -9,6 +9,26 @@
       </div>
 
       <div class="header-right">
+        <!-- Кнопка админки (только для админов) -->
+        <button
+          v-if="authStore.isAdmin"
+          @click="goToAdmin"
+          class="header-action-btn admin-btn"
+        >
+          ⚙️ Админка
+        </button>
+
+        <!-- Ссылка на репозиторий -->
+        <a
+          href="https://github.com/your-username/SeatReservation"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="repo-link"
+          title="GitHub репозиторий"
+        >
+          📦
+        </a>
+
         <div v-if="hasActions" class="header-actions">
           <button
             v-for="action in actions"
@@ -82,6 +102,10 @@ const getInitials = () => {
 
 const goToProfile = () => {
   router.push('/profile')
+}
+
+const goToAdmin = () => {
+  router.push('/admin')
 }
 
 const handleLogout = () => {
@@ -179,6 +203,28 @@ const handleLogout = () => {
   display: flex;
   gap: 1rem;
   align-items: center;
+}
+
+.repo-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.repo-link:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .header-action-btn {
