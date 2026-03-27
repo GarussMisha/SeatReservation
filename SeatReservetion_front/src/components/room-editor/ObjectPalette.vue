@@ -26,6 +26,15 @@
         </button>
 
         <button
+          @click="$emit('select-tool', 'internal_wall')"
+          :class="['tool-btn', { active: currentTool === 'internal_wall' }]"
+          title="Перегородка"
+        >
+          <span class="tool-icon">📏</span>
+          <span class="tool-label">Перегородка</span>
+        </button>
+
+        <button
           @click="$emit('select-tool', 'door')"
           :class="['tool-btn', { active: currentTool === 'door' }]"
           title="Дверь"

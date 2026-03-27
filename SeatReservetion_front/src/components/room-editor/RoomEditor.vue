@@ -29,23 +29,13 @@
       />
 
       <!-- Центральная область - холст -->
-      <EditorCanvas
-        :objects="objects"
-        :zoom="zoom"
-        :offset="offset"
-        :current-tool="currentTool"
-        :grid-size="gridSize"
-        :show-grid="showGrid"
-        :field-width="fieldWidth"
-        :field-height="fieldHeight"
-        @select-object="handleSelectObject"
-        @update-object="handleUpdateObject"
-        @delete-object="handleDeleteObject"
-        @add-object="handleAddObject"
-        @set-offset="handleSetOffset"
-        @set-zoom="handleSetZoom"
-        @select-tool="handleSelectTool"
-      />
+      <div class="canvas-wrapper">
+        <WallDrawingCanvas
+          :current-tool="currentTool"
+          :grid-size="gridSize"
+          @wall-completed="handleWallCompleted"
+        />
+      </div>
 
       <!-- Правая панель - свойства объекта -->
       <PropertiesPanel
@@ -66,7 +56,7 @@ import { roomObjectsAPI } from '@/services/roomObjects'
 
 import EditorToolbar from './EditorToolbar.vue'
 import ObjectPalette from './ObjectPalette.vue'
-import EditorCanvas from './EditorCanvas.vue'
+import WallDrawingCanvas from './WallDrawingCanvas.vue'
 import PropertiesPanel from './PropertiesPanel.vue'
 
 const router = useRouter()
@@ -123,6 +113,10 @@ const handleAddObject = (object) => {
       }
     }
   }, 0)
+}
+
+const handleWallCompleted = (wall) => {
+  notificationStore.success(`Стена добавлена (${wall.points.length} точек)`, 'Успешно')
 }
 
 const handleUpdateObject = (objectId, updates) => {
@@ -241,5 +235,12 @@ onUnmounted(() => {
   display: flex;
   flex: 1;
   overflow: hidden;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  overflow: hidden;
+  background: #f5f5f5;
+  position: relative;
 }
 </style>

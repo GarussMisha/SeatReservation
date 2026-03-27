@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор Плана Помещения</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background: #f8fafc;
+            padding: 24px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .tool-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tool-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .tool-btn:hover {
+            border-color: #667eea;
+            transform: translateX(4px);
+        }
+
+        .tool-btn.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tool-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wall-preview {
+            width: 40px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .wall-preview.external {
+            background: #1e293b;
+            height: 8px;
+        }
+
+        .wall-preview.internal {
+            background: #94a3b8;
+            height: 3px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-btn.danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .action-btn.danger:hover {
+            background: #dc2626;
+        }
+
+        .action-btn.secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .action-btn.secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .canvas-container {
+            padding: 24px;
+            background: #ffffff;
+            overflow: auto;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fafafa;
+        }
+
+        #floorplan-canvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        .info-panel {
+            margin-top: 20px;
+            padding: 16px;
+            background: #f0f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-panel h4 {
+            color: #0369a1;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-panel p {
+            color: #64748b;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .keyboard-hints {
+            margin-top: 20px;
+            padding: 16px;
+            background: #fef3c7;
+            border-radius: 10px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .keyboard-hints h4 {
+            color: #92400e;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .keyboard-hints p {
+            color: #78350f;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="app-container">
+        <header class="header">
+            <h1>🏠 Редактор Плана Помещения</h1>
+            <p>Рисуйте стены на сетке с привязкой к узлам</p>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Типы Стен</h3>
+                    <div class="tool-buttons">
+                        <button 
+                            class="tool-btn" 
+                            :class="{ active: currentTool === 'external' }"
+                            @click="currentTool = 'external'"
+                        >
+                            <div class="tool-icon">
+                                <div class="wall-preview external"></div>
+                            </div>
+                            <span>Внешние Стены</span>
+                        </button>
+                        <button 
+                            class="tool-btn" 
+                            :class="{ active: currentTool === 'internal' }"
+                            @click="currentTool = 'internal'"
+                        >
+                            <div class="tool-icon">
+                                <div class="wall-preview internal"></div>
+                            </div>
+                            <span>Перегородки</span>
+                        </button>
+                        <button 
+                            class="tool-btn" 
+                            :class="{ active: currentTool === 'select' }"
+                            @click="currentTool = 'select'"
+                        >
+                            <div class="tool-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/>
+                                </svg>
+                            </div>
+                            <span>Выделение</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Действия</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn primary" @click="finishDrawing">
+                            ✓ Завершить Линию
+                        </button>
+                        <button class="action-btn secondary" @click="undoLastPoint">
+                            ↩ Отменить Точку
+                        </button>
+                        <button class="action-btn danger" @click="clearAll">
+                            🗑 Очистить Всё
+                        </button>
+                        <button class="action-btn secondary" @click="exportPlan">
+                            📥 Экспорт PNG
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ walls.length }}</div>
+                        <div class="stat-label">Внешних Стен</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ partitions.length }}</div>
+                        <div class="stat-label">Перегородок</div>
+                    </div>
+                </div>
+
+                <div class="info-panel">
+                    <h4>💡 Как Рисовать</h4>
+                    <p>Кликните для начала линии, перемещайте мышь для предпросмотра, кликните для добавления точек. Двойной клик или кнопка "Завершить" заканчивает линию.</p>
+                </div>
+
+                <div class="keyboard-hints">
+                    <h4>⌨️ Горячие Клавиши</h4>
+                    <p><strong>ESC</strong> - Отменить текущую линию<br>
+                    <strong>DELETE</strong> - Удалить выделенное<br>
+                    <strong>Z</strong> - Отменить действие</p>
+                </div>
+            </aside>
+
+            <main class="canvas-container">
+                <div class="canvas-wrapper">
+                    <canvas 
+                        id="floorplan-canvas" 
+                        ref="canvas"
+                        @mousedown="handleMouseDown"
+                        @mousemove="handleMouseMove"
+                        @mouseup="handleMouseUp"
+                        @dblclick="handleDoubleClick"
+                    ></canvas>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted, watch } = Vue;
+
+        createApp({
+            setup() {
+                const canvas = ref(null);
+                const currentTool = ref('external');
+                const walls = ref([]);
+                const partitions = ref([]);
+                const currentLine = ref([]);
+                const isDrawing = ref(false);
+                const mousePos = ref({ x: 0, y: 0 });
+                const gridSize = ref(20);
+                const selectedWall = ref(null);
+
+                const ctx = ref(null);
+                const canvasWidth = 1200;
+                const canvasHeight = 800;
+
+                onMounted(() => {
+                    const c = canvas.value;
+                    c.width = canvasWidth;
+                    c.height = canvasHeight;
+                    ctx.value = c.getContext('2d');
+                    draw();
+
+                    document.addEventListener('keydown', handleKeyDown);
+                });
+
+                const snapToGrid = (value) => {
+                    return Math.round(value / gridSize.value) * gridSize.value;
+                };
+
+                const getMousePos = (e) => {
+                    const rect = canvas.value.getBoundingClientRect();
+                    const scaleX = canvasWidth / rect.width;
+                    const scaleY = canvasHeight / rect.height;
+                    return {
+                        x: snapToGrid((e.clientX - rect.left) * scaleX),
+                        y: snapToGrid((e.clientY - rect.top) * scaleY)
+                    };
+                };
+
+                const draw = () => {
+                    const c = ctx.value;
+                    c.clearRect(0, 0, canvasWidth, canvasHeight);
+
+                    // Draw grid
+                    drawGrid();
+
+                    // Draw completed walls
+                    walls.value.forEach(wall => {
+                        drawWall(wall, '#1e293b', 8);
+                    });
+
+                    // Draw completed partitions
+                    partitions.value.forEach(part => {
+                        drawWall(part, '#94a3b8', 3);
+                    });
+
+                    // Draw current line being drawn
+                    if (currentLine.value.length > 0 && isDrawing.value) {
+                        const color = currentTool.value === 'external' ? '#1e293b' : '#94a3b8';
+                        const width = currentTool.value === 'external' ? 8 : 3;
+                        
+                        // Draw completed segments
+                        for (let i = 0; i < currentLine.value.length - 1; i++) {
+                            drawLineSegment(
+                                currentLine.value[i],
+                                currentLine.value[i + 1],
+                                color,
+                                width
+                            );
+                        }
+
+                        // Draw preview line to mouse
+                        drawLineSegment(
+                            currentLine.value[currentLine.value.length - 1],
+                            mousePos.value,
+                            color,
+                            width,
+                            true
+                        );
+                    }
+
+                    // Draw selection
+                    if (selectedWall.value) {
+                        drawSelection(selectedWall.value);
+                    }
+                };
+
+                const drawGrid = () => {
+                    const c = ctx.value;
+                    c.strokeStyle = '#e2e8f0';
+                    c.lineWidth = 1;
+
+                    for (let x = 0; x <= canvasWidth; x += gridSize.value) {
+                        c.beginPath();
+                        c.moveTo(x, 0);
+                        c.lineTo(x, canvasHeight);
+                        c.stroke();
+                    }
+
+                    for (let y = 0; y <= canvasHeight; y += gridSize.value) {
+                        c.beginPath();
+                        c.moveTo(0, y);
+                        c.lineTo(canvasWidth, y);
+                        c.stroke();
+                    }
+                };
+
+                const drawWall = (wall, color, width) => {
+                    for (let i = 0; i < wall.points.length - 1; i++) {
+                        drawLineSegment(wall.points[i], wall.points[i + 1], color, width);
+                    }
+                };
+
+                const drawLineSegment = (start, end, color, width, isPreview = false) => {
+                    const c = ctx.value;
+                    c.beginPath();
+                    c.moveTo(start.x, start.y);
+                    c.lineTo(end.x, end.y);
+                    c.strokeStyle = color;
+                    c.lineWidth = width;
+                    c.lineCap = 'round';
+                    c.lineJoin = 'round';
+                    if (isPreview) {
+                        c.setLineDash([5, 5]);
+                        c.globalAlpha = 0.6;
+                    }
+                    c.stroke();
+                    c.setLineDash([]);
+                    c.globalAlpha = 1;
+                };
+
+                const drawSelection = (wall) => {
+                    const c = ctx.value;
+                    c.strokeStyle = '#667eea';
+                    c.lineWidth = 2;
+                    c.setLineDash([5, 5]);
+                    
+                    wall.points.forEach(point => {
+                        c.beginPath();
+                        c.arc(point.x, point.y, 8, 0, Math.PI * 2);
+                        c.stroke();
+                    });
+                    
+                    c.setLineDash([]);
+                };
+
+                const handleMouseDown = (e) => {
+                    if (currentTool.value === 'select') {
+                        selectWall(e);
+                        return;
+                    }
+
+                    const pos = getMousePos(e);
+                    
+                    if (!isDrawing.value) {
+                        isDrawing.value = true;
+                        currentLine.value = [pos];
+                    } else {
+                        currentLine.value.push(pos);
+                    }
+                    
+                    draw();
+                };
+
+                const handleMouseMove = (e) => {
+                    mousePos.value = getMousePos(e);
+                    if (isDrawing.value) {
+                        draw();
+                    }
+                };
+
+                const handleMouseUp = (e) => {
+                    // Keep drawing mode active
+                };
+
+                const handleDoubleClick = (e) => {
+                    if (isDrawing.value && currentLine.value.length >= 2) {
+                        finishDrawing();
+                    }
+                };
+
+                const handleKeyDown = (e) => {
+                    if (e.key === 'Escape') {
+                        currentLine.value = [];
+                        isDrawing.value = false;
+                        draw();
+                    }
+                    if (e.key === 'Delete' && selectedWall.value) {
+                        deleteSelected();
+                    }
+                    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+                        undoLastPoint();
+                    }
+                };
+
+                const selectWall = (e) => {
+                    const pos = getMousePos(e);
+                    const allWalls = [
+                        ...walls.value.map(w => ({ ...w, type: 'external' })),
+                        ...partitions.value.map(p => ({ ...p, type: 'internal' }))
+                    ];
+
+                    selectedWall.value = null;
+                    
+                    for (let wall of allWalls) {
+                        for (let i = 0; i < wall.points.length - 1; i++) {
+                            const dist = pointToLineDistance(
+                                pos,
+                                wall.points[i],
+                                wall.points[i + 1]
+                            );
+                            if (dist < 10) {
+                                selectedWall.value = wall;
+                                break;
+                            }
+                        }
+                        if (selectedWall.value) break;
+                    }
+                    
+                    draw();
+                };
+
+                const pointToLineDistance = (point, lineStart, lineEnd) => {
+                    const A = point.x - lineStart.x;
+                    const B = point.y - lineStart.y;
+                    const C = lineEnd.x - lineStart.x;
+                    const D = lineEnd.y - lineStart.y;
+
+                    const dot = A * C + B * D;
+                    const lenSq = C * C + D * D;
+                    let param = -1;
+                    
+                    if (lenSq !== 0) param = dot / lenSq;
+
+                    let xx, yy;
+
+                    if (param < 0) {
+                        xx = lineStart.x;
+                        yy = lineStart.y;
+                    } else if (param > 1) {
+                        xx = lineEnd.x;
+                        yy = lineEnd.y;
+                    } else {
+                        xx = lineStart.x + param * C;
+                        yy = lineStart.y + param * D;
+                    }
+
+                    const dx = point.x - xx;
+                    const dy = point.y - yy;
+                    return Math.sqrt(dx * dx + dy * dy);
+                };
+
+                const finishDrawing = () => {
+                    if (currentLine.value.length >= 2) {
+                        const lineData = {
+                            points: [...currentLine.value],
+                            id: Date.now()
+                        };
+
+                        if (currentTool.value === 'external') {
+                            walls.value.push(lineData);
+                        } else {
+                            partitions.value.push(lineData);
+                        }
+
+                        currentLine.value = [];
+                        isDrawing.value = false;
+                        draw();
+                    }
+                };
+
+                const undoLastPoint = () => {
+                    if (currentLine.value.length > 0) {
+                        currentLine.value.pop();
+                        if (currentLine.value.length === 0) {
+                            isDrawing.value = false;
+                        }
+                        draw();
+                    }
+                };
+
+                const deleteSelected = () => {
+                    if (!selectedWall.value) return;
+
+                    if (selectedWall.value.type === 'external') {
+                        walls.value = walls.value.filter(w => w.id !== selectedWall.value.id);
+                    } else {
+                        partitions.value = partitions.value.filter(p => p.id !== selectedWall.value.id);
+                    }
+
+                    selectedWall.value = null;
+                    draw();
+                };
+
+                const clearAll = () => {
+                    if (confirm('Вы уверены, что хотите очистить весь план?')) {
+                        walls.value = [];
+                        partitions.value = [];
+                        currentLine.value = [];
+                        isDrawing.value = false;
+                        selectedWall.value = null;
+                        draw();
+                    }
+                };
+
+                const exportPlan = () => {
+                    const link = document.createElement('a');
+                    link.download = 'floorplan.png';
+                    link.href = canvas.value.toDataURL('image/png');
+                    link.click();
+                };
+
+                watch(currentTool, () => {
+                    selectedWall.value = null;
+                    draw();
+                });
+
+                return {
+                    canvas,
+                    currentTool,
+                    walls,
+                    partitions,
+                    handleMouseDown,
+                    handleMouseMove,
+                    handleMouseUp,
+                    handleDoubleClick,
+                    finishDrawing,
+                    undoLastPoint,
+                    clearAll,
+                    exportPlan
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
+
