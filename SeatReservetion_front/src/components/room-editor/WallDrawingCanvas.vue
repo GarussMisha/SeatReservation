@@ -15,13 +15,29 @@
       @mousemove="handleMouseMove"
       @mouseup="handleMouseUp"
       @dblclick="handleDoubleClick"
-      @contextmenu.prevent
+      @contextmenu.prevent="handleContextMenu"
     ></canvas>
     
     <!-- Подсказка -->
     <div v-if="!isDrawing && (currentTool === 'wall' || currentTool === 'internal_wall')" class="canvas-hint">
-      <span class="hint-icon">🎯</span>
-      <span class="hint-text">Кликните для начала рисования стены</span>
+      <div class="hint-content">
+        <span class="hint-icon">🎯</span>
+        <div class="hint-text">
+          <p><strong>Кликните</strong> для начала рисования</p>
+          <p><strong>ПКМ</strong> для завершения линии</p>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="isDrawing" class="canvas-hint drawing">
+      <div class="hint-content">
+        <span class="hint-icon">✏️</span>
+        <div class="hint-text">
+          <p>Точек: <strong>{{ currentLine.length }}</strong></p>
+          <p><strong>ПКМ</strong> для завершения</p>
+          <p><strong>ESC</strong> для отмены</p>
+        </div>
+      </div>
     </div>
     
     <!-- Информация о масштабе -->
@@ -347,6 +363,14 @@ const drawSelection = (wall) => {
 // === Обработчики событий ===
 
 const handleMouseDown = (e) => {
+  // Правая кнопка мыши - завершить рисование
+  if (e.button === 2) {
+    if (isDrawing.value && currentLine.value.length >= 2) {
+      finishDrawing()
+    }
+    return
+  }
+  
   // Средняя кнопка мыши - перемещение
   if (e.button === 1) {
     e.preventDefault()
@@ -395,6 +419,13 @@ const handleMouseMove = (e) => {
 const handleMouseUp = (e) => {
   if (e.button === 1) {
     isPanning.value = false
+  }
+}
+
+const handleContextMenu = (e) => {
+  e.preventDefault()
+  if (isDrawing.value && currentLine.value.length >= 2) {
+    finishDrawing()
   }
 }
 
@@ -572,24 +603,47 @@ watch(() => [props.zoom, props.offset, props.fieldWidth, props.fieldHeight], () 
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(255, 255, 255, 0.95);
-  padding: 20px 30px;
+  padding: 24px 32px;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
-  gap: 12px;
   pointer-events: none;
   z-index: 10;
 }
 
+.canvas-hint.drawing {
+  background: rgba(255, 243, 199, 0.95);
+  border: 2px solid #f59e0b;
+}
+
+.hint-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
 .hint-icon {
-  font-size: 2rem;
+  font-size: 2.5rem;
+  flex-shrink: 0;
 }
 
 .hint-text {
-  font-size: 1rem;
+  text-align: left;
+}
+
+.hint-text p {
+  font-size: 0.95rem;
   color: #475569;
-  font-weight: 500;
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.hint-text strong {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.canvas-hint.drawing .hint-text strong {
+  color: #f59e0b;
 }
 
 .zoom-info {
