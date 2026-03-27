@@ -23,9 +23,11 @@
         :field-height="fieldHeight"
         :is-drawing="isDrawing"
         :current-line-length="currentLineLength"
+        :show-grid="showGrid"
         @select-tool="handleSelectTool"
         @update-field-size="handleUpdateFieldSize"
         @toggle-snap="handleToggleSnap"
+        @toggle-grid="handleToggleGrid"
       />
 
       <!-- Центральная область - холст -->
@@ -89,6 +91,21 @@ const handleToggleSnap = (enabled) => {
   snapToGrid.value = enabled
 }
 
+// Обработчик переключения отображения сетки
+const handleToggleGrid = (enabled) => {
+  editorStore.showGrid = enabled
+}
+
+// Единый метод для перерисовки холста
+const requestRedraw = () => {
+  setTimeout(() => {
+    const canvas = document.querySelector('.wall-canvas')
+    if (canvas && canvas._konva) {
+      canvas._konva.batchDraw()
+    }
+  }, 100)
+}
+
 // Состояние из store
 const currentRoom = computed(() => editorStore.currentRoom)
 const objects = computed(() => editorStore.objects)
@@ -124,20 +141,7 @@ const handleUpdateFieldSize = (dimension, value) => {
 
 const handleAddObject = (object) => {
   editorStore.addObject(object)
-  
-  // Принудительно перерисовываем холст после добавления объекта
-  setTimeout(() => {
-    const canvas = document.querySelector('.editor-canvas canvas')
-    if (canvas) {
-      const stage = canvas._konva
-      if (stage) {
-        const objectsLayer = stage.findOne('.objectsLayer')
-        if (objectsLayer) {
-          objectsLayer.batchDraw()
-        }
-      }
-    }
-  }, 0)
+  requestRedraw()
 }
 
 const handleUpdateZoom = (newZoom) => {
@@ -154,14 +158,6 @@ const handleUpdateObject = (objectId, updates) => {
 
 const handleDeleteObject = (objectId) => {
   editorStore.deleteObject(objectId)
-}
-
-const handleSetOffset = (newOffset) => {
-  editorStore.setOffset(newOffset || { x: 0, y: 0 })
-}
-
-const handleSetZoom = (newZoom) => {
-  editorStore.setZoom(newZoom)
 }
 
 const handleUndo = () => {
@@ -248,17 +244,8 @@ const loadRoomData = async () => {
 
     editorStore.setCurrentRoom({ id: roomId })
     
-    // Перерисовываем холст после загрузки с небольшой задержкой
-    setTimeout(() => {
-      const canvas = document.querySelector('.wall-canvas')
-      if (canvas) {
-        const stage = canvas._konva
-        if (stage) {
-          // Перерисовываем все слои
-          stage.batchDraw()
-        }
-      }
-    }, 200)
+    // Перерисовываем холст после загрузки
+    requestRedraw()
   } catch (error) {
     console.error('Ошибка загрузки плана:', error)
     // Если план не найден, продолжаем с пустым редактором
@@ -268,10 +255,6 @@ const loadRoomData = async () => {
 
 onMounted(() => {
   loadRoomData()
-})
-
-onUnmounted(() => {
-  editorStore.clearEditor()
 })
 </script>
 

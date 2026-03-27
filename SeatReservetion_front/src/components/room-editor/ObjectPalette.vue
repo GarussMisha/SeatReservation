@@ -140,7 +140,11 @@
       </label>
 
       <label class="checkbox-label">
-        <input type="checkbox" checked />
+        <input 
+          type="checkbox" 
+          :checked="showGrid"
+          @change="$emit('toggle-grid', $event.target.checked)"
+        />
         <span>Показывать сетку</span>
       </label>
 
@@ -233,10 +237,14 @@ const props = defineProps({
   currentLineLength: {
     type: [String, Number],
     default: '0'
+  },
+  showGrid: {
+    type: Boolean,
+    default: true
   }
 })
 
-const emit = defineEmits(['select-tool', 'update-field-size', 'toggle-snap'])
+const emit = defineEmits(['select-tool', 'update-field-size', 'toggle-snap', 'toggle-grid'])
 
 // Состояние привязки к сетке
 const snapToGridEnabled = ref(true)
@@ -244,28 +252,6 @@ const snapToGridEnabled = ref(true)
 // Вычисляемые значения в метрах
 const widthInMeters = computed(() => (props.fieldWidth * 0.5).toFixed(1))
 const heightInMeters = computed(() => (props.fieldHeight * 0.5).toFixed(1))
-
-// Функция для получения SVG иконки
-const getToolIcon = (toolName) => {
-  const iconMap = {
-    select: null,
-    wall: '🧱',
-    door: '🚪',
-    window: '🪟',
-    workspace: '🪑',
-    printer: '🖨️',
-    kitchen: icons.kitchen,
-    meeting_room: icons.conferenceRoom,
-    staircase: icons.ladder,
-    ladder: icons.ladder,
-    restroom: icons.toiletMan,
-    toilet_man: icons.toiletMan,
-    toilet_woman: icons.toiletWoman,
-    arrow: icons.arrow,
-    text: icons.text
-  }
-  return iconMap[toolName] || null
-}
 
 // Обработчики для ограничения ввода
 const handleWidthInput = (event) => {

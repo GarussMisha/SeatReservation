@@ -43,18 +43,10 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
   const error = ref(null)
   
   // === Вычисляемые свойства ===
-  
+
   const canUndo = computed(() => historyIndex.value > 0)
   const canRedo = computed(() => historyIndex.value < history.value.length - 1)
-  
-  const walls = computed(() => objects.value.filter(obj => obj.object_type === 'wall'))
-  const doors = computed(() => objects.value.filter(obj => obj.object_type === 'door'))
-  const windows = computed(() => objects.value.filter(obj => obj.object_type === 'window'))
-  const workspaces = computed(() => objects.value.filter(obj => obj.object_type === 'workspace'))
-  const otherObjects = computed(() => objects.value.filter(obj => 
-    !['wall', 'door', 'window', 'workspace'].includes(obj.object_type)
-  ))
-  
+
   // === Методы ===
   
   /**
@@ -227,28 +219,6 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
     error.value = null
     // currentRoom сохраняем
   }
-  
-  /**
-   * Экспорт объектов в JSON
-   */
-  const exportToJSON = () => {
-    return JSON.stringify(objects.value, null, 2)
-  }
-  
-  /**
-   * Импорт объектов из JSON
-   */
-  const importFromJSON = (jsonString) => {
-    try {
-      const imported = JSON.parse(jsonString)
-      objects.value = imported
-      addToHistory()
-      return true
-    } catch (error) {
-      console.error('Ошибка импорта JSON:', error)
-      return false
-    }
-  }
 
   /**
    * Установить ширину поля
@@ -284,11 +254,6 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
     // Вычисляемые свойства
     canUndo,
     canRedo,
-    walls,
-    doors,
-    windows,
-    workspaces,
-    otherObjects,
 
     // Методы
     setCurrentRoom,
@@ -304,8 +269,6 @@ export const useRoomEditorStore = defineStore('roomEditor', () => {
     setZoom,
     setOffset,
     clearEditor,
-    exportToJSON,
-    importFromJSON,
     setFieldWidth,
     setFieldHeight
   }

@@ -5,7 +5,7 @@
   <div v-if="selectedObject" class="properties-panel">
     <div class="panel-header">
       <h3 class="panel-title">Свойства объекта</h3>
-      <button @click="$emit('delete', selectedObject.id)" class="btn-delete" title="Удалить">
+      <button @click="handleDelete" class="btn-delete" title="Удалить">
         🗑️
       </button>
     </div>
@@ -52,6 +52,8 @@
             id="obj-scale"
             v-model.number="localScale"
             type="number"
+            min="10"
+            max="500"
             class="property-input small"
             @change="updateScale(localScale)"
           />
@@ -149,16 +151,24 @@ const updateProperty = (property, value) => {
   }
 }
 
+const handleDelete = () => {
+  if (confirm('Вы уверены, что хотите удалить этот объект?')) {
+    emit('delete', props.selectedObject.id)
+  }
+}
+
 // Обновление масштаба (в процентах)
 const updateScale = (scalePercent) => {
-  if (props.selectedObject) {
-    // Базовый размер 100px = 100%
-    const newSize = Math.round(scalePercent / 100 * 100)
-    emit('update', props.selectedObject.id, { 
-      width: newSize, 
-      height: newSize 
-    })
-  }
+  if (!props.selectedObject) return
+  
+  // Ограничиваем от 10% до 500%
+  const clampedScale = Math.max(10, Math.min(500, scalePercent))
+  const newSize = Math.round(clampedScale / 100 * 100)
+  
+  emit('update', props.selectedObject.id, {
+    width: newSize,
+    height: newSize
+  })
 }
 
 // Поворот объекта
