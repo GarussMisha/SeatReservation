@@ -33,7 +33,13 @@
         <WallDrawingCanvas
           :current-tool="currentTool"
           :grid-size="gridSize"
+          :zoom="zoom"
+          :offset="offset"
+          :field-width="fieldWidth"
+          :field-height="fieldHeight"
           @wall-completed="handleWallCompleted"
+          @update-zoom="handleUpdateZoom"
+          @update-offset="handleUpdateOffset"
         />
       </div>
 
@@ -117,6 +123,14 @@ const handleAddObject = (object) => {
 
 const handleWallCompleted = (wall) => {
   notificationStore.success(`Стена добавлена (${wall.points.length} точек)`, 'Успешно')
+}
+
+const handleUpdateZoom = (newZoom) => {
+  editorStore.setZoom(newZoom)
+}
+
+const handleUpdateOffset = (newOffset) => {
+  editorStore.setOffset(newOffset)
 }
 
 const handleUpdateObject = (objectId, updates) => {

@@ -4,10 +4,13 @@
  * С привязкой к сетке и предпросмотром
  */
 <template>
-  <div class="wall-canvas-container">
+  <div class="wall-canvas-container" @wheel="handleWheel">
     <canvas
       ref="canvas"
       class="wall-canvas"
+      :style="{
+        cursor: isPanning ? 'grabbing' : currentTool === 'wall' || currentTool === 'internal_wall' ? 'crosshair' : 'default'
+      }"
       @mousedown="handleMouseDown"
       @mousemove="handleMouseMove"
       @mouseup="handleMouseUp"
@@ -16,9 +19,14 @@
     ></canvas>
     
     <!-- Подсказка -->
-    <div v-if="!isDrawing && currentTool === 'wall'" class="canvas-hint">
+    <div v-if="!isDrawing && (currentTool === 'wall' || currentTool === 'internal_wall')" class="canvas-hint">
       <span class="hint-icon">🎯</span>
       <span class="hint-text">Кликните для начала рисования стены</span>
+    </div>
+    
+    <!-- Информация о масштабе -->
+    <div class="zoom-info">
+      <span class="zoom-value">{{ Math.round(zoom * 100) }}%</span>
     </div>
   </div>
 </template>
@@ -35,10 +43,26 @@ const props = defineProps({
   gridSize: {
     type: Number,
     default: 20
+  },
+  zoom: {
+    type: Number,
+    default: 1
+  },
+  offset: {
+    type: Object,
+    default: () => ({ x: 0, y: 0 })
+  },
+  fieldWidth: {
+    type: Number,
+    default: 200
+  },
+  fieldHeight: {
+    type: Number,
+    default: 100
   }
 })
 
-const emit = defineEmits(['wall-completed'])
+const emit = defineEmits(['wall-completed', 'update-zoom', 'update-offset'])
 
 const canvas = ref(null)
 const ctx = ref(null)
@@ -50,9 +74,17 @@ const currentLine = ref([])
 const mousePos = ref({ x: 0, y: 0 })
 const selectedWall = ref(null)
 
+// Состояние перемещения
+const isPanning = ref(false)
+const panStart = ref({ x: 0, y: 0 })
+
 // Размеры холста
-const canvasWidth = 2000
-const canvasHeight = 1500
+const canvasWidth = ref(2000)
+const canvasHeight = ref(1500)
+
+// Ограничения масштаба
+const MIN_ZOOM = 0.1
+const MAX_ZOOM = 5
 
 // Типы стен
 const wallTypes = {
@@ -61,19 +93,35 @@ const wallTypes = {
 }
 
 onMounted(() => {
+  updateCanvasSize()
   const c = canvas.value
-  c.width = canvasWidth
-  c.height = canvasHeight
   ctx.value = c.getContext('2d')
   
   draw()
   
   document.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('resize', updateCanvasSize)
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('resize', updateCanvasSize)
 })
+
+// === Обновление размеров ===
+
+const updateCanvasSize = () => {
+  if (!canvas.value) return
+  
+  const container = canvas.value.parentElement
+  canvasWidth.value = container.clientWidth
+  canvasHeight.value = container.clientHeight
+  
+  canvas.value.width = canvasWidth.value
+  canvas.value.height = canvasHeight.value
+  
+  draw()
+}
 
 // === Функции отрисовки ===
 
@@ -83,20 +131,35 @@ const snapToGrid = (value) => {
 
 const getMousePos = (e) => {
   const rect = canvas.value.getBoundingClientRect()
-  const scaleX = canvasWidth / rect.width
-  const scaleY = canvasHeight / rect.height
+  const scaleX = canvasWidth.value / rect.width
+  const scaleY = canvasHeight.value / rect.height
+  
+  // Учитываем масштаб и смещение
+  const x = (e.clientX - rect.left) * scaleX
+  const y = (e.clientY - rect.top) * scaleY
+  
   return {
-    x: snapToGrid((e.clientX - rect.left) * scaleX),
-    y: snapToGrid((e.clientY - rect.top) * scaleY)
+    x: snapToGrid((x - props.offset.x) / props.zoom),
+    y: snapToGrid((y - props.offset.y) / props.zoom)
   }
 }
 
 const draw = () => {
   const c = ctx.value
-  c.clearRect(0, 0, canvasWidth, canvasHeight)
+  c.clearRect(0, 0, canvasWidth.value, canvasHeight.value)
+  
+  // Сохраняем контекст для трансформаций
+  c.save()
+  
+  // Применяем масштаб и смещение
+  c.translate(props.offset.x, props.offset.y)
+  c.scale(props.zoom, props.zoom)
   
   // Рисуем сетку
   drawGrid()
+  
+  // Рисуем границы поля
+  drawFieldBounds()
   
   // Рисуем готовые стены из store
   const walls = store.objects.filter(obj => obj.object_type === 'wall')
@@ -109,6 +172,9 @@ const draw = () => {
   partitions.forEach(part => {
     drawWall(part, '#94a3b8', 3)
   })
+  
+  // Рисуем SVG объекты (иконки)
+  drawSvgObjects()
   
   // Рисуем текущую линию
   if (currentLine.value.length > 0 && isDrawing.value) {
@@ -140,26 +206,61 @@ const draw = () => {
   if (selectedWall.value) {
     drawSelection(selectedWall.value)
   }
+  
+  // Восстанавливаем контекст
+  c.restore()
 }
 
 const drawGrid = () => {
   const c = ctx.value
   c.strokeStyle = '#e2e8f0'
-  c.lineWidth = 1
+  c.lineWidth = 1 / props.zoom
   
-  for (let x = 0; x <= canvasWidth; x += props.gridSize) {
+  const fieldWidthPx = props.fieldWidth * props.gridSize
+  const fieldHeightPx = props.fieldHeight * props.gridSize
+  
+  for (let x = 0; x <= fieldWidthPx; x += props.gridSize) {
     c.beginPath()
     c.moveTo(x, 0)
-    c.lineTo(x, canvasHeight)
+    c.lineTo(x, fieldHeightPx)
     c.stroke()
   }
   
-  for (let y = 0; y <= canvasHeight; y += props.gridSize) {
+  for (let y = 0; y <= fieldHeightPx; y += props.gridSize) {
     c.beginPath()
     c.moveTo(0, y)
-    c.lineTo(canvasWidth, y)
+    c.lineTo(fieldWidthPx, y)
     c.stroke()
   }
+}
+
+const drawFieldBounds = () => {
+  const c = ctx.value
+  const fieldWidthPx = props.fieldWidth * props.gridSize
+  const fieldHeightPx = props.fieldHeight * props.gridSize
+  
+  c.strokeStyle = '#4CAF50'
+  c.lineWidth = 3 / props.zoom
+  c.setLineDash([10, 5])
+  c.strokeRect(0, 0, fieldWidthPx, fieldHeightPx)
+  c.setLineDash([])
+  
+  // Подписи размеров
+  c.fillStyle = '#4CAF50'
+  c.font = `${14 / props.zoom}px Arial`
+  c.textAlign = 'center'
+  c.fillText(`${props.fieldWidth} клеток (${props.fieldWidth * 0.5}м)`, fieldWidthPx / 2, -10 / props.zoom)
+  
+  c.save()
+  c.translate(-10 / props.zoom, fieldHeightPx / 2)
+  c.rotate(-Math.PI / 2)
+  c.fillText(`${props.fieldHeight} клеток (${props.fieldHeight * 0.5}м)`, 0, 0)
+  c.restore()
+}
+
+const drawSvgObjects = () => {
+  // Здесь можно рисовать SVG иконки через ctx.drawImage()
+  // Для простоты пока рисуем только стены
 }
 
 const drawWall = (wall, color, width) => {
@@ -176,7 +277,7 @@ const drawLineSegment = (start, end, color, width, isPreview = false) => {
   c.moveTo(start.x, start.y)
   c.lineTo(end.x, end.y)
   c.strokeStyle = color
-  c.lineWidth = width
+  c.lineWidth = width / props.zoom
   c.lineCap = 'round'
   c.lineJoin = 'round'
   
@@ -193,12 +294,12 @@ const drawLineSegment = (start, end, color, width, isPreview = false) => {
 const drawSelection = (wall) => {
   const c = ctx.value
   c.strokeStyle = '#667eea'
-  c.lineWidth = 2
+  c.lineWidth = 2 / props.zoom
   c.setLineDash([5, 5])
   
   wall.points.forEach(point => {
     c.beginPath()
-    c.arc(point.x, point.y, 8, 0, Math.PI * 2)
+    c.arc(point.x, point.y, 8 / props.zoom, 0, Math.PI * 2)
     c.stroke()
   })
   
@@ -208,6 +309,14 @@ const drawSelection = (wall) => {
 // === Обработчики событий ===
 
 const handleMouseDown = (e) => {
+  // Средняя кнопка мыши - перемещение
+  if (e.button === 1) {
+    e.preventDefault()
+    isPanning.value = true
+    panStart.value = { x: e.clientX - props.offset.x, y: e.clientY - props.offset.y }
+    return
+  }
+  
   if (props.currentTool === 'select') {
     selectWall(e)
     return
@@ -230,20 +339,41 @@ const handleMouseDown = (e) => {
 }
 
 const handleMouseMove = (e) => {
+  if (isPanning.value) {
+    const newOffset = {
+      x: e.clientX - panStart.value.x,
+      y: e.clientY - panStart.value.y
+    }
+    emit('update-offset', newOffset)
+    return
+  }
+  
   mousePos.value = getMousePos(e)
   if (isDrawing.value) {
     draw()
   }
 }
 
-const handleMouseUp = () => {
-  // Продолжаем рисовать
+const handleMouseUp = (e) => {
+  if (e.button === 1) {
+    isPanning.value = false
+  }
 }
 
 const handleDoubleClick = () => {
   if (isDrawing.value && currentLine.value.length >= 2) {
     finishDrawing()
   }
+}
+
+const handleWheel = (e) => {
+  e.preventDefault()
+  
+  const scaleBy = 1.1
+  const newZoom = e.deltaY < 0 ? props.zoom * scaleBy : props.zoom / scaleBy
+  const clampedZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom))
+  
+  emit('update-zoom', clampedZoom)
 }
 
 const handleKeyDown = (e) => {
@@ -373,6 +503,12 @@ const exportToImage = () => {
 defineExpose({
   exportToImage
 })
+
+// === Watchers ===
+
+watch(() => [props.zoom, props.offset, props.fieldWidth, props.fieldHeight], () => {
+  draw()
+}, { deep: true })
 </script>
 
 <style scoped>
@@ -389,7 +525,6 @@ defineExpose({
 .wall-canvas {
   width: 100%;
   height: 100%;
-  cursor: crosshair;
   display: block;
 }
 
@@ -417,5 +552,22 @@ defineExpose({
   font-size: 1rem;
   color: #475569;
   font-weight: 500;
+}
+
+.zoom-info {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.zoom-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #667eea;
 }
 </style>
