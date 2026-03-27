@@ -4,7 +4,7 @@
  * С привязкой к сетке и предпросмотром
  */
 <template>
-  <div class="wall-canvas-container" @wheel="handleWheel">
+  <div class="wall-canvas-container" @wheel.passive="handleWheel">
     <canvas
       ref="canvas"
       class="wall-canvas"
@@ -92,9 +92,15 @@ const wallTypes = {
   internal_wall: { color: '#94a3b8', width: 3, name: 'Перегородка' }
 }
 
-onMounted(() => {
+onMounted(async () => {
   updateCanvasSize()
+  
+  // Ждем пока canvas инициализируется
+  await new Promise(resolve => setTimeout(resolve, 0))
+  
   const c = canvas.value
+  if (!c) return
+  
   ctx.value = c.getContext('2d')
   
   // Инициализируем начальное смещение для центрирования поля
@@ -155,6 +161,8 @@ const getMousePos = (e) => {
 }
 
 const draw = () => {
+  if (!ctx.value) return
+  
   const c = ctx.value
   c.clearRect(0, 0, canvasWidth.value, canvasHeight.value)
   
