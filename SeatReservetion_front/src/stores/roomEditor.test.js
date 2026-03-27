@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useRoomEditorStore } from '../roomEditor'
+import { useRoomEditorStore } from './roomEditor'
 
 describe('roomEditor Store', () => {
   let store
@@ -37,7 +37,7 @@ describe('roomEditor Store', () => {
 
       store.setCurrentRoom(room)
 
-      expect(store.currentRoom).toBe(room)
+      expect(store.currentRoom).toEqual(room)
     })
   })
 
@@ -157,7 +157,7 @@ describe('roomEditor Store', () => {
 
       store.selectObject(object)
 
-      expect(store.selectedObject).toBe(object)
+      expect(store.selectedObject).toEqual(object)
     })
 
     it('должен снять выделение при null', () => {

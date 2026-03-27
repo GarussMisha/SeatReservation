@@ -24,9 +24,9 @@
    inkscape:pageopacity="0.0"
    inkscape:pagecheckerboard="0"
    inkscape:deskcolor="#d1d1d1"
-   inkscape:zoom="2.2792968"
-   inkscape:cx="204.66839"
-   inkscape:cy="334.97173"
+   inkscape:zoom="0.5698242"
+   inkscape:cx="248.3222"
+   inkscape:cy="513.31621"
    inkscape:window-width="2121"
    inkscape:window-height="1239"
    inkscape:window-x="1004"
@@ -50,70 +50,70 @@
 <g
    id="g2"
    transform="matrix(0.99984781,0,0,0.99984781,0.0462396,-13.976926)"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 	<g
    id="g1"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 		<polygon
    points="107.789,363.789 107.789,426.667 0,426.667 0,444.632 107.789,444.632 125.754,444.632 512,444.632 512,426.667 125.754,426.667 125.754,363.789 "
    id="polygon1"
-   style="stroke-width:14.60222231;stroke-dasharray:none" />
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8" />
 	</g>
 </g>
 <g
    id="g4"
    transform="matrix(0.99984781,0,0,0.99984781,0.0462396,-13.976926)"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 	<g
    id="g3"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 		<polygon
    points="179.649,273.965 179.649,336.842 80.842,336.842 80.842,354.807 179.649,354.807 197.614,354.807 215.579,354.807 215.579,336.842 197.614,336.842 197.614,273.965 "
    id="polygon2"
-   style="stroke-width:14.60222231;stroke-dasharray:none" />
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8" />
 	</g>
 </g>
 <g
    id="g6"
    transform="matrix(0.99984781,0,0,0.99984781,0.0462396,-13.976926)"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 	<g
    id="g5"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 		<polygon
    points="251.509,184.14 251.509,247.018 152.702,247.018 152.702,264.982 251.509,264.982 269.474,264.982 287.439,264.982 287.439,247.018 269.474,247.018 269.474,184.14 "
    id="polygon4"
-   style="stroke-width:14.60222231;stroke-dasharray:none" />
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8" />
 	</g>
 </g>
 <g
    id="g8"
    transform="matrix(0.99984781,0,0,0.99984781,-0.031305,49.300399)"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 	<g
    id="g7"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 		<polygon
    points="323.368,94.316 323.368,157.193 224.561,157.193 224.561,175.158 323.368,175.158 341.333,175.158 359.298,175.158 359.298,157.193 341.333,157.193 341.333,94.316 "
    id="polygon6"
    transform="translate(0.07755756,-63.286966)"
-   style="stroke-width:14.60222231;stroke-dasharray:none" />
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8" />
 	</g>
 </g>
 <g
    id="g10"
    transform="matrix(0.99984781,0,0,0.99984781,0.0462396,-13.976926)"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 	<g
    id="g9"
-   style="stroke-width:14.60222231;stroke-dasharray:none">
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8">
 		<rect
    x="296.42099"
    y="67.367996"
    width="134.737"
    height="17.965"
    id="rect8"
-   style="stroke-width:14.60222231;stroke-dasharray:none" />
+   style="stroke-width:14.60222231;stroke-dasharray:none;fill:#b7c4c8" />
 	</g>
 </g>
 </svg>
