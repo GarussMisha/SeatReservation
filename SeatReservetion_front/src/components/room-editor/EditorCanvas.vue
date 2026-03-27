@@ -280,7 +280,125 @@
           @tap="() => selectObject(printer)"
         />
 
-        <!-- SVG объекты временно удалены -->
+        <!-- Переговорные -->
+        <v-image
+          v-for="meeting in meetingRooms"
+          :key="meeting.id"
+          :config="{
+            x: meeting.x,
+            y: meeting.y,
+            rotation: meeting.rotation || 0,
+            image: getIconImage('meeting_room'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(meeting)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(meeting, e)"
+          @tap="() => selectObject(meeting)"
+        />
+
+        <!-- Кухня -->
+        <v-image
+          v-for="kitchen in kitchens"
+          :key="kitchen.id"
+          :config="{
+            x: kitchen.x,
+            y: kitchen.y,
+            rotation: kitchen.rotation || 0,
+            image: getIconImage('kitchen'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(kitchen)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(kitchen, e)"
+          @tap="() => selectObject(kitchen)"
+        />
+
+        <!-- Лестница -->
+        <v-image
+          v-for="staircase in staircases"
+          :key="staircase.id"
+          :config="{
+            x: staircase.x,
+            y: staircase.y,
+            rotation: staircase.rotation || 0,
+            image: getIconImage('ladder'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(staircase)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(staircase, e)"
+          @tap="() => selectObject(staircase)"
+        />
+
+        <!-- Раздевалка -->
+        <v-image
+          v-for="restroom in restrooms"
+          :key="restroom.id"
+          :config="{
+            x: restroom.x,
+            y: restroom.y,
+            rotation: restroom.rotation || 0,
+            image: getIconImage('hanger'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(restroom)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(restroom, e)"
+          @tap="() => selectObject(restroom)"
+        />
+
+        <!-- Женский туалет -->
+        <v-image
+          v-for="toiletFemale in toiletsFemale"
+          :key="toiletFemale.id"
+          :config="{
+            x: toiletFemale.x,
+            y: toiletFemale.y,
+            rotation: toiletFemale.rotation || 0,
+            image: getIconImage('toilet_woman'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(toiletFemale)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(toiletFemale, e)"
+          @tap="() => selectObject(toiletFemale)"
+        />
+
+        <!-- Мужской туалет -->
+        <v-image
+          v-for="toiletMale in toiletsMale"
+          :key="toiletMale.id"
+          :config="{
+            x: toiletMale.x,
+            y: toiletMale.y,
+            rotation: toiletMale.rotation || 0,
+            image: getIconImage('toilet_man'),
+            width: 40,
+            height: 40,
+            offset: { x: 20, y: 20 },
+            draggable: currentTool === 'select' && !isPanning
+          }"
+          @click="() => selectObject(toiletMale)"
+          @dragstart="handleDragStart"
+          @dragend="(e) => handleDragEnd(toiletMale, e)"
+          @tap="() => selectObject(toiletMale)"
+        />
 
         <!-- Другие объекты - серый прямоугольник -->
         <v-rect
@@ -335,6 +453,22 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { getIconUrl } from '@/components/accets/index.js'
+
+// Кэшированные изображения для иконок
+const iconImages = {}
+
+const getIconImage = (iconName) => {
+  const url = getIconUrl(iconName)
+  if (!url) return null
+  
+  if (!iconImages[iconName]) {
+    const img = new Image()
+    img.src = url
+    iconImages[iconName] = img
+  }
+  return iconImages[iconName]
+}
 
 const props = defineProps({
   objects: {
@@ -410,18 +544,15 @@ const walls = computed(() => props.objects.filter(obj => obj.object_type === 'wa
 const doors = computed(() => props.objects.filter(obj => obj.object_type === 'door'))
 const windows = computed(() => props.objects.filter(obj => obj.object_type === 'window'))
 const workspaces = computed(() => props.objects.filter(obj => obj.object_type === 'workspace'))
-// SVG объекты - закомментированы
-// const arrows = computed(() => props.objects.filter(obj => obj.object_type === 'arrow'))
-// const texts = computed(() => props.objects.filter(obj => obj.object_type === 'text'))
-// const printers = computed(() => props.objects.filter(obj => obj.object_type === 'printer'))
-// const meetingRooms = computed(() => props.objects.filter(obj => obj.object_type === 'meeting_room'))
-// const kitchens = computed(() => props.objects.filter(obj => obj.object_type === 'kitchen'))
-// const staircases = computed(() => props.objects.filter(obj => obj.object_type === 'staircase'))
-// const restrooms = computed(() => props.objects.filter(obj => obj.object_type === 'restroom'))
-// const toiletsFemale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_female'))
-// const toiletsMale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_male'))
+const printers = computed(() => props.objects.filter(obj => obj.object_type === 'printer'))
+const meetingRooms = computed(() => props.objects.filter(obj => obj.object_type === 'meeting_room'))
+const kitchens = computed(() => props.objects.filter(obj => obj.object_type === 'kitchen'))
+const staircases = computed(() => props.objects.filter(obj => obj.object_type === 'staircase'))
+const restrooms = computed(() => props.objects.filter(obj => obj.object_type === 'restroom'))
+const toiletsFemale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_female'))
+const toiletsMale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_male'))
 const otherObjects = computed(() => props.objects.filter(obj =>
-  !['wall', 'door', 'window', 'workspace'].includes(obj.object_type)
+  !['wall', 'door', 'window', 'workspace', 'printer', 'meeting_room', 'kitchen', 'staircase', 'restroom', 'toilet_female', 'toilet_male'].includes(obj.object_type)
 ))
 
 const stageConfig = computed(() => ({
