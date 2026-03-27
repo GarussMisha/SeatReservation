@@ -14,11 +14,12 @@ import toiletWomanSvg from './toilet_woman.svg?raw'
 
 // Функция для нормализации SVG к viewBox="0 0 100 100"
 const normalizeSvg = (svgString) => {
-  // Заменяем viewBox на 0 0 100 100
+  // Заменяем viewBox на 0 0 100 100 и экранируем закрывающие теги
   return svgString
     .replace(/viewBox="[^"]*"/, 'viewBox="0 0 100 100"')
     .replace(/width="[^"]*"/, 'width="100"')
     .replace(/height="[^"]*"/, 'height="100"')
+    .replace(/<\/svg>/g, '<\\/svg>') // Экранируем закрывающий тег
 }
 
 // Нормализованные SVG
@@ -29,10 +30,10 @@ export const ladder = normalizeSvg(ladderSvg)
 export const toiletMan = normalizeSvg(toiletManSvg)
 export const toiletWoman = normalizeSvg(toiletWomanSvg)
 
-// Стрелка и текст - простые SVG
-export const arrow = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/><polyline points="55,35 75,50 55,65" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+// Стрелка и текст - простые SVG (с экранированием)
+export const arrow = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><line x1="10" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/><polyline points="55,35 75,50 55,65" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><\/svg>`
 
-export const text = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="15" width="60" height="70" rx="5" fill="none" stroke="currentColor" stroke-width="6"/><line x1="30" y1="35" x2="70" y2="35" stroke="currentColor" stroke-width="4"/><line x1="30" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="4"/><line x1="30" y1="65" x2="60" y2="65" stroke="currentColor" stroke-width="4"/></svg>`
+export const text = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="15" width="60" height="70" rx="5" fill="none" stroke="currentColor" stroke-width="6"/><line x1="30" y1="35" x2="70" y2="35" stroke="currentColor" stroke-width="4"/><line x1="30" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="4"/><line x1="30" y1="65" x2="60" y2="65" stroke="currentColor" stroke-width="4"/><\/svg>`
 
 // Экспорт всех иконок
 export const icons = {

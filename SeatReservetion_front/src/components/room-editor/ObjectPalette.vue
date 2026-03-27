@@ -49,7 +49,7 @@
 
     <div class="palette-section">
       <h3 class="palette-title">Объекты</h3>
-      
+
       <div class="tools-grid">
         <button
           @click="$emit('select-tool', 'workspace')"
@@ -67,78 +67,6 @@
         >
           <span class="tool-icon">🖨️</span>
           <span class="tool-label">Принтер</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'kitchen')"
-          :class="['tool-btn', { active: currentTool === 'kitchen' }]"
-          title="Кухня"
-        >
-          <span class="tool-icon">☕</span>
-          <span class="tool-label">Кухня</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'staircase')"
-          :class="['tool-btn', { active: currentTool === 'staircase' }]"
-          title="Лестница"
-        >
-          <span class="tool-icon">🪜</span>
-          <span class="tool-label">Лестница</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'restroom')"
-          :class="['tool-btn', { active: currentTool === 'restroom' }]"
-          title="Раздевалка"
-        >
-          <span class="tool-icon">👔</span>
-          <span class="tool-label">Раздевалка</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'toilet_female')"
-          :class="['tool-btn', { active: currentTool === 'toilet_female' }]"
-          title="Женский туалет"
-        >
-          <span class="tool-icon">♀️</span>
-          <span class="tool-label">Женский</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'toilet_male')"
-          :class="['tool-btn', { active: currentTool === 'toilet_male' }]"
-          title="Мужской туалет"
-        >
-          <span class="tool-icon">♂️</span>
-          <span class="tool-label">Мужской</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'meeting_room')"
-          :class="['tool-btn', { active: currentTool === 'meeting_room' }]"
-          title="Переговорная"
-        >
-          <span class="tool-icon">💬</span>
-          <span class="tool-label">Переговорка</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'arrow')"
-          :class="['tool-btn', { active: currentTool === 'arrow' }]"
-          title="Стрелка"
-        >
-          <span class="tool-icon">➡️</span>
-          <span class="tool-label">Стрелка</span>
-        </button>
-
-        <button
-          @click="$emit('select-tool', 'text')"
-          :class="['tool-btn', { active: currentTool === 'text' }]"
-          title="Текст"
-        >
-          <span class="tool-icon">📝</span>
-          <span class="tool-label">Текст</span>
         </button>
       </div>
     </div>

@@ -661,17 +661,18 @@ const walls = computed(() => props.objects.filter(obj => obj.object_type === 'wa
 const doors = computed(() => props.objects.filter(obj => obj.object_type === 'door'))
 const windows = computed(() => props.objects.filter(obj => obj.object_type === 'window'))
 const workspaces = computed(() => props.objects.filter(obj => obj.object_type === 'workspace'))
-const arrows = computed(() => props.objects.filter(obj => obj.object_type === 'arrow'))
-const texts = computed(() => props.objects.filter(obj => obj.object_type === 'text'))
-const printers = computed(() => props.objects.filter(obj => obj.object_type === 'printer'))
-const meetingRooms = computed(() => props.objects.filter(obj => obj.object_type === 'meeting_room'))
-const kitchens = computed(() => props.objects.filter(obj => obj.object_type === 'kitchen'))
-const staircases = computed(() => props.objects.filter(obj => obj.object_type === 'staircase'))
-const restrooms = computed(() => props.objects.filter(obj => obj.object_type === 'restroom'))
-const toiletsFemale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_female'))
-const toiletsMale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_male'))
+// SVG объекты - закомментированы
+// const arrows = computed(() => props.objects.filter(obj => obj.object_type === 'arrow'))
+// const texts = computed(() => props.objects.filter(obj => obj.object_type === 'text'))
+// const printers = computed(() => props.objects.filter(obj => obj.object_type === 'printer'))
+// const meetingRooms = computed(() => props.objects.filter(obj => obj.object_type === 'meeting_room'))
+// const kitchens = computed(() => props.objects.filter(obj => obj.object_type === 'kitchen'))
+// const staircases = computed(() => props.objects.filter(obj => obj.object_type === 'staircase'))
+// const restrooms = computed(() => props.objects.filter(obj => obj.object_type === 'restroom'))
+// const toiletsFemale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_female'))
+// const toiletsMale = computed(() => props.objects.filter(obj => obj.object_type === 'toilet_male'))
 const otherObjects = computed(() => props.objects.filter(obj =>
-  !['wall', 'door', 'window', 'workspace', 'arrow', 'text', 'printer', 'meeting_room', 'kitchen', 'staircase', 'restroom', 'toilet_female', 'toilet_male'].includes(obj.object_type)
+  !['wall', 'door', 'window', 'workspace'].includes(obj.object_type)
 ))
 
 const stageConfig = computed(() => ({
