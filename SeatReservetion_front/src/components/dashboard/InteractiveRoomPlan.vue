@@ -116,13 +116,13 @@
                 />
               </template>
               <template v-else>
-                <Text
-                  :text="'🪑'"
-                  :fontSize="Math.min(workspace.width || 100, workspace.height || 50) * 0.5"
+                <Circle
+                  :radius="Math.min(workspace.width || 100, workspace.height || 50) * 0.25"
+                  fill="#667eea"
                   x="0"
                   y="0"
-                  align="center"
-                  verticalAlign="middle"
+                />
+                <Rect
                   :width="workspace.width || 100"
                   :height="workspace.height || 50"
                 />

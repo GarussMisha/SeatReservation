@@ -33,7 +33,11 @@
             @blur="updateWorkspaceName(localName)"
             @keyup.enter="updateWorkspaceName(localName)"
           />
-          <span v-if="isSavingName" class="saving-indicator">💾</span>
+          <span v-if="isSavingName" class="saving-indicator">
+            <svg class="saving-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </span>
         </div>
         <small v-if="selectedObject.object_type === 'workspace'" class="help-text">
           Нажмите Enter или кликните вне поля для сохранения
@@ -337,14 +341,19 @@ const rotateObject = (degrees) => {
 .saving-indicator {
   position: absolute;
   right: 0.75rem;
-  font-size: 1rem;
-  opacity: 0.7;
-  animation: pulse 1s ease-in-out;
+  display: inline-flex;
+  align-items: center;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
+.saving-icon-svg {
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .help-text {

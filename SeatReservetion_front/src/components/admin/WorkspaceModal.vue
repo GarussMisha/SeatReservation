@@ -96,9 +96,9 @@ const emit = defineEmits(['close', 'save'])
 
 // Статусы по умолчанию (должны совпадать с бэкендом)
 const defaultStatuses = {
-  FREE: 10,         // ✅ free (Свободно)
-  OCCUPIED: 11,     // ✅ occupied (Занято)
-  INACTIVE: 2       // ✅ inactive (Не активно)
+  FREE: 10,         // free (Свободно)
+  OCCUPIED: 11,     // occupied (Занято)
+  INACTIVE: 2       // inactive (Не активно)
 }
 
 // Локальные данные

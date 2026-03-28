@@ -12,7 +12,9 @@
           :class="['tool-btn', { active: currentTool === 'select' }]"
           title="Выделение"
         >
-          <span class="tool-icon">🖱️</span>
+          <svg class="tool-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+          </svg>
           <span class="tool-label">Выбор</span>
         </button>
 
@@ -21,7 +23,9 @@
           :class="['tool-btn', { active: currentTool === 'wall' }]"
           title="Стена"
         >
-          <span class="tool-icon">🧱</span>
+          <svg class="tool-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
           <span class="tool-label">Стена</span>
         </button>
 
@@ -311,6 +315,12 @@ const handleHeightInput = (event) => {
   align-items: flex-start;
   gap: 12px;
   width: 100%;
+}
+
+.tool-icon-svg {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
 }
 
 .hint-icon-svg {
