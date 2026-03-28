@@ -6,7 +6,9 @@
     <div class="panel-header">
       <h3 class="panel-title">Свойства объекта</h3>
       <button @click="handleDelete" class="btn-delete" title="Удалить">
-        🗑️
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
       </button>
     </div>
 
@@ -101,7 +103,9 @@
 
   <div v-else class="properties-panel empty">
     <div class="empty-state">
-      <span class="empty-icon">📋</span>
+      <svg class="empty-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
       <p>Выберите объект<br>для редактирования</p>
     </div>
   </div>
@@ -405,10 +409,18 @@ const rotateObject = (degrees) => {
   color: #999;
 }
 
-.empty-icon {
-  font-size: 3rem;
+.empty-icon-svg {
+  width: 60px;
+  height: 60px;
   display: block;
   margin-bottom: 1rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.btn-delete svg {
+  width: 20px;
+  height: 20px;
 }
 
 .empty-state p {

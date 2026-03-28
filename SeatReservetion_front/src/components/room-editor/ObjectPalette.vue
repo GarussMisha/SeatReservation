@@ -191,7 +191,9 @@
     <!-- Подсказка перед началом рисования -->
     <div v-if="!isDrawing && (currentTool === 'wall' || currentTool === 'internal_wall')" class="drawing-hint info">
       <div class="hint-content">
-        <span class="hint-icon">🎯</span>
+        <svg class="hint-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+        </svg>
         <div class="hint-text">
           <p><strong>Кликните</strong> для начала рисования</p>
           <p><strong>ПКМ</strong> для завершения линии</p>
@@ -202,7 +204,9 @@
     <!-- Подсказка при рисовании -->
     <div v-if="isDrawing" class="drawing-hint">
       <div class="hint-content">
-        <span class="hint-icon">✏️</span>
+        <svg class="hint-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+        </svg>
         <div class="hint-text">
           <p><strong>Длина:</strong> {{ currentLineLength }} м</p>
           <p><strong>ПКМ</strong> для завершения</p>
@@ -309,9 +313,11 @@ const handleHeightInput = (event) => {
   width: 100%;
 }
 
-.hint-icon {
-  font-size: 2rem;
+.hint-icon-svg {
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
+  color: var(--primary-start);
 }
 
 .hint-text {

@@ -14,19 +14,30 @@
       <!-- Заголовок -->
       <div class="page-header">
         <div class="header-content">
-          <h1>📬 Мои уведомления</h1>
+          <h1>
+            <svg class="page-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            </svg>
+            Мои уведомления
+          </h1>
           <p class="subtitle">История всех ваших уведомлений</p>
         </div>
         <div class="header-actions">
           <button @click="refreshNotifications" class="refresh-btn" :disabled="isLoading">
-            🔄 Обновить
+            <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Обновить
           </button>
           <button
             v-if="hasUnread"
             @click="markAllAsRead"
             class="mark-read-btn"
           >
-            ✅ Прочитать все
+            <svg class="btn-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+            Прочитать все
           </button>
         </div>
       </div>
@@ -92,10 +103,18 @@
             >
               <div class="notification-header">
                 <div class="notification-icon" :class="getIconClass(notification.notification_type)">
-                  <span v-if="notification.notification_type === 'booking_cancelled'">📅</span>
-                  <span v-else-if="notification.notification_type === 'workspace_disabled'">🪑</span>
-                  <span v-else-if="notification.notification_type === 'room_disabled'">🏢</span>
-                  <span v-else>📬</span>
+                  <svg v-if="notification.notification_type === 'booking_cancelled'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <svg v-else-if="notification.notification_type === 'workspace_disabled'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                  </svg>
+                  <svg v-else-if="notification.notification_type === 'room_disabled'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  </svg>
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                  </svg>
                 </div>
                 <div class="notification-meta">
                   <span class="notification-type">{{ getTypeName(notification.notification_type) }}</span>
@@ -368,8 +387,24 @@ onMounted(async () => {
 
 .header-content h1 {
   margin: 0 0 0.5rem 0;
-  font-size: 2rem;
-  color: #1f2937;
+  font-size: var(--font-size-3xl);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.page-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--primary-start);
+}
+
+.btn-icon-sm {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }
 
 .subtitle {
@@ -575,7 +610,11 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+}
+
+.notification-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .notification-icon.icon-cancelled {

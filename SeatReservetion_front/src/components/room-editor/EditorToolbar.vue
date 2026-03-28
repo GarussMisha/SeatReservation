@@ -10,7 +10,10 @@
       <div class="room-info">
         <h2 class="editor-title">Редактор помещения</h2>
         <span v-if="workspaceCount > 0" class="workspace-count">
-          🪑 {{ workspaceCount }} {{ declension(workspaceCount, ['рабочее место', 'рабочих места', 'рабочих мест']) }}
+          <svg class="workspace-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+          </svg>
+          {{ workspaceCount }} {{ declension(workspaceCount, ['рабочее место', 'рабочих места', 'рабочих мест']) }}
         </span>
       </div>
     </div>
@@ -38,10 +41,16 @@
 
     <div class="toolbar-right">
       <button @click="handleClear" class="btn-clear" title="Очистить весь план">
-        🗑️ Очистить
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+        Очистить
       </button>
       <button @click="handleSave" class="btn-save" :disabled="isSaving">
-        {{ isSaving ? '💾 Сохранение...' : '💾 Сохранить' }}
+        <svg class="save-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+        </svg>
+        {{ isSaving ? 'Сохранение...' : 'Сохранить' }}
       </button>
     </div>
   </div>
@@ -162,13 +171,34 @@ const handleClear = () => {
 
 .editor-title {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1f2937;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  background: var(--primary-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.workspace-icon-svg,
+.save-icon-svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.toolbar-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-clear svg,
+.btn-save svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 6px;
 }
 
 .toolbar-center {

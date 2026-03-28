@@ -114,38 +114,48 @@
         <section class="profile-section statistics">
           <div class="section-header">
             <h2>
-              <span class="icon">📊</span>
+              <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
               Статистика использования
             </h2>
           </div>
-          
+
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-icon">📅</div>
+              <svg class="stat-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
               <div class="stat-content">
                 <div class="stat-number">{{ user?.booking_count || 0 }}</div>
                 <div class="stat-label">Всего бронирований</div>
               </div>
             </div>
-            
+
             <div class="stat-card">
-              <div class="stat-icon">🗓️</div>
+              <svg class="stat-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
               <div class="stat-content">
                 <div class="stat-number">{{ getUpcomingBookingsCount() }}</div>
                 <div class="stat-label">Предстоящих</div>
               </div>
             </div>
-            
+
             <div class="stat-card">
-              <div class="stat-icon">✅</div>
+              <svg class="stat-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
               <div class="stat-content">
                 <div class="stat-number">{{ getCompletedBookingsCount() }}</div>
                 <div class="stat-label">Завершенных</div>
               </div>
             </div>
-            
+
             <div class="stat-card">
-              <div class="stat-icon">🕐</div>
+              <svg class="stat-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
               <div class="stat-content">
                 <div class="stat-number">{{ getAccountAge() }}</div>
                 <div class="stat-label">Дней в системе</div>
@@ -158,7 +168,9 @@
         <section class="profile-section account-info">
           <div class="section-header">
             <h2>
-              <span class="icon">🔐</span>
+              <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
               Информация об аккаунте
             </h2>
           </div>

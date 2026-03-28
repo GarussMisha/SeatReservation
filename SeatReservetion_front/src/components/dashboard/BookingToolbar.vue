@@ -6,7 +6,9 @@
   <div class="booking-toolbar">
     <div class="toolbar-section">
       <label class="toolbar-label">
-        <span class="label-icon">🏢</span>
+        <svg class="label-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
         Помещение
       </label>
       <div class="room-selector">
@@ -29,13 +31,17 @@
 
     <div class="toolbar-section">
       <label class="toolbar-label">
-        <span class="label-icon">📅</span>
+        <svg class="label-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
         Дата
       </label>
       <div class="calendar-wrapper">
         <button @click="toggleCalendar" class="date-display">
           {{ formattedDate }}
-          <span class="calendar-icon">📅</span>
+          <svg class="calendar-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
         </button>
 
         <transition name="calendar-slide">
@@ -284,16 +290,19 @@ onUnmounted(() => {
 .toolbar-label {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #667eea;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-start);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.label-icon {
-  font-size: 1.1rem;
+.label-icon-svg,
+.calendar-icon-svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .room-selector {
