@@ -26,13 +26,7 @@ const headerConfig = computed(() => {
       return {
         title: 'Панель управления',
         showLogout: true,
-        actions: isAdmin ? [{
-          key: 'admin',
-          text: 'Админка',
-          icon: 'settings',
-          className: 'admin-btn',
-          onClick: () => router.push('/admin')
-        }] : []
+        actions: []
       }
     case 'Booking':
       return {
@@ -66,14 +60,7 @@ const headerConfig = computed(() => {
             text: '← Назад к дашборду',
             className: 'back-btn',
             onClick: () => router.push('/dashboard')
-          },
-          ...(isAdmin ? [{
-            key: 'admin',
-            text: 'Админка',
-            icon: 'settings',
-            className: 'admin-btn',
-            onClick: () => router.push('/admin')
-          }] : [])
+          }
         ]
       }
     case 'AdminPanel':
@@ -99,27 +86,14 @@ const headerConfig = computed(() => {
             text: '← Назад к дашборду',
             className: 'back-btn',
             onClick: () => router.push('/dashboard')
-          },
-          ...(isAdmin ? [{
-            key: 'admin',
-            text: 'Админка',
-            icon: 'settings',
-            className: 'admin-btn',
-            onClick: () => router.push('/admin')
-          }] : [])
+          }
         ]
       }
     default:
       return {
         title: 'Система бронирования',
         showLogout: true,
-        actions: isAdmin ? [{
-          key: 'admin',
-          text: 'Админка',
-          icon: 'settings',
-          className: 'admin-btn',
-          onClick: () => router.push('/admin')
-        }] : []
+        actions: []
       }
   }
 })

@@ -9,6 +9,19 @@
       </div>
 
       <div class="header-right">
+        <!-- Кнопка админки (только для админов) -->
+        <button
+          v-if="authStore.isAdmin"
+          @click="goToAdmin"
+          class="header-action-btn admin-btn"
+        >
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Админка
+        </button>
+
         <div v-if="hasActions" class="header-actions">
           <button
             v-for="action in actions"
@@ -88,6 +101,10 @@ const goToProfile = () => {
   router.push('/profile')
 }
 
+const goToAdmin = () => {
+  router.push('/admin')
+}
+
 const handleLogout = () => {
   if (emit('logout')) {
     emit('logout')
@@ -123,6 +140,8 @@ const handleLogout = () => {
   margin: 0 auto;
   backdrop-filter: var(--backdrop-filter);
   border: 1px solid rgba(129, 119, 119, 0.2);
+  position: relative;
+  z-index: 1;
 }
 
 .header-left {
@@ -141,6 +160,8 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   gap: var(--spacing-lg);
+  position: relative;
+  z-index: 2;
 }
 
 /* Уведомления */
@@ -180,6 +201,8 @@ const handleLogout = () => {
   display: flex;
   gap: var(--spacing-lg);
   align-items: center;
+  position: relative;
+  z-index: 3;
 }
 
 .btn-icon {
@@ -201,6 +224,8 @@ const handleLogout = () => {
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  position: relative;
+  z-index: 4;
 }
 
 .header-action-btn.back-btn {

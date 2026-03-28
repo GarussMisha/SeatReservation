@@ -183,12 +183,12 @@ onMounted(() => {
 .notification-bell-btn {
   position: relative;
   background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid #5a5a5a4d;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 50%;
   transition: all 0.2s;
-  color: #ffffff;
+  color: #5a5a5a;
 }
 
 .notification-bell-btn:hover {
