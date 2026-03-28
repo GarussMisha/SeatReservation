@@ -612,10 +612,12 @@ onMounted(async () => {
 .plan-address {
   font-size: 0.9rem;
   color: #666;
+  display: block;
+  margin-bottom: 0.75rem;
 }
 
 .room-inactive-warning {
-  margin-top: 0.75rem;
+  margin-top: 0;
   padding: 0.5rem 1rem;
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%);
   border-left: 4px solid #f59e0b;
