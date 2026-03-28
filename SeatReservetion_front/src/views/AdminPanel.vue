@@ -864,6 +864,13 @@ onMounted(async () => {
   vertical-align: middle;
 }
 
+.info-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--primary-start);
+}
+
 .refresh-btn {
   padding: 0.75rem 1.5rem;
   background: var(--gradient-gray);
