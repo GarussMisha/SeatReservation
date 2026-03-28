@@ -615,7 +615,7 @@ onMounted(async () => {
 }
 
 .room-inactive-warning {
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   padding: 0.5rem 1rem;
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 146, 60, 0.1) 100%);
   border-left: 4px solid #f59e0b;
@@ -623,6 +623,9 @@ onMounted(async () => {
   font-size: 0.9rem;
   color: #92400e;
   font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .plan-stats {
