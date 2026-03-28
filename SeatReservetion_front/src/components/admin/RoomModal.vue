@@ -29,7 +29,7 @@
           <textarea
             id="description"
             v-model="formData.description"
-            placeholder="Описание помещения (необязательно)"
+            placeholder="Дополнительная информация по помещению "
             rows="3"
           ></textarea>
         </div>
@@ -59,7 +59,7 @@
               :key="status.id"
               :value="status.id"
             >
-              {{ status.name }}
+              {{ getStatusName(status.name) }}
             </option>
           </select>
         </div>
@@ -110,11 +110,20 @@ const isEdit = computed(() => !!props.room)
 // Фильтруем статусы - для помещений только active (1) и inactive (2)
 const roomStatuses = computed(() => {
   if (!props.statuses || props.statuses.length === 0) return []
-  
-  return props.statuses.filter(status => 
+
+  return props.statuses.filter(status =>
     status.id === 1 || status.id === 2  // Только active и inactive
   )
 })
+
+// Перевод названий статусов
+const getStatusName = (statusName) => {
+  const translations = {
+    'active': 'Активно',
+    'inactive': 'Неактивно'
+  }
+  return translations[statusName] || statusName
+}
 
 // Инициализация формы
 watch(() => props.room, (newRoom) => {
