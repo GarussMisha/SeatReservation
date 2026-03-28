@@ -337,6 +337,14 @@
       @save="saveUser"
     />
 
+    <WorkspaceModal
+      v-if="showWorkspaceModal"
+      :workspace="selectedWorkspace"
+      :statuses="statuses"
+      @close="closeWorkspaceModal"
+      @save="saveWorkspace"
+    />
+
     <!-- Модальное окно подтверждения удаления -->
     <ConfirmModal
       v-if="showConfirmModal"
@@ -363,6 +371,7 @@ import { getStatusConfig } from '../utils/statusHelpers'
 import Header from '../components/Header.vue'
 import RoomModal from '../components/admin/RoomModal.vue'
 import UserModal from '../components/admin/UserModal.vue'
+import WorkspaceModal from '../components/admin/WorkspaceModal.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
 const authStore = useAuthStore()
@@ -380,6 +389,7 @@ const workspaces = ref([])
 const statuses = ref([])
 const showRoomModal = ref(false)
 const showUserModal = ref(false)
+const showWorkspaceModal = ref(false)
 const selectedRoom = ref(null)
 const selectedUser = ref(null)
 const selectedWorkspace = ref(null)
@@ -568,6 +578,12 @@ const openRoomEditor = (room) => {
   router.push(`/room-editor/${room.id}`)
 }
 
+// Редактирование рабочего места
+const editWorkspace = (workspace) => {
+  selectedWorkspace.value = { ...workspace }
+  showWorkspaceModal.value = true
+}
+
 // Показать модальное окно подтверждения удаления
 const showDeleteConfirm = (itemType, itemId, itemName) => {
   const types = {
@@ -667,6 +683,11 @@ const closeRoomModal = () => {
   selectedRoom.value = null
 }
 
+const closeWorkspaceModal = () => {
+  showWorkspaceModal.value = false
+  selectedWorkspace.value = null
+}
+
 const saveUser = async (userData) => {
   try {
     if (selectedUser.value) {
@@ -691,13 +712,30 @@ const saveRoom = async (roomData) => {
     } else {
       await roomsApi.createRoom(roomData)
     }
-    
+
     await refreshRooms()
     closeRoomModal()
     notificationStore.success('Информация о помещении успешно обновлена', 'Сохранение выполнено')
   } catch (error) {
     console.error('Ошибка сохранения помещения:', error)
     notificationStore.error('Не удалось сохранить данные помещения', 'Ошибка сохранения')
+  }
+}
+
+const saveWorkspace = async (workspaceData) => {
+  try {
+    if (selectedWorkspace.value) {
+      await workspacesApi.updateWorkspace(selectedWorkspace.value.id, workspaceData)
+    } else {
+      await workspacesApi.createWorkspace(workspaceData)
+    }
+
+    await refreshWorkspaces()
+    closeWorkspaceModal()
+    notificationStore.success('Рабочее место успешно сохранено', 'Сохранение выполнено')
+  } catch (error) {
+    console.error('Ошибка сохранения рабочего места:', error)
+    notificationStore.error('Не удалось сохранить рабочее место', 'Ошибка сохранения')
   }
 }
 
