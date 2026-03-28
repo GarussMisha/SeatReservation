@@ -386,6 +386,11 @@ const handleClick = (e) => {
 }
 
 const handleWheel = (e) => {
+  // Зум колесиком работает только при зажатой Ctrl
+  if (!e.ctrlKey) {
+    return
+  }
+  
   e.preventDefault()
 
   const scaleBy = 1.1
