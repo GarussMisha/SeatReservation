@@ -49,9 +49,13 @@
             <option :value="11">Занято</option>
             <option :value="2">Неактивно</option>
           </select>
-          <p class="form-hint">
-            {{ getStatusHint(formData.status_id) }}
-          </p>
+        </div>
+
+        <div class="status-hint">
+          <svg class="hint-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span class="hint-text">{{ getStatusHint(formData.status_id) }}</span>
         </div>
 
         <!-- Оставляем is_active для обратной совместимости, но скрываем -->
@@ -293,6 +297,30 @@ const handleSubmit = () => {
   background: #ffffff;
   color: #333333;
   padding: 0.5rem;
+}
+
+.status-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-left: 3px solid var(--primary-start);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+
+.hint-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--primary-start);
+}
+
+.hint-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-body);
+  line-height: var(--line-height-normal);
 }
 
 .checkbox-label {
