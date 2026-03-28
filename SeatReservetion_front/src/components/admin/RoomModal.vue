@@ -11,11 +11,14 @@
       
       <form @submit.prevent="handleSubmit" class="modal-body">
         <div class="form-group">
-          <label for="name">Название *</label>
-          <input 
+          <label for="name">
+            Название
+            <span class="required">*</span>
+          </label>
+          <input
             id="name"
-            v-model="formData.name" 
-            type="text" 
+            v-model="formData.name"
+            type="text"
             required
             placeholder="Введите название помещения"
           >
@@ -23,7 +26,7 @@
 
         <div class="form-group">
           <label for="description">Описание</label>
-          <textarea 
+          <textarea
             id="description"
             v-model="formData.description"
             placeholder="Описание помещения (необязательно)"
@@ -32,11 +35,14 @@
         </div>
 
         <div class="form-group">
-          <label for="address">Адрес *</label>
-          <input 
+          <label for="address">
+            Адрес
+            <span class="required">*</span>
+          </label>
+          <input
             id="address"
-            v-model="formData.address" 
-            type="text" 
+            v-model="formData.address"
+            type="text"
             required
             placeholder="Введите адрес помещения"
           >
@@ -56,6 +62,11 @@
               {{ status.name }}
             </option>
           </select>
+        </div>
+
+        <div class="form-note">
+          <span class="note-asterisk">*</span>
+          <span class="note-text">Обязательные поля</span>
         </div>
 
         <div class="modal-footer">
@@ -212,8 +223,31 @@ const handleSubmit = () => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #333333;
-  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.form-group label .required {
+  color: var(--accent-danger);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.form-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.note-asterisk {
+  color: var(--accent-danger);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
 }
 
 .form-group input,

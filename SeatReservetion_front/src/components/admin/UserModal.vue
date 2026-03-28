@@ -11,11 +11,14 @@
       
       <form @submit.prevent="handleSubmit" class="modal-body">
         <div class="form-group">
-          <label for="login">Логин *</label>
-          <input 
+          <label for="login">
+            Логин
+            <span class="required">*</span>
+          </label>
+          <input
             id="login"
-            v-model="formData.login" 
-            type="text" 
+            v-model="formData.login"
+            type="text"
             required
             placeholder="Введите логин (email или имя пользователя)"
           >
@@ -23,7 +26,7 @@
 
         <div class="form-group">
           <label for="password">
-            Пароль {{ !isEdit ? '*' : '' }}
+            Пароль <span v-if="!isEdit" class="required">*</span>
           </label>
           <input
             id="password"
@@ -43,7 +46,10 @@
         </div>
 
         <div class="form-group">
-          <label for="first_name">Имя *</label>
+          <label for="first_name">
+            Имя
+            <span class="required">*</span>
+          </label>
           <input
             id="first_name"
             v-model="formData.first_name"
@@ -54,7 +60,10 @@
         </div>
 
         <div class="form-group">
-          <label for="last_name">Фамилия *</label>
+          <label for="last_name">
+            Фамилия
+            <span class="required">*</span>
+          </label>
           <input
             id="last_name"
             v-model="formData.last_name"
@@ -75,7 +84,10 @@
         </div>
 
         <div class="form-group">
-          <label for="email">Email *</label>
+          <label for="email">
+            Email
+            <span class="required">*</span>
+          </label>
           <input
             id="email"
             v-model="formData.email"
@@ -109,8 +121,8 @@
 
         <div class="form-group">
           <label class="checkbox-label">
-            <input 
-              v-model="formData.is_admin" 
+            <input
+              v-model="formData.is_admin"
               type="checkbox"
             >
             <span class="checkmark"></span>
@@ -119,6 +131,11 @@
           <small class="help-text">
             Администраторы имеют доступ ко всем функциям системы
           </small>
+        </div>
+
+        <div class="form-note">
+          <span class="note-asterisk">*</span>
+          <span class="note-text">Обязательные поля</span>
         </div>
 
         <div class="modal-footer">
@@ -309,8 +326,31 @@ const handleSubmit = async () => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #333333;
-  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.form-group label .required {
+  color: var(--accent-danger);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.form-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.note-asterisk {
+  color: var(--accent-danger);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
 }
 
 .form-group input {
