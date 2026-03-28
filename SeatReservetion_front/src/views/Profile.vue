@@ -20,7 +20,9 @@
       </div>
 
       <div v-else-if="error" class="error-state">
-        <div class="error-icon">⚠️</div>
+        <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
         <h3>Ошибка загрузки</h3>
         <p>{{ error }}</p>
         <button @click="loadProfileData" class="retry-btn">Повторить</button>
@@ -31,7 +33,9 @@
         <section class="profile-section user-info">
           <div class="section-header">
             <h2>
-              <span class="icon">👤</span>
+              <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
               Личная информация
             </h2>
           </div>
@@ -455,12 +459,26 @@ onMounted(() => {
 
 .section-header h2 {
   margin: 0;
-  color: #333;
-  font-size: 1.3rem;
-  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
+}
+
+.section-icon,
+.error-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.stat-icon-svg {
+  width: 32px;
+  height: 32px;
+  color: var(--primary-start);
+  opacity: 0.8;
 }
 
 .icon {

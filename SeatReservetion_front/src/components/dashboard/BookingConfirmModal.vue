@@ -7,7 +7,12 @@
       <div class="modal-container" @click.stop>
         <div class="modal-header">
           <div class="header-icon" :class="mode">
-            {{ mode === 'book' ? '✅' : '❌' }}
+            <svg v-if="mode === 'book'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
           </div>
           <h3 class="modal-title">{{ title }}</h3>
           <button @click="close" class="close-btn">×</button>
@@ -16,15 +21,30 @@
         <div class="modal-body">
           <div class="workspace-info">
             <div class="info-row">
-              <span class="info-label">🪑 Место:</span>
+              <span class="info-label">
+                <svg class="info-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                </svg>
+                Место:
+              </span>
               <span class="info-value">{{ workspaceName }}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">📅 Дата:</span>
+              <span class="info-label">
+                <svg class="info-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Дата:
+              </span>
               <span class="info-value">{{ formattedDate }}</span>
             </div>
             <div class="info-row" v-if="roomName">
-              <span class="info-label">🏢 Помещение:</span>
+              <span class="info-label">
+                <svg class="info-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+                Помещение:
+              </span>
               <span class="info-value">{{ roomName }}</span>
             </div>
           </div>
@@ -32,7 +52,9 @@
           <p class="confirm-message">{{ message }}</p>
 
           <div v-if="showWarning" class="warning-box">
-            <span class="warning-icon">⚠️</span>
+            <svg class="warning-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
             <span class="warning-text">{{ warningText }}</span>
           </div>
         </div>
@@ -233,8 +255,12 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
   flex-shrink: 0;
+}
+
+.header-icon svg {
+  width: 28px;
+  height: 28px;
 }
 
 .header-icon.book {
@@ -243,6 +269,20 @@ onUnmounted(() => {
 
 .header-icon.cancel {
   background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
+}
+
+.info-icon-svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.warning-icon-svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .modal-title {

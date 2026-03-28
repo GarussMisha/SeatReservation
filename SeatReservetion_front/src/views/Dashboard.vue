@@ -36,7 +36,9 @@
         <div class="plan-section">
           <div v-if="!selectedRoom" class="no-selection">
             <div class="empty-state">
-              <span class="empty-icon">🏢</span>
+              <svg class="empty-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
               <h3>Выберите помещение</h3>
               <p>Используйте панель сверху для выбора помещения и даты</p>
             </div>
@@ -49,7 +51,10 @@
                 <span class="plan-address">{{ selectedRoom.address }}</span>
                 <!-- Предупреждение если помещение не активно -->
                 <span v-if="selectedRoom.status_id === 2" class="room-inactive-warning">
-                  ⚠️ Помещение не активно. Бронирование недоступно.
+                  <svg class="warning-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                  Помещение не активно. Бронирование недоступно.
                 </span>
               </div>
               <div class="plan-stats">
@@ -91,7 +96,9 @@
           </div>
 
           <div v-else-if="sortedMyBookings.length === 0" class="no-bookings">
-            <span class="no-bookings-icon">📅</span>
+            <svg class="no-bookings-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
             <p>У вас пока нет бронирований</p>
           </div>
 
@@ -545,11 +552,29 @@ onMounted(async () => {
   color: #666;
 }
 
-.empty-icon {
-  font-size: 4rem;
+.empty-icon-svg {
+  width: 80px;
+  height: 80px;
   display: block;
   margin-bottom: 1rem;
   opacity: 0.5;
+  color: var(--text-muted);
+}
+
+.no-bookings-icon-svg {
+  width: 60px;
+  height: 60px;
+  display: block;
+  margin: 0 auto 1rem;
+  opacity: 0.5;
+  color: var(--text-muted);
+}
+
+.warning-icon-inline {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 6px;
 }
 
 .empty-state h3 {
