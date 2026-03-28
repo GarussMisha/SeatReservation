@@ -129,7 +129,7 @@ const handleLogout = () => {
 }
 
 .header-content {
-  background: var(--bg-card-transparent);
+  background: rgba(255, 255, 255, 0.15);
   padding: 1.2rem 2rem;
   box-shadow: var(--shadow-lg);
   display: flex;
@@ -140,9 +140,6 @@ const handleLogout = () => {
   margin: 0 auto;
   backdrop-filter: var(--backdrop-filter);
   border: 1px solid rgba(129, 119, 119, 0.2);
-  background: linear-gradient(135deg,
-    rgba(179, 49, 157, 0.2) 0%,
-    rgba(154, 3, 214, 0.1) 100%);
 }
 
 .header-left {
