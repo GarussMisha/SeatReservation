@@ -1029,6 +1029,14 @@ onMounted(async () => {
   font-size: 0.875rem;
   transition: all 0.3s;
   font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .action-btn.edit {
