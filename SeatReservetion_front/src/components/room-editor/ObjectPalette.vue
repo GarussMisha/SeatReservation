@@ -277,8 +277,8 @@ const handleHeightInput = (event) => {
 
 <style scoped>
 .object-palette {
-  width: 220px;
-  min-width: 220px;
+  width: 260px;
+  min-width: 260px;
   background: #ffffff;
   border-right: 1px solid #e0e0e0;
   padding: 1rem;
