@@ -136,8 +136,7 @@ const handleLogout = () => {
   justify-content: space-between;
   align-items: center;
   border-radius: var(--radius-lg);
-  max-width: 1400px;
-  margin: 0 auto;
+  margin: 0 30px;
   backdrop-filter: var(--backdrop-filter);
   border: 1px solid rgba(129, 119, 119, 0.2);
   position: relative;
