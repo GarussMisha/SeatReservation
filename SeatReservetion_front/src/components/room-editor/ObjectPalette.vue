@@ -23,9 +23,7 @@
           :class="['tool-btn', { active: currentTool === 'wall' }]"
           title="Стена"
         >
-          <svg class="tool-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
-          </svg>
+          <span class="tool-icon">🧱</span>
           <span class="tool-label">Стена</span>
         </button>
 
@@ -34,9 +32,7 @@
           :class="['tool-btn', { active: currentTool === 'internal_wall' }]"
           title="Перегородка"
         >
-          <svg class="tool-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-          </svg>
+          <span class="tool-icon">📏</span>
           <span class="tool-label">Перегородка</span>
         </button>
 
@@ -45,9 +41,7 @@
           :class="['tool-btn', { active: currentTool === 'window' }]"
           title="Окно"
         >
-          <svg class="tool-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16M6 6v12M18 6v12M12 6v12"/>
-          </svg>
+          <span class="tool-icon">🪟</span>
           <span class="tool-label">Окно</span>
         </button>
       </div>
