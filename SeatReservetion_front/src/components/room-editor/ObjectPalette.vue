@@ -322,8 +322,8 @@ const handleHeightInput = (event) => {
 }
 
 .tool-icon-svg {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   margin-bottom: 4px;
 }
 
