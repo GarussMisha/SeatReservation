@@ -11,7 +11,10 @@
 
       <form @submit.prevent="handleSubmit" class="modal-body">
         <div class="form-group">
-          <label for="name">Название *</label>
+          <label for="name">
+            Название рабочего места
+            <span class="required">*</span>
+          </label>
           <input
             id="name"
             v-model="formData.name"
@@ -22,7 +25,10 @@
         </div>
 
         <div class="form-group">
-          <label for="room_id">Помещение *</label>
+          <label for="room_id">
+            Помещение
+            <span class="required">*</span>
+          </label>
           <select
             id="room_id"
             v-model="formData.room_id"
@@ -56,6 +62,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
           <span class="hint-text">{{ getStatusHint(formData.status_id) }}</span>
+        </div>
+
+        <div class="form-note">
+          <span class="note-asterisk">*</span>
+          <span class="note-text">Обязательные поля</span>
         </div>
 
         <!-- Оставляем is_active для обратной совместимости, но скрываем -->
@@ -235,8 +246,31 @@ const handleSubmit = () => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #333333;
-  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.form-group label .required {
+  color: var(--accent-danger);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.form-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.note-asterisk {
+  color: var(--accent-danger);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
 }
 
 .form-group input,
