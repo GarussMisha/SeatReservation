@@ -6,6 +6,7 @@ from datetime import datetime, date
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 import logging
+import json
 
 from app.models.notification import Notification
 from app.models.account import Account
@@ -13,7 +14,16 @@ from app.models.booking import Booking
 from app.models.workspace import Workspace
 from app.models.room import Room
 from app.models.status import Status
-from app.services.email_service import email_service
+from app.services.notification_templates import (
+    get_booking_cancelled_data,
+    get_workspace_disabled_data,
+    get_room_disabled_data,
+    get_booking_reminder_data,
+    create_booking_cancelled_html,
+    create_workspace_disabled_html,
+    create_room_disabled_html,
+    create_booking_reminder_html
+)
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +36,11 @@ class NotificationService:
     TYPE_WORKSPACE_DISABLED = "workspace_disabled"
     TYPE_ROOM_DISABLED = "room_disabled"
     TYPE_CUSTOM = "custom"
+    TYPE_BOOKING_REMINDER = "booking_reminder"
 
     def __init__(self, db: Session):
         self.db = db
+        from app.services.email_service import email_service
         self.email_service = email_service
 
     def _get_status_by_name(self, name: str) -> Optional[Status]:
@@ -88,11 +100,20 @@ class NotificationService:
                 logger.warning(f"У пользователя {user.id} нет email для уведомления")
                 return result
 
-            # Получаем статус "pending" для уведомления
+            # Получаем статус "pending"
             pending_status = self._get_or_create_pending_status()
 
-            # Создаем HTML письмо
-            html_content = self.email_service.create_booking_cancelled_html(
+            # Создаем данные для frontend (JSON)
+            notification_data = get_booking_cancelled_data(
+                user_name=self._get_user_name(user),
+                workspace_name=workspace.name,
+                room_address=room.address or "Не указан",
+                booking_date=booking.booking_date.isoformat() if booking.booking_date else "Н/Д",
+                reason=reason
+            )
+
+            # Создаем HTML для email
+            html_content = create_booking_cancelled_html(
                 user_name=self._get_user_name(user),
                 workspace_name=workspace.name,
                 room_address=room.address or "Не указан",
@@ -102,11 +123,11 @@ class NotificationService:
 
             subject = f"Бронирование отменено: {workspace.name}"
 
-            # Создаем запись уведомления
+            # Создаем уведомление (сохраняем JSON в БД)
             notification = Notification(
                 notification_type=self.TYPE_BOOKING_CANCELLED,
                 subject=subject,
-                message=html_content,
+                message=json.dumps(notification_data, ensure_ascii=False),  # JSON вместо HTML
                 scheduled_at=None,
                 status_id=pending_status.id,
                 user_id=user.id,
@@ -128,17 +149,10 @@ class NotificationService:
 
             if email_result["success"]:
                 result["email_sent"] = True
-                # Обновляем статус на "sent"
                 sent_status = self._get_status_by_name("sent")
                 if sent_status:
                     notification.status_id = sent_status.id
                     notification.sent_at = datetime.now()
-                    self.db.commit()
-            else:
-                # Обновляем статус на "failed"
-                failed_status = self._get_status_by_name("failed")
-                if failed_status:
-                    notification.status_id = failed_status.id
                     self.db.commit()
 
             result["success"] = True

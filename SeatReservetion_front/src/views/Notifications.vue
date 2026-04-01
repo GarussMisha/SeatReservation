@@ -327,30 +327,43 @@ const truncateMessage = (message) => {
 const getNotificationText = (message) => {
   if (!message) return ''
 
-  // Создаем временный элемент для парсинга HTML
-  const tempDiv = document.createElement('div')
-  tempDiv.innerHTML = message
-  
-  // Получаем текстовое содержимое
-  let text = tempDiv.textContent || tempDiv.innerText || ''
-  
-  // Заменяем множественные пробелы на один
-  text = text.replace(/\s+/g, ' ').trim()
-  
-  // Добавляем переносы строк после ключевых элементов
-  text = text
-    .replace(/⚠️ Причина:/g, '\n⚠️ Причина:')
-    .replace(/📅 Дата:/g, '\n📅 Дата:')
-    .replace(/🏢 Помещение:/g, '\n🏢 Помещение:')
-    .replace(/🪑 Место:/g, '\n🪑 Место:')
-    .replace(/❌ Бронирование отменено!/g, '❌ Бронирование отменено!\n')
-  
-  // Обрезаем до 300 символов
-  if (text.length > 300) {
-    return text.substring(0, 300) + '...'
-  }
+  try {
+    // Пытаемся распарсить JSON (новый формат)
+    const data = typeof message === 'string' ? JSON.parse(message) : message
+    
+    // Формируем текст из структурированных данных
+    let text = `${data.title}\n\n`
+    
+    if (data.greeting) {
+      text += `${data.greeting}\n`
+    }
+    
+    if (data.message) {
+      text += `${data.message}\n\n`
+    }
+    
+    // Добавляем элементы
+    if (data.items && data.items.length > 0) {
+      data.items.forEach(item => {
+        text += `${item.icon} ${item.label}: ${item.value}\n`
+      })
+      text += '\n'
+    }
+    
+    if (data.footer) {
+      text += `${data.footer}`
+    }
+    
+    // Обрезаем до 300 символов
+    if (text.length > 300) {
+      return text.substring(0, 300) + '...'
+    }
 
-  return text
+    return text
+  } catch (e) {
+    // Если не JSON, возвращаем как есть (старый формат)
+    return message.length > 300 ? message.substring(0, 300) + '...' : message
+  }
 }
 
 onMounted(async () => {
