@@ -207,22 +207,29 @@ class NotificationService:
             # Получаем статус "pending"
             pending_status = self._get_or_create_pending_status()
 
-            # Создаем HTML письмо
-            html_content = self.email_service.create_booking_reminder_html(
+            # Создаем данные для frontend (JSON)
+            notification_data = get_booking_reminder_data(
                 user_name=self._get_user_name(user),
                 workspace_name=workspace.name,
-                room_name=room.name,
+                room_address=room.address or "Не указан",
+                booking_date=booking.booking_date.isoformat() if booking.booking_date else "Н/Д"
+            )
+
+            # Создаем HTML для email
+            html_content = create_booking_reminder_html(
+                user_name=self._get_user_name(user),
+                workspace_name=workspace.name,
                 room_address=room.address or "Не указан",
                 booking_date=booking.booking_date.isoformat() if booking.booking_date else "Н/Д"
             )
 
             subject = f"Напоминание: бронирование на {booking.booking_date}"
 
-            # Создаем уведомление
+            # Создаем уведомление (сохраняем JSON в БД)
             notification = Notification(
-                notification_type="booking_reminder",
+                notification_type=self.TYPE_BOOKING_REMINDER,
                 subject=subject,
-                message=html_content,
+                message=json.dumps(notification_data, ensure_ascii=False),
                 scheduled_at=None,
                 status_id=pending_status.id,
                 user_id=user.id,
@@ -329,11 +336,18 @@ class NotificationService:
                     })
                     continue
 
-                # Создаем HTML письмо
-                html_content = self.email_service.create_workspace_disabled_html(
+                # Создаем данные для frontend (JSON)
+                notification_data = get_workspace_disabled_data(
                     user_name=self._get_user_name(user),
                     workspace_name=workspace.name,
-                    room_name=room.name if room else "Н/Д",
+                    room_address=room.address if room else "Не указан",
+                    booking_date=booking.booking_date.isoformat() if booking.booking_date else "Н/Д"
+                )
+
+                # Создаем HTML для email
+                html_content = create_workspace_disabled_html(
+                    user_name=self._get_user_name(user),
+                    workspace_name=workspace.name,
                     room_address=room.address if room else "Не указан",
                     booking_date=booking.booking_date.isoformat() if booking.booking_date else "Н/Д"
                 )
@@ -341,18 +355,13 @@ class NotificationService:
                 subject = f"Рабочее место недоступно: {workspace.name} на {booking.booking_date}"
 
                 # Получаем статус "pending"
-                pending_status = self._get_status_by_name("pending")
-                if not pending_status:
-                    pending_status = Status(name="pending", description="Ожидает отправки")
-                    self.db.add(pending_status)
-                    self.db.commit()
-                    self.db.refresh(pending_status)
+                pending_status = self._get_or_create_pending_status()
 
-                # Создаем уведомление
+                # Создаем уведомление (сохраняем JSON в БД)
                 notification = Notification(
                     notification_type=self.TYPE_WORKSPACE_DISABLED,
                     subject=subject,
-                    message=html_content,
+                    message=json.dumps(notification_data, ensure_ascii=False),
                     scheduled_at=None,
                     status_id=pending_status.id,
                     user_id=user.id,
@@ -500,8 +509,16 @@ class NotificationService:
                         "booking_date": b.booking_date.isoformat() if b.booking_date else "Н/Д"
                     })
 
-                # Создаем HTML письмо
-                html_content = self.email_service.create_room_disabled_html(
+                # Создаем данные для frontend (JSON)
+                notification_data = get_room_disabled_data(
+                    user_name=self._get_user_name(user),
+                    room_name=room.name,
+                    room_address=room.address or "Не указан",
+                    affected_bookings=affected_bookings
+                )
+
+                # Создаем HTML для email
+                html_content = create_room_disabled_html(
                     user_name=self._get_user_name(user),
                     room_name=room.name,
                     room_address=room.address or "Не указан",
@@ -511,18 +528,13 @@ class NotificationService:
                 subject = f"Помещение недоступно: {room.name}"
 
                 # Получаем статус "pending"
-                pending_status = self._get_status_by_name("pending")
-                if not pending_status:
-                    pending_status = Status(name="pending", description="Ожидает отправки")
-                    self.db.add(pending_status)
-                    self.db.commit()
-                    self.db.refresh(pending_status)
+                pending_status = self._get_or_create_pending_status()
 
-                # Создаем уведомление
+                # Создаем уведомление (сохраняем JSON в БД)
                 notification = Notification(
                     notification_type=self.TYPE_ROOM_DISABLED,
                     subject=subject,
-                    message=html_content,
+                    message=json.dumps(notification_data, ensure_ascii=False),
                     scheduled_at=None,
                     status_id=pending_status.id,
                     user_id=user.id,
