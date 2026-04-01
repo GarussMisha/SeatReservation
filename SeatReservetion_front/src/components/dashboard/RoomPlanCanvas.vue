@@ -236,7 +236,7 @@ const drawRoomLabel = (c, obj) => {
   c.translate(centerX, centerY)
   
   // Рисуем SVG иконку в центре (без фона и текста)
-  const iconSize = Math.min(width, height) * 0.6
+  const iconSize = Math.min(width, height)
   c.drawImage(iconImg, -iconSize / 2, -iconSize / 2, iconSize, iconSize)
   
   c.restore()
@@ -309,7 +309,7 @@ const drawWorkspace = async (c, workspace) => {
 
   // SVG иконка рабочего места
   if (desktopImage.value) {
-    const iconSize = Math.min(width, height) * 0.6
+    const iconSize = Math.min(width, height)
     c.drawImage(desktopImage.value, -iconSize / 2, -iconSize / 2, iconSize, iconSize)
   }
 

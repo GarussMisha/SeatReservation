@@ -36,7 +36,7 @@ class SchedulerService:
         try:
             self.scheduler = BackgroundScheduler()
 
-            # Добавляем задачу проверки отложенных уведомлений
+            # Задача 1: Проверка pending уведомлений (каждые 5 минут)
             self.scheduler.add_job(
                 func=self._send_pending_notifications_task,
                 trigger=IntervalTrigger(minutes=check_interval_minutes),
@@ -46,11 +46,23 @@ class SchedulerService:
                 misfire_grace_time=60  # Допустимая задержка выполнения (секунды)
             )
 
+            # Задача 2: Напоминания о бронированиях (каждый час)
+            # Отправляет напоминания за 6 часов до начала бронирования (в 18:00 за 00:00)
+            self.scheduler.add_job(
+                func=self._send_booking_reminders_task,
+                trigger=IntervalTrigger(hours=1),
+                id='send_booking_reminders',
+                name='Напоминания о бронированиях',
+                replace_existing=True,
+                misfire_grace_time=300
+            )
+
             # Запускаем планировщик
             self.scheduler.start()
             self._is_running = True
 
             logger.info(f"Планировщик запущен. Проверка уведомлений каждые {check_interval_minutes} мин.")
+            logger.info("Напоминания о бронированиях проверяются каждый час (17:00-23:00)")
 
         except Exception as e:
             logger.error(f"Ошибка при запуске планировщика: {e}")
@@ -88,6 +100,82 @@ class SchedulerService:
 
         except Exception as e:
             logger.error(f"Ошибка в задаче отправки уведомлений: {e}")
+        finally:
+            db.close()
+
+    def _send_booking_reminders_task(self):
+        """
+        Проверка бронирований и отправка напоминаний за 6 часов до начала
+        Вызывается планировщиком каждый час
+        Напоминание отправляется в 18:00 за 6 часов до начала бронирования (00:00 следующего дня)
+        """
+        logger.debug("Запуск задачи проверки напоминаний о бронированиях")
+
+        db: Session = SessionLocal()
+        try:
+            from app.models.booking import Booking
+            from app.models.status import BookingStatuses
+            from app.services.notification_service import NotificationService
+            from datetime import timedelta, time
+            
+            # Текущее время (локальное время сервера)
+            now = datetime.now()
+
+            # Находим все CONFIRMED бронирования на завтра
+            # Напоминание отправляется сегодня в 18:00 за 6 часов до начала (00:00 завтра)
+            tomorrow = (now + timedelta(days=1)).date()
+
+            # Проверяем, что сейчас между 17:00 и 23:00 (время для напоминаний на завтра)
+            current_hour = now.hour
+            if current_hour < 17 or current_hour > 23:
+                logger.debug(f"Сейчас {current_hour}:00 - не время для напоминаний (ждем 17:00-23:00)")
+                return
+            
+            bookings = db.query(Booking).filter(
+                Booking.booking_date == tomorrow,
+                Booking.status_id == BookingStatuses.CONFIRMED
+            ).all()
+            
+            if not bookings:
+                logger.debug("Нет подтвержденных бронирований на завтра")
+                return
+
+            reminders_sent = 0
+            reminders_failed = 0
+            
+            for booking in bookings:
+                # Проверяем, не отправляли ли уже напоминание сегодня
+                already_reminded = db.query(Notification).filter(
+                    Notification.user_id == booking.account_id,
+                    Notification.notification_type == "booking_reminder",
+                    Notification.created_at >= now - timedelta(hours=24)
+                ).first()
+                
+                if already_reminded:
+                    logger.debug(f"Напоминание уже отправлено для booking {booking.id}")
+                    continue
+                
+                # Отправляем напоминание
+                notification_service = NotificationService(db)
+                result = notification_service.send_booking_reminder_notification(
+                    booking_id=booking.id
+                )
+                
+                if result["success"]:
+                    reminders_sent += 1
+                    logger.info(f"Напоминание отправлено для booking {booking.id}")
+                else:
+                    reminders_failed += 1
+                    logger.warning(f"Не удалось отправить напоминание для booking {booking.id}: {result['message']}")
+            
+            logger.info(
+                f"Напоминания о бронированиях: "
+                f"всего={len(bookings)}, отправлено={reminders_sent}, "
+                f"ошибок={reminders_failed}"
+            )
+
+        except Exception as e:
+            logger.error(f"Ошибка в задаче напоминаний: {e}")
         finally:
             db.close()
 

@@ -12,9 +12,9 @@ Base = declarative_base()
 class BaseModel(Base):
     """Базовый класс для всех моделей с общими полями"""
     __abstract__ = True
-    
+
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.now, nullable=False)
 
 
 # Экспорт Base для удобства импорта

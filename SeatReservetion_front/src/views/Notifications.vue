@@ -44,21 +44,13 @@
 
       <!-- Статистика -->
       <div v-if="!isLoading && notifications.length > 0" class="stats-cards">
-        <div class="stat-card">
-          <div class="stat-value">{{ totalNotifications }}</div>
-          <div class="stat-label">Всего</div>
-        </div>
         <div class="stat-card unread">
           <div class="stat-value">{{ unreadCount }}</div>
           <div class="stat-label">Непрочитанные</div>
         </div>
-        <div class="stat-card pending">
-          <div class="stat-value">{{ pendingCount }}</div>
-          <div class="stat-label">Ожидают</div>
-        </div>
-        <div class="stat-card sent">
-          <div class="stat-value">{{ sentCount }}</div>
-          <div class="stat-label">Отправлено</div>
+        <div class="stat-card">
+          <div class="stat-value">{{ totalNotifications }}</div>
+          <div class="stat-label">Всего</div>
         </div>
       </div>
 
@@ -124,14 +116,13 @@
 
               <div class="notification-body">
                 <h3 class="notification-title">{{ notification.subject }}</h3>
-                <div v-if="notification.message" class="notification-message">{{ truncateMessage(notification.message) }}</div>
+                <div v-if="notification.message" class="notification-message">{{ getNotificationText(notification.message) }}</div>
               </div>
 
               <div class="notification-footer">
                 <span :class="['status-badge', getStatusClass(notification.status_name)]">
                   {{ getStatusName(notification.status_name) }}
                 </span>
-                <span class="notification-date">{{ formatDate(notification.created_at) }}</span>
               </div>
             </div>
           </div>
@@ -177,9 +168,7 @@ const pageSize = 10
 
 const filters = [
   { value: 'all', label: 'Все' },
-  { value: 'pending', label: 'Ожидают' },
-  { value: 'sent', label: 'Отправлено' },
-  { value: 'failed', label: 'Ошибка' }
+  { value: 'unread', label: 'Непрочитанные' }
 ]
 
 const notifications = computed(() => notificationStore.notifications)
@@ -187,21 +176,16 @@ const totalNotifications = computed(() => notificationStore.totalNotifications)
 const unreadCount = computed(() => notificationStore.unreadCount)
 const hasUnread = computed(() => notificationStore.hasUnreadNotifications)
 
-const pendingCount = computed(() =>
-  notifications.value.filter(n => n.status_name === 'pending').length
-)
-
-const sentCount = computed(() =>
-  notifications.value.filter(n => n.status_name === 'sent').length
-)
-
 const totalPages = computed(() => Math.ceil(totalNotifications.value / pageSize))
 
 const filteredNotifications = computed(() => {
   let filtered = notifications.value
 
-  if (activeFilter.value !== 'all') {
-    filtered = filtered.filter(n => n.status_name === activeFilter.value)
+  // Фильтр "Непрочитанные" показывает уведомления в статусе pending, которые ещё не прочитаны
+  if (activeFilter.value === 'unread') {
+    filtered = filtered.filter(n => 
+      n.status_name === 'pending' && !notificationStore.isRead(n.id)
+    )
   }
 
   const start = (currentPage.value - 1) * pageSize
@@ -277,25 +261,54 @@ const getStatusClass = (statusName) => {
 }
 
 const formatTime = (dateString) => {
+  if (!dateString) return 'Неизвестно'
+  
+  // Парсим дату (формат ISO без timezone: 2026-04-01T19:00:00.123456)
+  // Это локальное время сервера, которое нужно отображать как есть
   const date = new Date(dateString)
+  
+  // Проверяем, валидна ли дата
+  if (isNaN(date.getTime())) {
+    console.error('Неверный формат даты:', dateString)
+    return 'Неизвестно'
+  }
+  
+  // Возвращаем точное время и дату (14:35, 1 апр. 2026)
+  return date.toLocaleString('ru-RU', { 
+    hour: '2-digit',
+    minute: '2-digit',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  })
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  
+  const date = new Date(dateString)
+  
+  // Проверяем, валидна ли дата
+  if (isNaN(date.getTime())) {
+    return ''
+  }
+  
+  // Возвращаем дату с относительным временем
   const now = new Date()
-  const diff = now - date
-
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-
+  const diffMs = now - date
+  const minutes = Math.floor(diffMs / 60000)
+  const hours = Math.floor(diffMs / 3600000)
+  const days = Math.floor(diffMs / 86400000)
+  
+  // Для свежих уведомлений показываем относительное время
   if (minutes < 1) return 'Только что'
   if (minutes < 60) return `${minutes} мин. назад`
   if (hours < 24) return `${hours} ч. назад`
   if (days < 7) return `${days} дн. назад`
-
-  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
-}
-
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString('ru-RU', {
-    day: 'numeric',
+  
+  // Для старых уведомлений показываем полную дату
+  return date.toLocaleDateString('ru-RU', { 
+    day: 'numeric', 
     month: 'long',
     year: 'numeric'
   })
@@ -308,6 +321,35 @@ const truncateMessage = (message) => {
   if (text.length > 200) {
     return text.substring(0, 200) + '...'
   }
+  return text
+}
+
+const getNotificationText = (message) => {
+  if (!message) return ''
+
+  // Создаем временный элемент для парсинга HTML
+  const tempDiv = document.createElement('div')
+  tempDiv.innerHTML = message
+  
+  // Получаем текстовое содержимое
+  let text = tempDiv.textContent || tempDiv.innerText || ''
+  
+  // Заменяем множественные пробелы на один
+  text = text.replace(/\s+/g, ' ').trim()
+  
+  // Добавляем переносы строк после ключевых элементов
+  text = text
+    .replace(/⚠️ Причина:/g, '\n⚠️ Причина:')
+    .replace(/📅 Дата:/g, '\n📅 Дата:')
+    .replace(/🏢 Помещение:/g, '\n🏢 Помещение:')
+    .replace(/🪑 Место:/g, '\n🪑 Место:')
+    .replace(/❌ Бронирование отменено!/g, '❌ Бронирование отменено!\n')
+  
+  // Обрезаем до 300 символов
+  if (text.length > 300) {
+    return text.substring(0, 300) + '...'
+  }
+
   return text
 }
 
@@ -665,6 +707,7 @@ onMounted(async () => {
   color: #4b5563;
   font-size: 0.95rem;
   line-height: 1.6;
+  white-space: pre-wrap;  /* Сохраняет переносы строк */
 }
 
 .notification-footer {

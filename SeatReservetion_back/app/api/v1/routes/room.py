@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi import Query
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, desc as sql_desc
+import logging
 
 from app.core.database import get_db
 from app.models.room import Room
@@ -22,6 +23,8 @@ from app.schemas.room import (
     RoomBulkUpdate
 )
 from app.services.notification_service import get_notification_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["rooms"])
 
@@ -253,13 +256,15 @@ async def update_room(
         send_notification = False
         old_status_id = room.status_id
         new_status_id = room_data.status_id if room_data.status_id is not None else old_status_id
-        
-        # Получаем статус "available" для сравнения
-        available_status = db.query(Status).filter(Status.name == "available").first()
-        available_status_id = available_status.id if available_status else None
-        
-        # Если статус меняется с "available" на другой - отправляем уведомления
-        if old_status_id == available_status_id and new_status_id != available_status_id:
+
+        # Получаем статусы "active" и "inactive" для сравнения
+        active_status = db.query(Status).filter(Status.name == "active").first()
+        inactive_status = db.query(Status).filter(Status.name == "inactive").first()
+        active_status_id = active_status.id if active_status else 1
+        inactive_status_id = inactive_status.id if inactive_status else 2
+
+        # Если статус меняется с "active" на "inactive" - отправляем уведомления
+        if old_status_id == active_status_id and new_status_id == inactive_status_id:
             send_notification = True
 
         # Обновляем поля
@@ -268,7 +273,7 @@ async def update_room(
             setattr(room, field, value)
 
         db.commit()
-        
+
         # Если помещение отключено, отправляем уведомления
         if send_notification:
             try:
@@ -277,6 +282,7 @@ async def update_room(
             except Exception as notif_error:
                 # Логгируем ошибку уведомления, но не прерываем основной запрос
                 print(f"Предупреждение: не удалось отправить уведомления: {notif_error}")
+                logger.warning(f"Ошибка при отправке уведомления об отключении помещения {room_id}: {notif_error}")
 
         db.refresh(room)
 

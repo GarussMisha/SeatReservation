@@ -35,14 +35,16 @@ def format_notification_response(notification: Notification) -> Dict[str, Any]:
     Returns:
         Словарь с отформатированными данными
     """
+    from datetime import timezone
+    
     return {
         "id": notification.id,
         "notification_type": notification.notification_type,
         "subject": notification.subject,
         "message": notification.message,
-        "scheduled_at": notification.scheduled_at.isoformat() if notification.scheduled_at else None,
-        "sent_at": notification.sent_at.isoformat() if notification.sent_at else None,
-        "created_at": notification.created_at.isoformat() if notification.created_at else None,
+        "scheduled_at": notification.scheduled_at.replace(tzinfo=timezone.utc).isoformat() if notification.scheduled_at else None,
+        "sent_at": notification.sent_at.replace(tzinfo=timezone.utc).isoformat() if notification.sent_at else None,
+        "created_at": notification.created_at.replace(tzinfo=timezone.utc).isoformat() if notification.created_at else None,
         "status_id": notification.status_id,
         "status_name": notification.status.name if notification.status else None,
         "user_id": notification.user_id,

@@ -682,7 +682,10 @@ async def cancel_booking(booking_id: int, db: Session = Depends(get_db)):
         # Отправляем уведомление пользователю
         try:
             notification_service = get_notification_service(db)
-            notification_service.send_booking_cancelled_notification(booking_id=booking.id)
+            notification_service.send_booking_cancelled_notification(
+                booking_id=booking.id,
+                reason="Ручная отмена"
+            )
         except Exception as notif_error:
             # Логгируем ошибку уведомления, но не прерываем основной запрос
             print(f"Предупреждение: не удалось отправить уведомление об отмене: {notif_error}")

@@ -3,3 +3,5 @@
 *.db
 *.vscode*
 /SeatReservetion_front/node_modules/
+.qwen
+.playwright-mcp

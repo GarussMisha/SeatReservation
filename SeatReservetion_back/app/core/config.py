@@ -69,28 +69,28 @@ class Settings(BaseSettings):
 
     # === НАСТРОЙКИ EMAIL / SMTP ===
     smtp_host: str = Field(
-        default="smtp.gmail.com",
-        description="SMTP сервер для отправки email"
+        default="smtp.resend.com",
+        description="SMTP сервер для отправки email (Resend: smtp.resend.com)"
     )
 
     smtp_port: int = Field(
-        default=587,
-        description="SMTP порт (587 для TLS, 465 для SSL)"
+        default=465,
+        description="SMTP порт (465 для SSL, 587 для TLS)"
     )
 
     smtp_user: str = Field(
-        default="",
-        description="SMTP пользователь (email)"
+        default="resend",
+        description="SMTP пользователь (для Resend: 'resend')"
     )
 
     smtp_password: str = Field(
         default="",
-        description="SMTP пароль (app password)"
+        description="SMTP пароль (для Resend: API ключ начинающийся с 're_')"
     )
 
     smtp_from_email: str = Field(
-        default="noreply@seatreservation.com",
-        description="Email отправителя"
+        default="onboarding@resend.dev",
+        description="Email отправителя (для Resend: onboarding@resend.dev или ваш домен)"
     )
 
     smtp_from_name: str = Field(
@@ -100,7 +100,7 @@ class Settings(BaseSettings):
 
     smtp_use_tls: bool = Field(
         default=True,
-        description="Использовать TLS для SMTP"
+        description="Использовать TLS/SSL для SMTP (True для Resend)"
     )
     
     class Config:

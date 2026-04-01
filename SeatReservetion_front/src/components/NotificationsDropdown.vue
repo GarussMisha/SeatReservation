@@ -143,34 +143,53 @@ const getNotificationIconClass = (type) => {
 }
 
 const formatTime = (dateString) => {
+  if (!dateString) return ''
+  
+  // Парсим дату (формат ISO с UTC: 2026-04-01T10:00:00+00:00)
   const date = new Date(dateString)
   const now = new Date()
-  const diff = now - date
+  
+  // Проверяем, валидна ли дата
+  if (isNaN(date.getTime())) {
+    return ''
+  }
+  
+  // Вычисляем разницу в миллисекундах
+  const diffMs = now - date
+  
+  // Если дата в будущем
+  if (diffMs < -60000) {
+    return 'только что'
+  }
+  
+  if (diffMs < 0) {
+    return 'только что'
+  }
+  
+  const minutes = Math.floor(diffMs / 60000)
+  const hours = Math.floor(diffMs / 3600000)
+  const days = Math.floor(diffMs / 86400000)
 
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-
-  if (minutes < 1) return 'Только что'
+  // Для свежих уведомлений показываем относительное время
+  if (minutes < 1) return 'только что'
   if (minutes < 60) return `${minutes} мин. назад`
   if (hours < 24) return `${hours} ч. назад`
   if (days < 7) return `${days} дн. назад`
-
-  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+  
+  // Для старых уведомлений показываем точное время
+  return date.toLocaleDateString('ru-RU', { 
+    day: 'numeric', 
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 // Загружаем уведомления при монтировании компонента
 onMounted(() => {
-  // Периодическая проверка новых уведомлений (каждые 30 секунд)
-  const interval = setInterval(() => {
-    if (!isOpen.value) {
-      notificationStore.fetchMyNotifications(1, 0)
-    }
-  }, 30000)
-
-  onUnmounted(() => {
-    clearInterval(interval)
-  })
+  // Загружаем уведомления один раз при монтировании
+  // Периодическое обновление отключено, чтобы не мешать работе страницы уведомлений
+  // Пользователь может обновить вручную, открыв dropdown
 })
 </script>
 

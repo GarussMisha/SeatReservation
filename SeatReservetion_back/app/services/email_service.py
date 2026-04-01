@@ -80,12 +80,14 @@ class EmailService:
             part_html = MIMEText(html_content, "html", "utf-8")
             msg.attach(part_html)
 
-            # Отправляем
+            # Отправляем через SMTP
+            # Для Resend: smtp.resend.com:465 с SSL
             if self.use_tls:
+                # Используем SSL (для порта 465)
+                server = smtplib.SMTP_SSL(self.smtp_host, self.smtp_port)
+            else:
                 server = smtplib.SMTP(self.smtp_host, self.smtp_port)
                 server.starttls()
-            else:
-                server = smtplib.SMTP_SSL(self.smtp_host, self.smtp_port)
 
             server.login(self.smtp_user, self.smtp_password)
             server.sendmail(self.from_email, to_email, msg.as_string())
@@ -93,7 +95,7 @@ class EmailService:
 
             result["success"] = True
             result["message"] = "Письмо успешно отправлено"
-            result["sent_at"] = datetime.utcnow().isoformat()
+            result["sent_at"] = datetime.now().isoformat()
 
             logger.info(f"Письмо отправлено на {to_email} с темой '{subject}'")
 
@@ -175,9 +177,9 @@ class EmailService:
     def create_booking_cancelled_html(
         user_name: str,
         workspace_name: str,
-        room_name: str,
         room_address: str,
-        booking_date: str
+        booking_date: str,
+        reason: str = "Ручная отмена"
     ) -> str:
         """
         Создание HTML шаблона для уведомления об отмене бронирования
@@ -185,9 +187,9 @@ class EmailService:
         Args:
             user_name: Имя пользователя
             workspace_name: Название рабочего места
-            room_name: Название помещения
             room_address: Адрес помещения
             booking_date: Дата бронирования
+            reason: Причина отмены
 
         Returns:
             HTML строка
@@ -205,39 +207,42 @@ class EmailService:
                 .info-box {{ background-color: white; border-left: 4px solid #f44336; padding: 15px; margin: 15px 0; }}
                 .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
                 h1 {{ margin: 0; font-size: 24px; }}
-                h2 {{ color: #f44336; font-size: 18px; }}
-                .detail {{ margin: 10px 0; }}
+                .detail {{ margin: 12px 0; }}
                 .label {{ font-weight: bold; color: #555; }}
+                .value {{ color: #333; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>⚠️ Бронирование отменено</h1>
+                    <h1>❌ Бронирование отменено!</h1>
                 </div>
                 <div class="content">
-                    <p>Уважаемый(ая), <strong>{user_name}</strong>!</p>
+                    <p>Здравствуйте, <strong>{user_name}</strong>!</p>
                     
-                    <p>К сожалению, ваше бронирование рабочего места было отменено по техническим причинам. Приносим свои извинения за доставленные неудобства!</p>
-                    
+                    <p>Ваше бронирование было отменено.</p>
+
                     <div class="info-box">
-                        <h2>Детали отмененного бронирования:</h2>
                         <div class="detail">
-                            <span class="label">🪑 Рабочее место:</span> {workspace_name}
+                            <span class="label">🪑 Место:</span>
+                            <span class="value">{workspace_name}</span>
                         </div>
                         <div class="detail">
-                            <span class="label">🏢 Помещение:</span> {room_name}
+                            <span class="label">🏢 Помещение:</span>
+                            <span class="value">{room_address or 'Не указан'}</span>
                         </div>
                         <div class="detail">
-                            <span class="label">📍 Адрес:</span> {room_address or 'Не указан'}
+                            <span class="label">📅 Дата:</span>
+                            <span class="value">{booking_date}</span>
                         </div>
                         <div class="detail">
-                            <span class="label">📅 Дата:</span> {booking_date}
+                            <span class="label">⚠️ Причина:</span>
+                            <span class="value">{reason}</span>
                         </div>
                     </div>
-                    
+
                     <p>Если у вас возникли вопросы, пожалуйста, обратитесь к администратору системы.</p>
-                    
+
                     <p>С уважением,<br>Команда Seat Reservation System</p>
                 </div>
                 <div class="footer">
@@ -403,20 +408,22 @@ class EmailService:
         """
 
     @staticmethod
-    def create_custom_notification_html(
+    def create_booking_reminder_html(
         user_name: str,
-        subject: str,
-        message: str,
-        sender_name: str = "Администратор"
+        workspace_name: str,
+        room_name: str,
+        room_address: str,
+        booking_date: str
     ) -> str:
         """
-        Создание HTML шаблона для произвольного уведомления
+        Создание HTML шаблона для напоминания о бронировании
 
         Args:
             user_name: Имя пользователя
-            subject: Тема сообщения
-            message: Текст сообщения
-            sender_name: Имя отправителя
+            workspace_name: Название рабочего места
+            room_name: Название помещения
+            room_address: Адрес помещения
+            booking_date: Дата бронирования
 
         Returns:
             HTML строка
@@ -431,30 +438,59 @@ class EmailService:
                 .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
                 .header {{ background-color: #2196f3; color: white; padding: 20px; text-align: center; }}
                 .content {{ background-color: #f9f9f9; padding: 20px; margin-top: 10px; }}
-                .message-box {{ background-color: white; border-left: 4px solid #2196f3; padding: 15px; margin: 15px 0; }}
+                .info-box {{ background-color: white; border-left: 4px solid #2196f3; padding: 15px; margin: 15px 0; }}
                 .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
                 h1 {{ margin: 0; font-size: 24px; }}
                 h2 {{ color: #2196f3; font-size: 18px; }}
+                .detail {{ margin: 10px 0; }}
+                .label {{ font-weight: bold; color: #555; }}
+                .reminder-badge {{ 
+                    background-color: #fff3cd; 
+                    border: 2px solid #ffc107; 
+                    padding: 10px; 
+                    border-radius: 5px; 
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                }}
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📬 Сообщение от администрации</h1>
+                    <h1>📅 Напоминание о бронировании</h1>
                 </div>
                 <div class="content">
-                    <p>Уважаемый(ая), <strong>{user_name}</strong>!</p>
+                    <p>Здравствуйте, <strong>{user_name}</strong>!</p>
                     
-                    <h2>{subject}</h2>
-                    
-                    <div class="message-box">
-                        {message.replace(chr(10), '<br>')}
+                    <div class="reminder-badge">
+                        ⏰ Не забудьте посетить офис завтра!
                     </div>
                     
-                    <p>С уважением,<br>{sender_name}</p>
+                    <p>Напоминаем вам о предстоящем бронировании рабочего места.</p>
+                    
+                    <div class="info-box">
+                        <h2>Детали бронирования:</h2>
+                        <div class="detail">
+                            <span class="label">🪑 Рабочее место:</span> {workspace_name}
+                        </div>
+                        <div class="detail">
+                            <span class="label">🏢 Помещение:</span> {room_name}
+                        </div>
+                        <div class="detail">
+                            <span class="label">📍 Адрес:</span> {room_address or 'Не указан'}
+                        </div>
+                        <div class="detail">
+                            <span class="label">📅 Дата:</span> {booking_date}
+                        </div>
+                    </div>
+                    
+                    <p>Желаем продуктивного дня!</p>
+                    
+                    <p>С уважением,<br>Команда Seat Reservation System</p>
                 </div>
                 <div class="footer">
-                    <p>Это уведомление от администрации системы бронирования.</p>
+                    <p>Это автоматическое напоминание. Если вы больше не хотите получать уведомления, обратитесь к администратору.</p>
                 </div>
             </div>
         </body>

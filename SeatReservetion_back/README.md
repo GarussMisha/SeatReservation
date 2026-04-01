@@ -74,6 +74,8 @@ SeatReservetion_back/
   | /sync | Синхронизация статусов | Admin |
 - **Безопасность**: bcrypt хеши, CORS, глобальный exception handler
 - **Инициализация**: Авто-создание тестового admin (login: `admin`, пароль: `admin123`)
+- **Email-уведомления**: Resend SMTP, автоматические уведомления, планировщик задач
+- **Планировщик**: APScheduler для отложенных уведомлений (проверка каждые 5 мин)
 
 ### Тестовый администратор
 ```
@@ -110,7 +112,25 @@ DATABASE_URL=sqlite:///./seat_reservation.db
 SECRET_KEY=your-secret-key-here  # Изменить!
 ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"]
 DEBUG=True
+
+# Email уведомления (Resend)
+SMTP_HOST=smtp.resend.com
+SMTP_PORT=465
+SMTP_USER=resend
+SMTP_PASSWORD=re_6mBXRPmz_4BsoQoXXSnupL8ysdpm69GyK
+SMTP_FROM_EMAIL=onboarding@resend.dev
+SMTP_FROM_NAME=Seat Reservation System
+SMTP_USE_TLS=True
 ```
+
+### 📧 Тестирование Email
+
+```bash
+# Запуск теста email-уведомлений
+python test_email.py
+```
+
+Подробная документация: [RESEND_EMAIL_SETUP.md](RESEND_EMAIL_SETUP.md)
 
 ## 📊 Схема БД
 

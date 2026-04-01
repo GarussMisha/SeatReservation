@@ -35,16 +35,27 @@ class NotificationService:
         """Получение статуса по названию"""
         return self.db.query(Status).filter(Status.name == name).first()
 
+    def _get_or_create_pending_status(self) -> Status:
+        """Получить или создать статус 'pending'"""
+        pending_status = self._get_status_by_name("pending")
+        if not pending_status:
+            pending_status = Status(name="pending", description="Ожидает отправки")
+            self.db.add(pending_status)
+            self.db.commit()
+            self.db.refresh(pending_status)
+        return pending_status
+
     def _get_user_name(self, user: Account) -> str:
         """Получение имени пользователя для отображения"""
         return f"{user.first_name} {user.last_name}"
 
-    def send_booking_cancelled_notification(self, booking_id: int) -> Dict[str, Any]:
+    def send_booking_cancelled_notification(self, booking_id: int, reason: str = "Ручная отмена") -> Dict[str, Any]:
         """
         Отправка уведомления об отмене бронирования
 
         Args:
             booking_id: ID бронирования
+            reason: Причина отмены
 
         Returns:
             Результат отправки
@@ -78,34 +89,28 @@ class NotificationService:
                 return result
 
             # Получаем статус "pending" для уведомления
-            pending_status = self._get_status_by_name("pending")
-            if not pending_status:
-                # Создаем статус если нет
-                pending_status = Status(name="pending", description="Ожидает отправки")
-                self.db.add(pending_status)
-                self.db.commit()
-                self.db.refresh(pending_status)
+            pending_status = self._get_or_create_pending_status()
 
             # Создаем HTML письмо
             html_content = self.email_service.create_booking_cancelled_html(
                 user_name=self._get_user_name(user),
                 workspace_name=workspace.name,
-                room_name=room.name,
                 room_address=room.address or "Не указан",
-                booking_date=booking.booking_date.isoformat() if booking.booking_date else "Н/Д"
+                booking_date=booking.booking_date.isoformat() if booking.booking_date else "Н/Д",
+                reason=reason
             )
 
-            subject = f"Отмена бронирования: {workspace.name} на {booking.booking_date}"
+            subject = f"Бронирование отменено: {workspace.name}"
 
             # Создаем запись уведомления
             notification = Notification(
                 notification_type=self.TYPE_BOOKING_CANCELLED,
                 subject=subject,
                 message=html_content,
-                scheduled_at=None,  # Немедленная отправка
+                scheduled_at=None,
                 status_id=pending_status.id,
                 user_id=user.id,
-                created_by_id=None  # Системное уведомление
+                created_by_id=None
             )
 
             self.db.add(notification)
@@ -127,7 +132,7 @@ class NotificationService:
                 sent_status = self._get_status_by_name("sent")
                 if sent_status:
                     notification.status_id = sent_status.id
-                    notification.sent_at = datetime.utcnow()
+                    notification.sent_at = datetime.now()
                     self.db.commit()
             else:
                 # Обновляем статус на "failed"
@@ -144,6 +149,101 @@ class NotificationService:
             self.db.rollback()
             result["message"] = f"Ошибка: {str(e)}"
             logger.error(f"Ошибка при отправке уведомления об отмене бронирования: {e}")
+
+        return result
+
+    def send_booking_reminder_notification(self, booking_id: int) -> Dict[str, Any]:
+        """
+        Отправка напоминания о предстоящем бронировании
+
+        Args:
+            booking_id: ID бронирования
+
+        Returns:
+            Результат отправки
+        """
+        result = {
+            "success": False,
+            "message": "",
+            "notification_id": None,
+            "email_sent": False
+        }
+
+        try:
+            # Получаем бронирование
+            booking = self.db.query(Booking).filter(Booking.id == booking_id).first()
+            if not booking:
+                result["message"] = f"Бронирование {booking_id} не найдено"
+                return result
+
+            # Получаем связанные данные
+            user = self.db.query(Account).filter(Account.id == booking.account_id).first()
+            workspace = self.db.query(Workspace).filter(Workspace.id == booking.workspace_id).first()
+            room = self.db.query(Room).filter(Room.id == workspace.room_id).first() if workspace else None
+
+            if not user or not workspace or not room:
+                result["message"] = "Недостаточно данных для отправки уведомления"
+                return result
+
+            if not user.email:
+                result["message"] = "У пользователя нет email"
+                logger.warning(f"У пользователя {user.id} нет email для напоминания")
+                return result
+
+            # Получаем статус "pending"
+            pending_status = self._get_or_create_pending_status()
+
+            # Создаем HTML письмо
+            html_content = self.email_service.create_booking_reminder_html(
+                user_name=self._get_user_name(user),
+                workspace_name=workspace.name,
+                room_name=room.name,
+                room_address=room.address or "Не указан",
+                booking_date=booking.booking_date.isoformat() if booking.booking_date else "Н/Д"
+            )
+
+            subject = f"Напоминание: бронирование на {booking.booking_date}"
+
+            # Создаем уведомление
+            notification = Notification(
+                notification_type="booking_reminder",
+                subject=subject,
+                message=html_content,
+                scheduled_at=None,
+                status_id=pending_status.id,
+                user_id=user.id,
+                created_by_id=None
+            )
+
+            self.db.add(notification)
+            self.db.commit()
+            self.db.refresh(notification)
+
+            result["notification_id"] = notification.id
+
+            # Отправляем email
+            email_result = self.email_service.send_email(
+                to_email=user.email,
+                subject=subject,
+                html_content=html_content
+            )
+
+            if email_result["success"]:
+                result["email_sent"] = True
+                sent_status = self._get_status_by_name("sent")
+                if sent_status:
+                    notification.status_id = sent_status.id
+                    notification.sent_at = datetime.now()
+                    self.db.commit()
+
+            result["success"] = True
+            result["message"] = "Напоминание отправлено"
+            logger.info(f"Напоминание о бронировании {booking_id} отправлено пользователю {user.id}")
+
+        except Exception as e:
+            self.db.rollback()
+            result["message"] = f"Ошибка: {str(e)}"
+            logger.error(f"Ошибка при отправке напоминания: {e}")
 
         return result
 
@@ -262,7 +362,7 @@ class NotificationService:
                     sent_status = self._get_status_by_name("sent")
                     if sent_status:
                         notification.status_id = sent_status.id
-                        notification.sent_at = datetime.utcnow()
+                        notification.sent_at = datetime.now()
                         self.db.commit()
 
                     result["details"].append({
@@ -431,7 +531,7 @@ class NotificationService:
                     sent_status = self._get_status_by_name("sent")
                     if sent_status:
                         notification.status_id = sent_status.id
-                        notification.sent_at = datetime.utcnow()
+                        notification.sent_at = datetime.now()
                         self.db.commit()
 
                     result["details"].append({
@@ -559,7 +659,7 @@ class NotificationService:
         }
 
         try:
-            now = datetime.utcnow()
+            now = datetime.now()
 
             # Получаем статусы
             pending_status = self._get_status_by_name("pending")
