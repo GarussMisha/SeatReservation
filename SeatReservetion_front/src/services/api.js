@@ -715,4 +715,7 @@ export { notificationsAPI } from './notifications'
 // Room Objects API (экспорт для удобства)
 export { roomObjectsAPI } from './roomObjects'
 
+// Notification Settings API (экспорт для удобства)
+export { notificationSettingsAPI } from './notificationSettings'
+
 export default api
