@@ -12,16 +12,6 @@
     />
 
     <div class="dashboard-content-wrapper">
-      <!-- Фоновая декорация -->
-      <div class="background-decoration">
-        <div class="floating-shapes">
-          <div class="shape shape-1"></div>
-          <div class="shape shape-2"></div>
-          <div class="shape shape-3"></div>
-          <div class="shape shape-4"></div>
-        </div>
-      </div>
-
       <div class="dashboard-container">
         <main class="dashboard-main">
           <!-- Верхняя панель с выбором помещения и даты -->
@@ -453,13 +443,6 @@ onMounted(async () => {
   position: relative;
   overflow: hidden;
   padding-top: 100px;
-}
-
-.dashboard-content-wrapper {
-  flex: 1;
-  position: relative;
-  z-index: 10;
-  min-height: calc(100vh - 180px);
 }
 
 .background-decoration {
