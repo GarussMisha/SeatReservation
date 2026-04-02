@@ -12,7 +12,7 @@ export const notificationSettingsAPI = {
    */
   async getMySettings() {
     try {
-      const response = await api.get('/notification-settings/my/settings')
+      const response = await api.get('/api/v1/notification-settings/my/settings')
       return response.data
     } catch (error) {
       console.error('Ошибка получения настроек уведомлений:', error)
@@ -29,7 +29,7 @@ export const notificationSettingsAPI = {
    */
   async updateMySettings(data) {
     try {
-      const response = await api.put('/notification-settings/my/settings', data)
+      const response = await api.put('/api/v1/notification-settings/my/settings', data)
       return response.data
     } catch (error) {
       console.error('Ошибка обновления настроек уведомлений:', error)
@@ -43,7 +43,7 @@ export const notificationSettingsAPI = {
    */
   async getNotificationSettings() {
     try {
-      const response = await api.get('/notification-settings/admin/notification-settings')
+      const response = await api.get('/api/v1/notification-settings/admin/notification-settings')
       return response.data
     } catch (error) {
       console.error('Ошибка получения настроек SMTP:', error)
@@ -58,7 +58,7 @@ export const notificationSettingsAPI = {
    */
   async updateNotificationSettings(data) {
     try {
-      const response = await api.put('/notification-settings/admin/notification-settings', data)
+      const response = await api.put('/api/v1/notification-settings/admin/notification-settings', data)
       return response.data
     } catch (error) {
       console.error('Ошибка обновления настроек SMTP:', error)
@@ -73,7 +73,7 @@ export const notificationSettingsAPI = {
    */
   async testNotificationSettings(testEmail) {
     try {
-      const response = await api.post('/notification-settings/admin/notification-settings/test', {
+      const response = await api.post('/api/v1/notification-settings/admin/notification-settings/test', {
         test_email: testEmail
       })
       return response.data
