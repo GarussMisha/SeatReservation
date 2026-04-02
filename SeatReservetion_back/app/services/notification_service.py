@@ -14,6 +14,7 @@ from app.models.booking import Booking
 from app.models.workspace import Workspace
 from app.models.room import Room
 from app.models.status import Status
+from app.models.user_notification_settings import UserNotificationSettings
 from app.services.notification_templates import (
     get_booking_cancelled_data,
     get_workspace_disabled_data,
@@ -95,6 +96,25 @@ class NotificationService:
                 result["message"] = "Недостаточно данных для отправки уведомления"
                 return result
 
+            # Проверяем настройки уведомлений пользователя
+            user_settings = user.notification_settings
+            if not user_settings:
+                # Если настроек нет, создаём по умолчанию (включены)
+                user_settings = UserNotificationSettings(
+                    user_id=user.id,
+                    email_enabled=True,
+                    site_enabled=True
+                )
+                db.add(user_settings)
+                db.commit()
+            
+            # Если оба типа уведомлений отключены, не создаём уведомление
+            if not user_settings.email_enabled and not user_settings.site_enabled:
+                logger.info(f"Пользователь {user.id} отключил все уведомления. Уведомление не создано.")
+                result["success"] = True
+                result["message"] = "Уведомления отключены пользователем"
+                return result
+
             if not user.email:
                 result["message"] = "У пользователя нет email"
                 logger.warning(f"У пользователя {user.id} нет email для уведомления")
@@ -123,37 +143,39 @@ class NotificationService:
 
             subject = f"Бронирование отменено: {workspace.name}"
 
-            # Создаем уведомление (сохраняем JSON в БД)
-            notification = Notification(
-                notification_type=self.TYPE_BOOKING_CANCELLED,
-                subject=subject,
-                message=json.dumps(notification_data, ensure_ascii=False),  # JSON вместо HTML
-                scheduled_at=None,
-                status_id=pending_status.id,
-                user_id=user.id,
-                created_by_id=None
-            )
+            # Создаем уведомление в БД только если включены site уведомления
+            if user_settings.site_enabled:
+                notification = Notification(
+                    notification_type=self.TYPE_BOOKING_CANCELLED,
+                    subject=subject,
+                    message=json.dumps(notification_data, ensure_ascii=False),
+                    scheduled_at=None,
+                    status_id=pending_status.id,
+                    user_id=user.id,
+                    created_by_id=None
+                )
 
-            self.db.add(notification)
-            self.db.commit()
-            self.db.refresh(notification)
+                self.db.add(notification)
+                self.db.commit()
+                self.db.refresh(notification)
 
-            result["notification_id"] = notification.id
+                result["notification_id"] = notification.id
 
-            # Отправляем email
-            email_result = self.email_service.send_email(
-                to_email=user.email,
-                subject=subject,
-                html_content=html_content
-            )
+            # Отправляем email только если включены email уведомления
+            if user_settings.email_enabled:
+                email_result = self.email_service.send_email(
+                    to_email=user.email,
+                    subject=subject,
+                    html_content=html_content
+                )
 
-            if email_result["success"]:
-                result["email_sent"] = True
-                sent_status = self._get_status_by_name("sent")
-                if sent_status:
-                    notification.status_id = sent_status.id
-                    notification.sent_at = datetime.now()
-                    self.db.commit()
+                if email_result["success"]:
+                    result["email_sent"] = True
+                    sent_status = self._get_status_by_name("sent")
+                    if sent_status:
+                        notification.status_id = sent_status.id
+                        notification.sent_at = datetime.now()
+                        self.db.commit()
 
             result["success"] = True
             result["message"] = "Уведомление обработано"
