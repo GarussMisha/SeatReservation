@@ -15,6 +15,7 @@ from app.api.v1.routes.sync import router as sync_router
 from app.api.v1.routes.status import router as status_router
 from app.api.v1.routes.notification import router as notification_router
 from app.api.v1.routes.room_object import router as room_object_router
+from app.api.v1.routes.notification_settings import router as notification_settings_router
 
 # Создаем главный роутер API v1
 api_router = APIRouter()
@@ -28,3 +29,4 @@ api_router.include_router(sync_router, prefix="/sync", tags=["sync"])
 api_router.include_router(status_router, prefix="/statuses", tags=["statuses"])
 api_router.include_router(notification_router, prefix="/notifications", tags=["notifications"])
 api_router.include_router(room_object_router, prefix="/rooms", tags=["room-objects"])
+api_router.include_router(notification_settings_router, prefix="", tags=["notification-settings"])
