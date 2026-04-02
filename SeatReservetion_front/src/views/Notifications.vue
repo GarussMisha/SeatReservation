@@ -351,6 +351,11 @@ const getNotificationText = (message) => {
     // Пытаемся распарсить JSON (новый формат)
     const data = typeof message === 'string' ? JSON.parse(message) : message
     
+    // Если это объект с данными — возвращаем null (будет обработано в isJsonNotification)
+    if (data && typeof data === 'object' && data.title !== undefined) {
+      return null
+    }
+    
     // Формируем текст из структурированных данных
     let text = `${data.title}\n\n`
     
@@ -381,8 +386,24 @@ const getNotificationText = (message) => {
 
     return text
   } catch (e) {
-    // Если не JSON, возвращаем как есть (старый формат)
-    return message.length > 300 ? message.substring(0, 300) + '...' : message
+    // Если не JSON, значит это старый HTML формат — удаляем теги
+    let text = message
+    
+    // Удаляем HTML теги
+    text = text.replace(/<[^>]*>/g, ' ')
+    
+    // Заменяем HTML entities
+    text = text.replace(/&nbsp;/g, ' ')
+    text = text.replace(/&amp;/g, '&')
+    text = text.replace(/&lt;/g, '<')
+    text = text.replace(/&gt;/g, '>')
+    text = text.replace(/&quot;/g, '"')
+    text = text.replace(/&#39;/g, "'")
+    
+    // Удаляем множественные пробелы
+    text = text.replace(/\s+/g, ' ').trim()
+    
+    return text.length > 300 ? text.substring(0, 300) + '...' : text
   }
 }
 
