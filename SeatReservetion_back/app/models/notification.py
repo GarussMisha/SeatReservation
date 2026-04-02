@@ -37,7 +37,6 @@ class Notification(BaseModel):
     user = relationship("Account", back_populates="notifications", foreign_keys=[user_id])
     creator = relationship("Account", back_populates="created_notifications", foreign_keys=[created_by_id])
     status = relationship("Status", back_populates="notifications")
-    user_settings = relationship("UserNotificationSettings", back_populates="user", foreign_keys=[user_id], viewonly=True)
 
     def __repr__(self):
         return f"<Notification(id={self.id}, type={self.notification_type}, status={self.status.name if self.status else 'N/A'})>"
