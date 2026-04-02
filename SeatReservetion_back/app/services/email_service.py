@@ -119,58 +119,6 @@ class EmailService:
 
         return result
 
-    def send_email_batch(
-        self,
-        recipients: List[Dict[str, str]],
-        subject: str,
-        html_content: str,
-        text_content: Optional[str] = None
-    ) -> Dict[str, Any]:
-        """
-        Массовая рассылка email
-
-        Args:
-            recipients: Список получателей [{"email": "...", "name": "..."}, ...]
-            subject: Тема письма
-            html_content: HTML содержимое письма
-            text_content: Текстовое содержимое (опционально)
-
-        Returns:
-            Словарь с результатами рассылки
-        """
-        results = {
-            "total": len(recipients),
-            "success": 0,
-            "failed": 0,
-            "details": []
-        }
-
-        for recipient in recipients:
-            email = recipient.get("email")
-            if not email:
-                results["failed"] += 1
-                results["details"].append({
-                    "email": email,
-                    "success": False,
-                    "message": "Email не указан"
-                })
-                continue
-
-            result = self.send_email(email, subject, html_content, text_content)
-
-            if result["success"]:
-                results["success"] += 1
-            else:
-                results["failed"] += 1
-
-            results["details"].append({
-                "email": email,
-                "success": result["success"],
-                "message": result["message"]
-            })
-
-        return results
-
 
 # Singleton экземпляр сервиса
 email_service = EmailService()

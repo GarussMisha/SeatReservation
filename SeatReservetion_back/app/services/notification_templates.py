@@ -6,7 +6,28 @@ Notification Templates - шаблоны уведомлений для систе
 - Функции для генерации HTML (для email)
 """
 from typing import Dict, List, Any
-from datetime import date
+
+
+# =============================================================================
+# БАЗОВЫЕ ДАННЫЕ (единый источник истины)
+# =============================================================================
+
+def get_base_booking_data(
+    workspace_name: str,
+    room_address: str,
+    booking_date: str
+) -> Dict[str, Any]:
+    """
+    Базовые данные для всех уведомлений о бронировании
+    
+    Returns:
+        Словарь с общими данными
+    """
+    return {
+        "workspace_name": workspace_name,
+        "room_address": room_address,
+        "booking_date": booking_date
+    }
 
 
 # =============================================================================
@@ -26,6 +47,8 @@ def get_booking_cancelled_data(
     Returns:
         Словарь с данными для отображения
     """
+    base_data = get_base_booking_data(workspace_name, room_address, booking_date)
+    
     return {
         "type": "booking_cancelled",
         "title": "Бронирование отменено!",
@@ -33,9 +56,9 @@ def get_booking_cancelled_data(
         "greeting": f"Здравствуйте, {user_name}!",
         "message": "Ваше бронирование было отменено.",
         "items": [
-            {"icon": "🪑", "label": "Место", "value": workspace_name},
-            {"icon": "🏢", "label": "Помещение", "value": room_address},
-            {"icon": "📅", "label": "Дата", "value": booking_date},
+            {"icon": "🪑", "label": "Место", "value": base_data["workspace_name"]},
+            {"icon": "🏢", "label": "Помещение", "value": base_data["room_address"]},
+            {"icon": "📅", "label": "Дата", "value": base_data["booking_date"]},
             {"icon": "⚠️", "label": "Причина", "value": reason}
         ],
         "footer": "Если у вас возникли вопросы, пожалуйста, обратитесь к администратору системы."
@@ -54,6 +77,8 @@ def get_workspace_disabled_data(
     Returns:
         Словарь с данными для отображения
     """
+    base_data = get_base_booking_data(workspace_name, room_address, booking_date)
+    
     return {
         "type": "workspace_disabled",
         "title": "Рабочее место недоступно!",
@@ -61,9 +86,9 @@ def get_workspace_disabled_data(
         "greeting": f"Здравствуйте, {user_name}!",
         "message": "Рабочее место, которое вы забронировали, стало недоступно. Ваше бронирование было отменено.",
         "items": [
-            {"icon": "🪑", "label": "Место", "value": workspace_name},
-            {"icon": "🏢", "label": "Помещение", "value": room_address},
-            {"icon": "📅", "label": "Дата", "value": booking_date}
+            {"icon": "🪑", "label": "Место", "value": base_data["workspace_name"]},
+            {"icon": "🏢", "label": "Помещение", "value": base_data["room_address"]},
+            {"icon": "📅", "label": "Дата", "value": base_data["booking_date"]}
         ],
         "footer": "Пожалуйста, выберите другое рабочее место в системе бронирования."
     }
@@ -119,6 +144,8 @@ def get_booking_reminder_data(
     Returns:
         Словарь с данными для отображения
     """
+    base_data = get_base_booking_data(workspace_name, room_address, booking_date)
+    
     return {
         "type": "booking_reminder",
         "title": "Напоминание о бронировании!",
@@ -126,9 +153,9 @@ def get_booking_reminder_data(
         "greeting": f"Здравствуйте, {user_name}!",
         "message": "Напоминаем вам о предстоящем бронировании рабочего места.",
         "items": [
-            {"icon": "🪑", "label": "Место", "value": workspace_name},
-            {"icon": "🏢", "label": "Помещение", "value": room_address},
-            {"icon": "📅", "label": "Дата", "value": booking_date}
+            {"icon": "🪑", "label": "Место", "value": base_data["workspace_name"]},
+            {"icon": "🏢", "label": "Помещение", "value": base_data["room_address"]},
+            {"icon": "📅", "label": "Дата", "value": base_data["booking_date"]}
         ],
         "footer": "Желаем продуктивного дня!"
     }
