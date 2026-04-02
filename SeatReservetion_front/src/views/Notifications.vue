@@ -116,7 +116,27 @@
 
               <div class="notification-body">
                 <h3 class="notification-title">{{ notification.subject }}</h3>
-                <div v-if="notification.message" class="notification-message">{{ getNotificationText(notification.message) }}</div>
+                
+                <!-- Отображение структурированных данных -->
+                <div v-if="isJsonNotification(notification.message)" class="notification-structured">
+                  <div class="notification-greeting">{{ getNotificationGreeting(notification.message) }}</div>
+                  <div class="notification-main-text">{{ getNotificationMessage(notification.message) }}</div>
+                  
+                  <div class="notification-items">
+                    <div v-for="(item, index) in getNotificationItems(notification.message)" :key="index" class="notification-item">
+                      <span class="item-icon">{{ item.icon }}</span>
+                      <span class="item-label">{{ item.label }}:</span>
+                      <span class="item-value">{{ item.value }}</span>
+                    </div>
+                  </div>
+                  
+                  <div v-if="getNotificationFooter(notification.message)" class="notification-footer-text">
+                    {{ getNotificationFooter(notification.message) }}
+                  </div>
+                </div>
+                
+                <!-- Старый формат (текст) -->
+                <div v-else class="notification-message">{{ getNotificationText(notification.message) }}</div>
               </div>
 
               <div class="notification-footer">
@@ -364,6 +384,47 @@ const getNotificationText = (message) => {
     // Если не JSON, возвращаем как есть (старый формат)
     return message.length > 300 ? message.substring(0, 300) + '...' : message
   }
+}
+
+// Новые функции для структурированного отображения
+
+const isJsonNotification = (message) => {
+  if (!message) return false
+  try {
+    const data = typeof message === 'string' ? JSON.parse(message) : message
+    return data && typeof data === 'object' && data.title !== undefined
+  } catch (e) {
+    return false
+  }
+}
+
+const getNotificationData = (message) => {
+  if (!message) return null
+  try {
+    return typeof message === 'string' ? JSON.parse(message) : message
+  } catch (e) {
+    return null
+  }
+}
+
+const getNotificationGreeting = (message) => {
+  const data = getNotificationData(message)
+  return data?.greeting || ''
+}
+
+const getNotificationMessage = (message) => {
+  const data = getNotificationData(message)
+  return data?.message || ''
+}
+
+const getNotificationItems = (message) => {
+  const data = getNotificationData(message)
+  return data?.items || []
+}
+
+const getNotificationFooter = (message) => {
+  const data = getNotificationData(message)
+  return data?.footer || ''
 }
 
 onMounted(async () => {
@@ -721,6 +782,66 @@ onMounted(async () => {
   font-size: 0.95rem;
   line-height: 1.6;
   white-space: pre-wrap;  /* Сохраняет переносы строк */
+}
+
+/* Структурированное отображение уведомлений */
+.notification-structured {
+  color: #4b5563;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.notification-greeting {
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+}
+
+.notification-main-text {
+  margin-bottom: 1rem;
+  color: #4b5563;
+}
+
+.notification-items {
+  background-color: #f9fafb;
+  border-left: 3px solid #667eea;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.notification-item:last-child {
+  margin-bottom: 0;
+}
+
+.item-icon {
+  font-size: 1.1rem;
+  min-width: 1.5rem;
+}
+
+.item-label {
+  font-weight: 600;
+  color: #555;
+  min-width: 120px;
+}
+
+.item-value {
+  color: #333;
+  flex: 1;
+}
+
+.notification-footer-text {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 0.9rem;
 }
 
 .notification-footer {
