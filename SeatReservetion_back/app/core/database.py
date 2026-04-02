@@ -51,6 +51,7 @@ def create_tables():
         # Импортируем модели здесь, чтобы избежать циклических импортов
         from app.models import Account, Status, Room, Workspace, Booking, Notification
         from app.models import RoomObject, WorkspaceOnPlan, Wall, Door, Window
+        from app.models import NotificationSettings, UserNotificationSettings
         Base.metadata.create_all(bind=engine)
     except Exception as e:
         print(f"Ошибка при создании таблиц: {e}")
@@ -70,38 +71,56 @@ def drop_tables():
 # Функция для заполнения стандартных данных
 def initialize_data():
     """Заполнение базы данных стандартными данными (статусы и др.)"""
-    from app.models import Status
+    from app.models import Status, NotificationSettings
     from app.core.config import AppConstants
-    
+
     db = SessionLocal()
     try:
         # Проверяем, есть ли уже статусы
         existing_statuses = db.query(Status).count()
         if existing_statuses > 0:
             print(f"ℹ️  В базе данных уже есть {existing_statuses} статусов, пропускаем инициализацию")
-            return
-        
-        # Создаем стандартные статусы
-        default_statuses = AppConstants.DEFAULT_STATUSES
-        created_count = 0
-        
-        for status_key, status_name in default_statuses.items():
-            # Проверяем, существует ли уже такой статус
-            existing = db.query(Status).filter(Status.name == status_key).first()
-            if not existing:
-                new_status = Status(
-                    name=status_key,
-                    description=status_name
-                )
-                db.add(new_status)
-                created_count += 1
-        
-        if created_count > 0:
-            db.commit()
-            print(f"✅ Создано {created_count} стандартных статусов")
         else:
-            print("✅ Стандартные статусы уже существуют")
+            # Создаем стандартные статусы
+            default_statuses = AppConstants.DEFAULT_STATUSES
+            created_count = 0
+
+            for status_key, status_name in default_statuses.items():
+                # Проверяем, существует ли уже такой статус
+                existing = db.query(Status).filter(Status.name == status_key).first()
+                if not existing:
+                    new_status = Status(
+                        name=status_key,
+                        description=status_name
+                    )
+                    db.add(new_status)
+                    created_count += 1
+
+            if created_count > 0:
+                db.commit()
+                print(f"✅ Создано {created_count} стандартных статусов")
+            else:
+                print("✅ Стандартные статусы уже существуют")
         
+        # Создаем настройки уведомлений по умолчанию
+        existing_settings = db.query(NotificationSettings).first()
+        if not existing_settings:
+            default_settings = NotificationSettings(
+                smtp_host="smtp.resend.com",
+                smtp_port=465,
+                smtp_user="resend",
+                smtp_password="",  # Пустой пароль - нужно настроить
+                smtp_from_email="onboarding@resend.dev",
+                smtp_from_name="Seat Reservation System",
+                smtp_use_tls=True,
+                email_notifications_enabled=True
+            )
+            db.add(default_settings)
+            db.commit()
+            print("✅ Настройки уведомлений по умолчанию созданы")
+        else:
+            print("ℹ️  Настройки уведомлений уже существуют")
+
     except Exception as e:
         db.rollback()
         print(f"❌ Ошибка при инициализации данных: {e}")

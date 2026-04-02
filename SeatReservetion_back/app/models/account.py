@@ -41,6 +41,9 @@ class Account(BaseModel):
 
     # Отношения к уведомлениям (как создатель/админ)
     created_notifications = relationship("Notification", back_populates="creator", foreign_keys="Notification.created_by_id")
+    
+    # Отношение к настройкам уведомлений
+    notification_settings = relationship("UserNotificationSettings", back_populates="user", uselist=False)
 
     # Ограничения
     __table_args__ = (

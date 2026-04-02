@@ -5,6 +5,8 @@ from app.core.base import Base
 from .account import Account
 from .booking import Booking
 from .notification import Notification
+from .notification_settings import NotificationSettings
+from .user_notification_settings import UserNotificationSettings
 from .room import Room
 from .status import Status
 from .workspace import Workspace
@@ -19,6 +21,8 @@ __all__ = [
     "Account",
     "Booking",
     "Notification",
+    "NotificationSettings",
+    "UserNotificationSettings",
     "Room",
     "Status",
     "Workspace",
