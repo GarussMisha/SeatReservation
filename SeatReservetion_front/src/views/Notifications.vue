@@ -411,8 +411,13 @@ const getNotificationText = (message) => {
 
 const isJsonNotification = (message) => {
   if (!message) return false
+  // message уже может быть объектом (распарсен на backend)
+  if (typeof message === 'object') {
+    return message && message.title !== undefined
+  }
+  // Или строкой JSON
   try {
-    const data = typeof message === 'string' ? JSON.parse(message) : message
+    const data = JSON.parse(message)
     return data && typeof data === 'object' && data.title !== undefined
   } catch (e) {
     return false
@@ -421,8 +426,13 @@ const isJsonNotification = (message) => {
 
 const getNotificationData = (message) => {
   if (!message) return null
+  // Если уже объект
+  if (typeof message === 'object') {
+    return message
+  }
+  // Если строка JSON
   try {
-    return typeof message === 'string' ? JSON.parse(message) : message
+    return JSON.parse(message)
   } catch (e) {
     return null
   }

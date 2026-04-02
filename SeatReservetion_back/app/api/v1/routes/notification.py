@@ -36,12 +36,21 @@ def format_notification_response(notification: Notification) -> Dict[str, Any]:
         Словарь с отформатированными данными
     """
     from datetime import timezone
-    
+    import json
+
+    # Пытаемся распарсить message как JSON (новый формат)
+    message_data = notification.message
+    try:
+        message_data = json.loads(notification.message)
+    except (json.JSONDecodeError, TypeError):
+        # Если не JSON, оставляем как есть (старый формат или текст)
+        pass
+
     return {
         "id": notification.id,
         "notification_type": notification.notification_type,
         "subject": notification.subject,
-        "message": notification.message,
+        "message": message_data,  # JSON объект или строка
         "scheduled_at": notification.scheduled_at.replace(tzinfo=timezone.utc).isoformat() if notification.scheduled_at else None,
         "sent_at": notification.sent_at.replace(tzinfo=timezone.utc).isoformat() if notification.sent_at else None,
         "created_at": notification.created_at.replace(tzinfo=timezone.utc).isoformat() if notification.created_at else None,
