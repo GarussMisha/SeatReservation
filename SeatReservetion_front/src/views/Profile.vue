@@ -204,6 +204,9 @@
           </div>
         </section>
 
+        <!-- Настройки уведомлений -->
+        <NotificationSettings />
+
       </div>
     </main>
   </div>
@@ -215,6 +218,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { authAPI, bookingsAPI } from '../services/api'
+import NotificationSettings from '../components/profile/NotificationSettings.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
